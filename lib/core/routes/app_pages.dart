@@ -8,6 +8,8 @@ import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_view.dart';
 import '../../features/login/bindings/login_binding.dart';
 import '../../features/login/views/login_view.dart';
+import '../../features/onboarding/bindings/onboarding_binding.dart';
+import '../../features/onboarding/views/onboarding_view.dart';
 import '../../features/profile/bindings/profile_binding.dart';
 import '../../features/profile/views/profile_view.dart';
 import '../../features/savings/bindings/savings_binding.dart';
@@ -43,6 +45,11 @@ class AppPages {
       name: AppRoutes.login,
       page: () => const LoginView(),
       binding: LoginBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.onboarding,
+      page: () => const OnboardingView(),
+      binding: OnboardingBinding(),
     ),
     GetPage(
       name: AppRoutes.profile,

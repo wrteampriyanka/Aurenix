@@ -1,13 +1,185 @@
-import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
-class AppButton extends StatelessWidget {
-  const AppButton({super.key, required this.label, this.onPressed});
+import 'package:flutter/material.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+
+import '../../core/theme/app_colors.dart';
+import '../../utils/elapsed_time_mixin.dart';
+import 'custom_text.dart';
+
+/// Primary pill button with a leading animated circular icon.
+/// Colours and text style are fixed; only [label], [icon] and [onPressed] vary.
+///
+/// While enabled, the leading circle emits a soft ripple ring and the icon
+/// nudges forward; the whole button scales down slightly while pressed.
+class AppButton extends StatefulWidget {
+  const AppButton({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.icon = PhosphorIconsRegular.arrowRight,
+    this.height = 58,
+  });
 
   final String label;
   final VoidCallback? onPressed;
+  final IconData icon;
+  final double height;
+
+  @override
+  State<AppButton> createState() => _AppButtonState();
+}
+
+class _AppButtonState extends State<AppButton>
+    with SingleTickerProviderStateMixin, ElapsedTimeMixin {
+  static const double _circleSize = 26;
+
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed != value) setState(() => _pressed = value);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(onPressed: onPressed, child: Text(label));
+    final enabled = widget.onPressed != null;
+    final radius = BorderRadius.circular(widget.height / 2);
+
+    return AnimatedScale(
+      scale: _pressed ? 0.97 : 1,
+      duration: const Duration(milliseconds: 120),
+      curve: Curves.easeOut,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.5,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            border: Border.all(color: context.color.buttonBorder),
+            gradient: RadialGradient(
+              center: const Alignment(-0.7, -1.4),
+              radius: 1.6,
+              colors: [context.color.buttonHighlight, context.color.primary],
+              stops: const [0, 0.55],
+            ),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: radius,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: widget.onPressed,
+              onTapDown: enabled ? (_) => _setPressed(true) : null,
+              onTapUp: enabled ? (_) => _setPressed(false) : null,
+              onTapCancel: () => _setPressed(false),
+              child: SizedBox(
+                height: widget.height,
+                width: double.infinity,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _AnimatedIconCircle(
+                      time: time,
+                      animate: enabled,
+                      size: _circleSize,
+                      icon: widget.icon,
+                    ),
+                    const SizedBox(width: 18),
+                    Flexible(
+                      child: CustomText(
+                        widget.label,
+                        maxLines: 1,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        color: context.color.textNatural,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
+}
+
+class _AnimatedIconCircle extends StatelessWidget {
+  const _AnimatedIconCircle({
+    required this.time,
+    required this.animate,
+    required this.size,
+    required this.icon,
+  });
+
+  final ValueNotifier<double> time;
+  final bool animate;
+  final double size;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final circle = Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: context.color.primaryShade50,
+        shape: BoxShape.circle,
+      ),
+      child: animate
+          ? ValueListenableBuilder<double>(
+              valueListenable: time,
+              builder: (_, t, child) => Transform.translate(
+                // Quick nudge forward, then rest.
+                offset: Offset(
+                  math.pow(math.max(0.0, math.sin(t * 3)), 3) * 2.5,
+                  0,
+                ),
+                child: child,
+              ),
+              child: Icon(icon, size: 18, color: context.color.primary),
+            )
+          : Icon(icon, size: 18, color: context.color.primary),
+    );
+
+    if (!animate) return circle;
+
+    return CustomPaint(
+      painter: _RipplePainter(time: time, color: context.color.primaryShade50),
+      child: circle,
+    );
+  }
+}
+
+/// Two staggered rings that expand out of the icon circle and fade.
+class _RipplePainter extends CustomPainter {
+  _RipplePainter({required this.time, required this.color})
+    : super(repaint: time);
+
+  final ValueNotifier<double> time;
+  final Color color;
+
+  static const double _period = 1.8;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final base = size.width / 2;
+
+    for (final offset in const [0.0, 0.5]) {
+      final progress = ((time.value / _period) + offset) % 1;
+      final eased = Curves.easeOut.transform(progress);
+      canvas.drawCircle(
+        center,
+        base + eased * base * 0.9,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5 * (1 - progress) + 0.5
+          ..color = color.withValues(alpha: 0.6 * (1 - progress)),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RipplePainter oldDelegate) => oldDelegate.color != color;
 }

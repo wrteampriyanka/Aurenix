@@ -7,21 +7,19 @@ class AppTheme {
 
   static const String fontFamily = 'Space Grotesk';
 
+  static const AppColors _colors = AppColors.instance;
+
   static ThemeData get light => ThemeData(
     useMaterial3: true,
     fontFamily: fontFamily,
+    scaffoldBackgroundColor: _colors.backgroundPrimary,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
+      seedColor: _colors.primary,
+      primary: _colors.primary,
+      secondary: _colors.secondary,
+      error: _colors.error,
+      surface: _colors.backgroundPrimary,
       brightness: Brightness.light,
-    ),
-  );
-
-  static ThemeData get dark => ThemeData(
-    useMaterial3: true,
-    fontFamily: fontFamily,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.dark,
     ),
   );
 }

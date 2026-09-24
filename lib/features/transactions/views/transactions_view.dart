@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../commons/widgets/custom_text.dart';
 import '../controllers/transactions_controller.dart';
 
 class TransactionsView extends GetView<TransactionsController> {
@@ -9,8 +10,8 @@ class TransactionsView extends GetView<TransactionsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Transactions')),
-      body: const Center(child: Text('Transactions')),
+      appBar: AppBar(title: const CustomText('Transactions')),
+      body: const Center(child: CustomText('Transactions')),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../commons/widgets/custom_text.dart';
 import '../controllers/budget_controller.dart';
 
 class BudgetView extends GetView<BudgetController> {
@@ -9,8 +10,8 @@ class BudgetView extends GetView<BudgetController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Budget')),
-      body: const Center(child: Text('Budget')),
+      appBar: AppBar(title: const CustomText('Budget')),
+      body: const Center(child: CustomText('Budget')),
     );
   }
 }
