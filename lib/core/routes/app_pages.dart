@@ -12,6 +12,8 @@ import '../../features/profile/bindings/profile_binding.dart';
 import '../../features/profile/views/profile_view.dart';
 import '../../features/savings/bindings/savings_binding.dart';
 import '../../features/savings/views/savings_view.dart';
+import '../../features/splash/bindings/splash_binding.dart';
+import '../../features/splash/views/splash_view.dart';
 import '../../features/transactions/bindings/transactions_binding.dart';
 import '../../features/transactions/views/transactions_view.dart';
 import 'app_routes.dart';
@@ -19,7 +21,7 @@ import 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const initial = AppRoutes.login;
+  static const initial = AppRoutes.splash;
 
   static final routes = <GetPage>[
     GetPage(
@@ -51,6 +53,11 @@ class AppPages {
       name: AppRoutes.savings,
       page: () => const SavingsView(),
       binding: SavingsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.splash,
+      page: () => const SplashView(),
+      binding: SplashBinding(),
     ),
     GetPage(
       name: AppRoutes.transactions,

@@ -7,5 +7,6 @@ abstract class AppRoutes {
   static const login = '/login';
   static const profile = '/profile';
   static const savings = '/savings';
+  static const splash = '/splash';
   static const transactions = '/transactions';
 }
