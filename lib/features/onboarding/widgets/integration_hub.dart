@@ -1,3 +1,5 @@
+import 'dart:ui' show PathMetric;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -188,26 +190,39 @@ class _ConnectorPainter extends CustomPainter {
   /// Seconds for a pulse to travel one connector.
   static const double _period = 2.4;
 
+  // Paths and their metrics only depend on size, so they are measured once
+  // instead of on every animation frame.
+  Size? _cachedSize;
+  List<Path> _paths = const [];
+  List<PathMetric> _metrics = const [];
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paths = _connectorPaths(size);
+    if (size != _cachedSize) {
+      _cachedSize = size;
+      _paths = _connectorPaths(size);
+      _metrics = [for (final p in _paths) p.computeMetrics().first];
+    }
 
     final linePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1
       ..color = lineColor;
-    for (final path in paths) {
+    for (final path in _paths) {
       canvas.drawPath(path, linePaint);
     }
 
-    // Travelling pulses, staggered per connector.
-    final glowPaint = Paint()
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    // Travelling pulses, staggered per connector. The soft halo is a radial
+    // gradient rather than a blur mask filter, which is far cheaper per frame.
+    const glowRadius = 5.0;
+    final glowPaint = Paint();
     final dotPaint = Paint();
-    for (var i = 0; i < paths.length; i++) {
-      final metric = paths[i].computeMetrics().first;
-      final progress = ((time.value / _period) + i / paths.length) % 1;
-      final tangent = metric.getTangentForOffset(metric.length * progress);
+    for (var i = 0; i < _metrics.length; i++) {
+      final metric = _metrics[i];
+      final progress = ((time.value / _period) + i / _metrics.length) % 1;
+      final tangent = metric.getTangentForOffset(
+        metric.length * Curves.easeInOut.transform(progress),
+      );
       if (tangent == null) continue;
 
       // Fade in at the start and out on arrival.
@@ -216,10 +231,16 @@ class _ConnectorPainter extends CustomPainter {
           : progress > 0.85
           ? (1 - progress) / 0.15
           : 1.0);
-      glowPaint.color = pulseColor.withValues(alpha: 0.6 * fade);
+      final p = tangent.position;
+      glowPaint.shader = RadialGradient(
+        colors: [
+          pulseColor.withValues(alpha: 0.6 * fade),
+          pulseColor.withValues(alpha: 0),
+        ],
+      ).createShader(Rect.fromCircle(center: p, radius: glowRadius));
       dotPaint.color = pulseColor.withValues(alpha: 0.9 * fade);
-      canvas.drawCircle(tangent.position, 4, glowPaint);
-      canvas.drawCircle(tangent.position, 1.5, dotPaint);
+      canvas.drawCircle(p, glowRadius, glowPaint);
+      canvas.drawCircle(p, 1.5, dotPaint);
     }
   }
 

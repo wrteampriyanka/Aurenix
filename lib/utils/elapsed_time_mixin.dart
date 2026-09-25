@@ -7,7 +7,8 @@ import 'package:flutter/widgets.dart';
 /// per frame. Unlike a repeating [AnimationController], time never wraps, so
 /// sine-based motion loops seamlessly at any speed.
 ///
-/// Respects the platform "reduce motion" setting.
+/// Respects the platform "reduce motion" setting unless
+/// [respectsReduceMotion] is overridden to return false.
 mixin ElapsedTimeMixin<T extends StatefulWidget>
     on SingleTickerProviderStateMixin<T> {
   final ValueNotifier<double> time = ValueNotifier<double>(0);
@@ -17,10 +18,15 @@ mixin ElapsedTimeMixin<T extends StatefulWidget>
         time.value = elapsed.inMicroseconds / Duration.microsecondsPerSecond,
   );
 
+  /// Whether the ticker stops when the platform asks to reduce motion.
+  bool get respectsReduceMotion => true;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final reduceMotion =
+        respectsReduceMotion &&
+        (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
     if (reduceMotion && _ticker.isActive) {
       _ticker.stop();
     } else if (!reduceMotion && !_ticker.isActive) {

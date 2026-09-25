@@ -9,6 +9,7 @@ import 'custom_text.dart';
 
 /// Primary pill button with a leading animated circular icon.
 /// Colours and text style are fixed; only [label], [icon] and [onPressed] vary.
+/// Pass `icon: null` for a plain text button without the leading circle.
 ///
 /// While enabled, the leading circle emits a soft ripple ring and the icon
 /// nudges forward; the whole button scales down slightly while pressed.
@@ -23,7 +24,7 @@ class AppButton extends StatefulWidget {
 
   final String label;
   final VoidCallback? onPressed;
-  final IconData icon;
+  final IconData? icon;
   final double height;
 
   @override
@@ -77,13 +78,15 @@ class _AppButtonState extends State<AppButton>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _AnimatedIconCircle(
-                      time: time,
-                      animate: enabled,
-                      size: _circleSize,
-                      icon: widget.icon,
-                    ),
-                    const SizedBox(width: 18),
+                    if (widget.icon case final icon?) ...[
+                      _AnimatedIconCircle(
+                        time: time,
+                        animate: enabled,
+                        size: _circleSize,
+                        icon: icon,
+                      ),
+                      const SizedBox(width: 18),
+                    ],
                     Flexible(
                       child: CustomText(
                         widget.label,
@@ -115,7 +118,7 @@ class _AnimatedIconCircle extends StatelessWidget {
   final ValueNotifier<double> time;
   final bool animate;
   final double size;
-  final IconData icon;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {

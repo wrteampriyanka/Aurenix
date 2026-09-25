@@ -6,12 +6,33 @@ import 'core/localization/app_translations.dart';
 import 'core/routes/app_pages.dart';
 import 'core/theme/app_theme.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final translations = await AppTranslations.load();
+  runApp(MyApp(translations: translations));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key, required this.translations});
+
+  final AppTranslations translations;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  /// Hot reload doesn't rerun [main], so reload the translation files here;
+  /// otherwise newly added keys show up as raw keys until a full restart.
+  @override
+  void reassemble() {
+    super.reassemble();
+    AppTranslations.load().then((translations) {
+      Get.clearTranslations();
+      Get.addTranslations(translations.keys);
+      Get.forceAppUpdate();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +40,7 @@ class MyApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      translations: AppTranslations(),
+      translations: widget.translations,
       locale: const Locale('en', 'US'),
       fallbackLocale: const Locale('en', 'US'),
       initialRoute: AppPages.initial,

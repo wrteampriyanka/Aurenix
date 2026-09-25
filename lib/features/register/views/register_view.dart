@@ -12,10 +12,10 @@ import '../../../commons/widgets/or_divider.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../controllers/login_controller.dart';
+import '../controllers/register_controller.dart';
 
-class LoginView extends GetView<LoginController> {
-  const LoginView({super.key});
+class RegisterView extends GetView<RegisterController> {
+  const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,23 +36,23 @@ class LoginView extends GetView<LoginController> {
                       const Spacer(),
                       _Header(),
                       const SizedBox(height: 28),
-                      _LoginForm(controller: controller),
+                      _RegisterForm(controller: controller),
                       const SizedBox(height: 24),
                       const OrDivider(),
                       const SizedBox(height: 24),
                       AppSocialButton(
                         label: 'continue_with_google'.tr,
                         logo: AppAssets.googleLogo,
-                        onPressed: controller.onGoogleLogin,
+                        onPressed: controller.onGoogleSignUp,
                       ),
                       const SizedBox(height: 14),
                       AppSocialButton(
                         label: 'continue_with_github'.tr,
                         logo: AppAssets.githubLogo,
-                        onPressed: controller.onGithubLogin,
+                        onPressed: controller.onGithubSignUp,
                       ),
                       const SizedBox(height: 28),
-                      _RegisterPrompt(controller: controller),
+                      _SignInPrompt(controller: controller),
                       const Spacer(),
                       const SizedBox(height: 32),
                       AppTermsFooter(
@@ -78,7 +78,7 @@ class _Header extends StatelessWidget {
     return Column(
       children: [
         CustomText(
-          'login_title'.tr,
+          'register_title'.tr,
           fontSize: 32,
           fontWeight: FontWeight.w700,
           textAlign: TextAlign.center,
@@ -86,7 +86,7 @@ class _Header extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         CustomText(
-          'login_subtitle'.tr,
+          'register_subtitle'.tr,
           fontSize: 16,
           textAlign: TextAlign.center,
           color: context.color.textBody,
@@ -96,10 +96,10 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _LoginForm extends StatelessWidget {
-  const _LoginForm({required this.controller});
+class _RegisterForm extends StatelessWidget {
+  const _RegisterForm({required this.controller});
 
-  final LoginController controller;
+  final RegisterController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +109,16 @@ class _LoginForm extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            AppTextField(
+              controller: controller.nameController,
+              hint: 'name_hint'.tr,
+              prefixIcon: PhosphorIconsRegular.userCircle,
+              keyboardType: TextInputType.name,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.name],
+              validator: Validators.required,
+            ),
+            const SizedBox(height: 16),
             AppTextField(
               controller: controller.emailController,
               hint: 'email_hint'.tr,
@@ -126,9 +136,9 @@ class _LoginForm extends StatelessWidget {
                 prefixIcon: PhosphorIconsRegular.lockSimpleOpen,
                 obscureText: controller.isPasswordHidden.value,
                 textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.password],
+                autofillHints: const [AutofillHints.newPassword],
                 validator: Validators.required,
-                onFieldSubmitted: (_) => controller.onLogin(),
+                onFieldSubmitted: (_) => controller.onCreateAccount(),
                 suffix: IconButton(
                   onPressed: controller.togglePasswordVisibility,
                   icon: Icon(
@@ -141,25 +151,11 @@ class _LoginForm extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: controller.onForgotPassword,
-                child: CustomText(
-                  'forgot_password'.tr,
-                  fontSize: 14,
-                  showUnderline: true,
-                  color: context.color.textBody,
-                  underlineOrLineColor: context.color.textBody,
-                ),
-              ),
-            ),
             const SizedBox(height: 16),
             AppButton(
-              label: 'continue_login'.tr,
+              label: 'create_account'.tr,
               height: 52,
-              onPressed: controller.onLogin,
+              onPressed: controller.onCreateAccount,
             ),
           ],
         ),
@@ -168,10 +164,10 @@ class _LoginForm extends StatelessWidget {
   }
 }
 
-class _RegisterPrompt extends StatelessWidget {
-  const _RegisterPrompt({required this.controller});
+class _SignInPrompt extends StatelessWidget {
+  const _SignInPrompt({required this.controller});
 
-  final LoginController controller;
+  final RegisterController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -182,10 +178,10 @@ class _RegisterPrompt extends StatelessWidget {
       color: context.color.textBody,
       textSpan: TextSpan(
         children: [
-          TextSpan(text: 'no_account'.tr),
+          TextSpan(text: 'have_account'.tr),
           TextSpan(
-            text: 'register_now'.tr,
-            recognizer: controller.registerRecognizer,
+            text: 'sign_in'.tr,
+            recognizer: controller.signInRecognizer,
             style: TextStyle(
               color: context.color.textNatural,
               decoration: TextDecoration.underline,

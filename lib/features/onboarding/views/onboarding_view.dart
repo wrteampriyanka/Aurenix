@@ -15,8 +15,10 @@ class OnboardingView extends GetView<OnboardingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundDark,
+      backgroundColor: context.color.backgroundBase,
       body: AppBackground(
+        // The orb lights the top here, so keep the softer fade.
+        deepTop: false,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -38,7 +40,7 @@ class OnboardingView extends GetView<OnboardingController> {
                               child: Column(
                                 children: [
                                   CustomText(
-                                    'Introducing Aurenix',
+                                    'onboarding_title'.tr,
                                     fontSize: 30,
                                     fontWeight: FontWeight.w600,
                                     textAlign: TextAlign.center,
@@ -46,7 +48,7 @@ class OnboardingView extends GetView<OnboardingController> {
                                   ),
                                   const SizedBox(height: 10),
                                   CustomText(
-                                    'One AI for all your daily tasks and schedules.',
+                                    'onboarding_subtitle'.tr,
                                     fontSize: 16,
                                     textAlign: TextAlign.center,
                                     color: context.color.textBody,
@@ -62,7 +64,7 @@ class OnboardingView extends GetView<OnboardingController> {
                 ),
                 const SizedBox(height: 16),
                 AppButton(
-                  label: 'Get Started',
+                  label: 'get_started'.tr,
                   onPressed: controller.onGetStarted,
                 ),
                 const SizedBox(height: 16),
