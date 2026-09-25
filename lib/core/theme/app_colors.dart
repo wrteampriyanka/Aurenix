@@ -75,6 +75,12 @@ class AppColors {
   final Color inputBorder = const Color(0x14FFFFFF);
   final Color divider = const Color(0x33FFFFFF);
   final Color socialButtonFill = const Color(0xFFE8EEFB);
+
+  // Sidebar (home drawer and search)
+  final Color sidebarBackground = const Color(0xFF1A1F29);
+  final Color sidebarCard = const Color(0x08FFFFFF);
+  final Color sidebarSelected = const Color(0xFF28303F);
+  final Color sidebarScrim = const Color(0x99000000);
 }
 
 extension AppColorsContextX on BuildContext {

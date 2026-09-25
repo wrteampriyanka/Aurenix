@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../../../core/constants/app_assets.dart';
+import 'sidebar_controller.dart';
 
 /// A quick action chip under the orb.
 class HomeAction {
@@ -14,8 +15,16 @@ class HomeAction {
   final String icon;
 }
 
-class HomeController extends GetxController {
+class HomeController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   final messageController = TextEditingController();
+
+  /// Sidebar drawer position: 0 closed, 1 open.
+  late final drawer = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
+  final isDrawerOpen = false.obs;
 
   static const actions = [
     HomeAction(labelKey: 'home_code', icon: AppAssets.codeIcon),
@@ -28,8 +37,19 @@ class HomeController extends GetxController {
     HomeAction(labelKey: 'home_integration', icon: AppAssets.integrationIcon),
   ];
 
+  @override
+  void onInit() {
+    super.onInit();
+    drawer.addListener(() => isDrawerOpen.value = drawer.value > 0);
+    // Picking a chat in the sidebar (or on search) shows it here.
+    ever(Get.find<SidebarController>().selectedChatId, (_) => closeDrawer());
+  }
+
+  void onMenu() => drawer.isDismissed ? drawer.forward() : closeDrawer();
+
+  void closeDrawer() => drawer.reverse();
+
   // TODO: wire these up once the chat and menus exist.
-  void onMenu() {}
   void onModelTap() {}
   void onNewChat() {}
   void onMore() {}
@@ -41,6 +61,7 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     messageController.dispose();
+    drawer.dispose();
     super.onClose();
   }
 }

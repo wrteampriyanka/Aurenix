@@ -43,5 +43,15 @@
   "home_research": "Research",
   "home_canvas": "Canvas",
   "home_generate_images": "Generate Images",
-  "home_integration": "Integration"
+  "home_integration": "Integration",
+  "sidebar_search_hint": "Search anything",
+  "sidebar_new_chat": "New Chat",
+  "sidebar_temporary_chat": "Temporary Chat",
+  "sidebar_presets": "Presets",
+  "sidebar_new_project": "New Project",
+  "sidebar_research": "Research",
+  "sidebar_education": "Education",
+  "sidebar_view_ai": "View AI",
+  "sidebar_chats": "Chats",
+  "sidebar_no_chats": "No chats found"
 }

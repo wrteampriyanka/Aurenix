@@ -8,15 +8,45 @@ import '../../../commons/widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../onboarding/widgets/wave_orb.dart';
 import '../controllers/home_controller.dart';
+import '../widgets/app_sidebar.dart';
+import '../widgets/sidebar_drawer.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.color.backgroundBase,
-      body: AppBackground(
+    final scaffold = Scaffold(
+      backgroundColor: context.color.sidebarBackground,
+      body: SidebarDrawer(
+        animation: controller.drawer,
+        sidebar: const AppSidebar(),
+        child: _HomeBody(controller: controller),
+      ),
+    );
+    // Back closes the drawer first.
+    return Obx(
+      () => PopScope(
+        canPop: !controller.isDrawerOpen.value,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) controller.closeDrawer();
+        },
+        child: scaffold,
+      ),
+    );
+  }
+}
+
+class _HomeBody extends StatelessWidget {
+  const _HomeBody({required this.controller});
+
+  final HomeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: context.color.backgroundBase,
+      child: AppBackground(
         showGrid: false,
         child: SafeArea(
           child: Column(

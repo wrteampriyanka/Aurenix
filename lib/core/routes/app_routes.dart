@@ -11,6 +11,7 @@ abstract class AppRoutes {
   static const register = '/register';
   static const resetPassword = '/reset-password';
   static const savings = '/savings';
+  static const search = '/search';
   static const splash = '/splash';
   static const transactions = '/transactions';
 }

@@ -21,6 +21,8 @@ import '../../features/reset_password/bindings/reset_password_binding.dart';
 import '../../features/reset_password/views/reset_password_view.dart';
 import '../../features/savings/bindings/savings_binding.dart';
 import '../../features/savings/views/savings_view.dart';
+import '../../features/search/bindings/search_binding.dart';
+import '../../features/search/views/search_view.dart';
 import '../../features/splash/bindings/splash_binding.dart';
 import '../../features/splash/views/splash_view.dart';
 import '../../features/transactions/bindings/transactions_binding.dart';
@@ -100,6 +102,13 @@ class AppPages {
       name: AppRoutes.savings,
       page: () => const SavingsView(),
       binding: SavingsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.search,
+      page: () => const SearchView(),
+      binding: SearchBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 250),
     ),
     GetPage(
       name: AppRoutes.splash,
