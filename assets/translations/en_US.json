@@ -58,5 +58,11 @@
   "chat_thinking": "Thinking...",
   "chat_searching_web": "Searching Web",
   "chat_copied": "Copied to clipboard",
-  "chat_error": "Something went wrong. Please try again."
+  "chat_error": "Something went wrong. Please try again.",
+  "chat_sources": "Sources",
+  "chat_open_failed": "Couldn't open the link",
+  "chat_mic_unavailable": "Microphone or speech recognition is not available",
+  "chat_listening_hint": "Listening...",
+  "chat_voice_empty": "Didn't catch that, please try again",
+  "chat_speak_failed": "Couldn't read this aloud. Check that text-to-speech is enabled on your device."
 }

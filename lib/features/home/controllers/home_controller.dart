@@ -2,10 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_assets.dart';
-import '../../../core/services/gemini_service.dart';
+import '../../../core/services/api_service.dart';
 import 'sidebar_controller.dart';
 
 /// A quick action chip under the orb.
@@ -37,6 +42,9 @@ class ChatMessage {
 
   /// null: no vote, true: liked, false: disliked.
   final liked = RxnBool();
+
+  /// Web pages the reply was grounded on (Research only).
+  final sources = <ChatSource>[].obs;
 }
 
 class HomeController extends GetxController
@@ -52,7 +60,29 @@ class HomeController extends GetxController
   /// Chip picked from the welcome screen, shown as a tag in the input.
   final selectedAction = Rxn<HomeAction>();
 
-  StreamSubscription<String>? _reply;
+  StreamSubscription<ChatChunk>? _reply;
+
+  final _speech = SpeechToText();
+  final _tts = FlutterTts();
+
+  /// Whether the mic is on and the input shows the live waveform.
+  final isListening = false.obs;
+
+  /// Recent mic levels, 0..1, oldest first, for the waveform.
+  final soundLevels = <double>[].obs;
+  double _minLevel = 0, _maxLevel = 0;
+
+  /// Off once dictation is sent or cancelled, so late words are dropped.
+  bool _acceptSpeech = false;
+
+  /// Completes when the recognizer delivers its final words.
+  Completer<void>? _finalWords;
+
+  /// The reply being read aloud, if any.
+  final speakingMessage = Rxn<ChatMessage>();
+
+  /// Bumped on every speak or stop, so an older read-aloud loop quits.
+  int _speakRun = 0;
 
   static const researchAction = HomeAction(
     labelKey: 'home_research',
@@ -86,6 +116,7 @@ class HomeController extends GetxController
     );
     // Picking a chat in the sidebar (or on search) shows it here.
     ever(Get.find<SidebarController>().selectedChatId, (_) => closeDrawer());
+    _tts.setErrorHandler((_) => _stopSpeaking());
   }
 
   void onMenu() => drawer.isDismissed ? drawer.forward() : closeDrawer();
@@ -105,8 +136,15 @@ class HomeController extends GetxController
   }
 
   void onSend() {
+    if (isListening.value) {
+      onSendVoice();
+      return;
+    }
     final text = messageController.text.trim();
-    if (text.isEmpty || isGenerating.value) return;
+    if (text.isEmpty) return;
+    // Sending a new message replaces the reply still streaming in.
+    if (isGenerating.value) onStop();
+    _acceptSpeech = false;
     messageController.clear();
     messages.add(ChatMessage.user(text));
     _generate();
@@ -115,7 +153,7 @@ class HomeController extends GetxController
   /// Stops the reply that is streaming in.
   void onStop() {
     _reply?.cancel();
-    _finish(messages.last);
+    if (messages.lastOrNull case final last? when !last.isUser) _finish(last);
   }
 
   /// Asks again for [message], replacing it with a new reply.
@@ -138,12 +176,193 @@ class HomeController extends GetxController
   void onLike(ChatMessage message, bool liked) =>
       message.liked.value = message.liked.value == liked ? null : liked;
 
+  /// Reads [message] aloud, or stops if it is already being read.
+  Future<void> onSpeak(ChatMessage message) async {
+    final wasSpeaking = speakingMessage.value == message;
+    await _stopSpeaking();
+    if (wasSpeaking) return;
+    if (isListening.value) onCancelVoice();
+
+    final run = _speakRun;
+    speakingMessage.value = message;
+    try {
+      await _prepareTts();
+      for (final part in _speechParts(_plainText(message.text.value))) {
+        if (run != _speakRun) return;
+        if (await _tts.speak(part) != 1) throw Exception('speak failed');
+      }
+    } catch (_) {
+      if (run == _speakRun) Get.rawSnackbar(message: 'chat_speak_failed'.tr);
+    }
+    if (run == _speakRun) speakingMessage.value = null;
+  }
+
+  Future<void> _stopSpeaking() async {
+    _speakRun++;
+    speakingMessage.value = null;
+    await _tts.stop();
+  }
+
+  /// Each speak call returns once it is read out. On iOS it plays through
+  /// the speaker even in silent mode and after the mic set up recording.
+  Future<void> _prepareTts() async {
+    await _tts.awaitSpeakCompletion(true);
+    if (GetPlatform.isIOS) {
+      await _tts.setSharedInstance(true);
+      await _tts.setIosAudioCategory(IosTextToSpeechAudioCategory.playback, [
+        IosTextToSpeechAudioCategoryOptions.duckOthers,
+      ], IosTextToSpeechAudioMode.spokenAudio);
+    }
+  }
+
+  /// Splits [text] at sentence ends into parts short enough for Android,
+  /// which refuses to read long text in one go.
+  static List<String> _speechParts(String text, {int maxLength = 1000}) {
+    final parts = <String>[];
+    var current = '';
+    for (final sentence in text.split(RegExp(r'(?<=[.!?\n])\s+'))) {
+      if (current.isNotEmpty &&
+          current.length + sentence.length + 1 > maxLength) {
+        parts.add(current);
+        current = '';
+      }
+      current = current.isEmpty ? sentence : '$current $sentence';
+      while (current.length > maxLength) {
+        parts.add(current.substring(0, maxLength));
+        current = current.substring(maxLength);
+      }
+    }
+    if (current.trim().isNotEmpty) parts.add(current);
+    return parts;
+  }
+
+  void onShare(ChatMessage message) =>
+      SharePlus.instance.share(ShareParams(text: message.text.value));
+
+  Future<void> onOpenSource(ChatSource source) async {
+    final opened = await launchUrl(
+      Uri.parse(source.uri),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened) Get.rawSnackbar(message: 'chat_open_failed'.tr);
+  }
+
+  /// Markdown without the symbols, so they are not read out.
+  static String _plainText(String markdown) => markdown
+      .replaceAllMapped(RegExp(r'\[([^\]]*)\]\([^)]*\)'), (m) => m[1]!)
+      .replaceAll(RegExp(r'[*_#`>|~]'), '')
+      .replaceAll(RegExp(r'^\s*[-+]\s+', multiLine: true), '');
+
+  /// Starts dictation into the input, or stops it if already listening.
+  Future<void> onMic() async {
+    if (isListening.value) return _stopListening(cancel: false);
+    bool available;
+    try {
+      available = await _speech.initialize(
+        onStatus: (status) {
+          if (status == SpeechToText.doneStatus ||
+              status == SpeechToText.notListeningStatus) {
+            isListening.value = false;
+          }
+        },
+        onError: (error) {
+          if (!isListening.value) return;
+          isListening.value = false;
+          Get.rawSnackbar(
+            message: switch (error.errorMsg) {
+              'error_no_match' ||
+              'error_speech_timeout' => 'chat_voice_empty'.tr,
+              'error_permission' => 'chat_mic_unavailable'.tr,
+              final msg => msg,
+            },
+          );
+        },
+      );
+    } catch (_) {
+      // e.g. the plugin is missing after a hot reload, or no recognizer.
+      available = false;
+    }
+    if (!available) {
+      Get.rawSnackbar(message: 'chat_mic_unavailable'.tr);
+      return;
+    }
+    await _stopSpeaking();
+    soundLevels.clear();
+    _minLevel = _maxLevel = 0;
+    isListening.value = true;
+    _acceptSpeech = true;
+    _finalWords = Completer();
+    await _speech.listen(
+      onResult: _onSpeechResult,
+      onSoundLevelChange: _onSoundLevel,
+      listenOptions: SpeechListenOptions(
+        partialResults: true,
+        listenMode: ListenMode.dictation,
+        pauseFor: const Duration(seconds: 5),
+      ),
+    );
+  }
+
+  /// Stops dictation and sends what was said.
+  Future<void> onSendVoice() async {
+    final finalWords = _finalWords;
+    await _stopListening(cancel: false);
+    // The recognizer often delivers the last words just after stopping.
+    if (finalWords != null && !finalWords.isCompleted) {
+      await finalWords.future.timeout(
+        const Duration(seconds: 2),
+        onTimeout: () {},
+      );
+    }
+    _acceptSpeech = false;
+    if (messageController.text.trim().isEmpty) {
+      Get.rawSnackbar(message: 'chat_voice_empty'.tr);
+      return;
+    }
+    onSend();
+  }
+
+  /// Stops dictation and throws away what was said.
+  void onCancelVoice() {
+    _acceptSpeech = false;
+    _stopListening(cancel: true);
+    messageController.clear();
+  }
+
+  Future<void> _stopListening({required bool cancel}) async {
+    isListening.value = false;
+    cancel ? await _speech.cancel() : await _speech.stop();
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    if (!_acceptSpeech) return;
+    if (result.finalResult && !(_finalWords?.isCompleted ?? true)) {
+      _finalWords!.complete();
+    }
+    messageController.value = TextEditingValue(
+      text: result.recognizedWords,
+      selection: TextSelection.collapsed(offset: result.recognizedWords.length),
+    );
+  }
+
+  /// Levels come in dB on a platform dependent scale, so they are scaled
+  /// between the quietest and loudest seen so far.
+  void _onSoundLevel(double level) {
+    if (soundLevels.isEmpty) _minLevel = _maxLevel = level;
+    _minLevel = level < _minLevel ? level : _minLevel;
+    _maxLevel = level > _maxLevel ? level : _maxLevel;
+    final range = _maxLevel - _minLevel;
+    soundLevels.add(range == 0 ? 0 : (level - _minLevel) / range);
+    if (soundLevels.length > 120) soundLevels.removeAt(0);
+  }
+
+  /// Streams the AI reply to the conversation so far into a new message.
   void _generate() {
     final history = [
       for (final m in messages)
         if (m.error.value == null && m.text.isNotEmpty)
-          GeminiTurn(
-            role: m.isUser ? GeminiRole.user : GeminiRole.model,
+          ChatTurn(
+            role: m.isUser ? ChatRole.user : ChatRole.model,
             text: m.text.value,
           ),
     ];
@@ -152,17 +371,20 @@ class HomeController extends GetxController
     isGenerating.value = true;
     _scrollToBottom();
 
-    _reply = GeminiService.instance
-        .streamReply(history, searchWeb: _searchWeb)
+    _reply = ApiService.instance
+        .streamChat(history, searchWeb: _searchWeb)
         .listen(
           (chunk) {
-            reply.text.value += chunk;
+            reply.text.value += chunk.text;
+            reply.sources.addAll(
+              chunk.sources.where(
+                (s) => reply.sources.every((old) => old.uri != s.uri),
+              ),
+            );
             _scrollToBottom();
           },
           onError: (Object e) {
-            reply.error.value = e is GeminiException
-                ? e.message
-                : 'chat_error'.tr;
+            reply.error.value = e is ApiException ? e.message : 'chat_error'.tr;
             _finish(reply);
           },
           onDone: () => _finish(reply),
@@ -189,6 +411,8 @@ class HomeController extends GetxController
 
   void onNewChat() {
     _reply?.cancel();
+    _stopSpeaking();
+    if (isListening.value) onCancelVoice();
     _reply = null;
     isGenerating.value = false;
     messages.clear();
@@ -202,16 +426,19 @@ class HomeController extends GetxController
 
   void onCloseDisclaimer() => showDisclaimer.value = false;
 
-  // TODO: wire these up once the menus and voice exist.
+  /// The round waveform button starts voice input too.
+  void onVoice() => onMic();
+
+  // TODO: wire these up once the menus exist.
   void onModelTap() {}
   void onMore() {}
   void onAttach() {}
-  void onMic() {}
-  void onVoice() {}
 
   @override
   void onClose() {
     _reply?.cancel();
+    _speech.cancel();
+    _tts.stop();
     messageController.dispose();
     scrollController.dispose();
     drawer.dispose();

@@ -311,24 +311,28 @@ class _InputBar extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: TextField(
-                      controller: controller.messageController,
-                      cursorColor: context.color.primary,
-                      minLines: 1,
-                      maxLines: 5,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) => controller.onSend(),
-                      style: TextStyle(
-                        color: context.color.textNatural,
-                        fontSize: 15,
-                      ),
-                      decoration: InputDecoration(
-                        isCollapsed: true,
-                        border: InputBorder.none,
-                        hintText: 'home_input_hint'.tr,
-                        hintStyle: TextStyle(
-                          color: context.color.textBody,
+                    child: Obx(
+                      () => TextField(
+                        controller: controller.messageController,
+                        cursorColor: context.color.primary,
+                        minLines: 1,
+                        maxLines: 5,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (_) => controller.onSend(),
+                        style: TextStyle(
+                          color: context.color.textNatural,
                           fontSize: 15,
+                        ),
+                        decoration: InputDecoration(
+                          isCollapsed: true,
+                          border: InputBorder.none,
+                          hintText: controller.isListening.value
+                              ? 'chat_listening_hint'.tr
+                              : 'home_input_hint'.tr,
+                          hintStyle: TextStyle(
+                            color: context.color.textBody,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ),
@@ -343,23 +347,43 @@ class _InputBar extends StatelessWidget {
                           color: context.color.textNatural,
                         ),
                       ),
-                      Obx(() {
-                        final action = controller.selectedAction.value;
-                        return action == null
-                            ? const SizedBox.shrink()
-                            : _ActionTag(
-                                action: action,
-                                onClear: controller.onClearAction,
-                              );
-                      }),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: controller.onMic,
-                        icon: Icon(
-                          PhosphorIconsRegular.microphone,
-                          size: 22,
-                          color: context.color.textNatural,
-                        ),
+                      Expanded(
+                        child: Obx(() {
+                          if (controller.isListening.value) {
+                            return _VoiceWaveform(
+                              levels: controller.soundLevels.toList(),
+                            );
+                          }
+                          final action = controller.selectedAction.value;
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: action == null
+                                ? const SizedBox.shrink()
+                                : _ActionTag(
+                                    action: action,
+                                    onClear: controller.onClearAction,
+                                  ),
+                          );
+                        }),
+                      ),
+                      Obx(
+                        () => controller.isListening.value
+                            ? IconButton(
+                                onPressed: controller.onCancelVoice,
+                                icon: Icon(
+                                  PhosphorIconsRegular.x,
+                                  size: 20,
+                                  color: context.color.textBody,
+                                ),
+                              )
+                            : IconButton(
+                                onPressed: controller.onMic,
+                                icon: Icon(
+                                  PhosphorIconsRegular.microphone,
+                                  size: 22,
+                                  color: context.color.textNatural,
+                                ),
+                              ),
                       ),
                     ],
                   ),
@@ -369,7 +393,12 @@ class _InputBar extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Obx(
-            () => controller.isGenerating.value
+            () => controller.isListening.value
+                ? _RoundButton(
+                    icon: PhosphorIconsRegular.paperPlaneRight,
+                    onTap: controller.onSendVoice,
+                  )
+                : controller.isGenerating.value
                 ? _RoundButton(
                     icon: PhosphorIconsFill.pause,
                     onTap: controller.onStop,
@@ -385,6 +414,59 @@ class _InputBar extends StatelessWidget {
                   ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Live mic levels as bars, with dots for the space still to fill.
+class _VoiceWaveform extends StatelessWidget {
+  const _VoiceWaveform({required this.levels});
+
+  /// 0..1, oldest first.
+  final List<double> levels;
+
+  static const _step = 5.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 28,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final slots = (constraints.maxWidth / _step).floor();
+          final shown = levels.length > slots
+              ? levels.sublist(levels.length - slots)
+              : levels;
+          return Row(
+            children: [
+              for (var i = 0; i < slots; i++)
+                SizedBox(
+                  width: _step,
+                  child: Center(
+                    child: i < shown.length
+                        ? AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            width: 2,
+                            height: 4 + 22 * shown[i],
+                            decoration: BoxDecoration(
+                              color: context.color.textNatural,
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          )
+                        : Container(
+                            width: 2,
+                            height: 2,
+                            decoration: BoxDecoration(
+                              color: context.color.textBody,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

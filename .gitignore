@@ -48,4 +48,5 @@ app.*.map.json
 .widget_preview/
 
 # Local secrets (Gemini API key)
+.env
 env.json

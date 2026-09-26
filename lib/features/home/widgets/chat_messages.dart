@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../commons/widgets/custom_text.dart';
+import '../../../core/services/api_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../controllers/home_controller.dart';
 
@@ -236,7 +237,8 @@ class _Markdown extends StatelessWidget {
   }
 }
 
-/// Copy, regenerate and feedback buttons under a finished reply.
+/// Copy, read aloud, regenerate, share, feedback and sources under a
+/// finished reply.
 class _MessageActions extends StatelessWidget {
   const _MessageActions({required this.message, required this.controller});
 
@@ -246,18 +248,33 @@ class _MessageActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final liked = message.liked.value;
+    final hasText = message.text.isNotEmpty;
+    final speaking = controller.speakingMessage.value == message;
+    final sources = message.sources;
     return Row(
       children: [
-        if (message.text.isNotEmpty)
+        if (hasText) ...[
           _ActionIcon(
             icon: PhosphorIconsRegular.copy,
             onTap: () => controller.onCopy(message),
           ),
+          _ActionIcon(
+            icon: speaking
+                ? PhosphorIconsFill.speakerHigh
+                : PhosphorIconsRegular.speakerHigh,
+            active: speaking,
+            onTap: () => controller.onSpeak(message),
+          ),
+        ],
         _ActionIcon(
           icon: PhosphorIconsRegular.arrowsClockwise,
           onTap: () => controller.onRegenerate(message),
         ),
         if (message.error.value == null) ...[
+          _ActionIcon(
+            icon: PhosphorIconsRegular.shareNetwork,
+            onTap: () => controller.onShare(message),
+          ),
           _ActionIcon(
             icon: liked == true
                 ? PhosphorIconsFill.thumbsUp
@@ -271,16 +288,29 @@ class _MessageActions extends StatelessWidget {
             onTap: () => controller.onLike(message, false),
           ),
         ],
+        if (sources.isNotEmpty) ...[
+          const Spacer(),
+          SizedBox(
+            height: 20,
+            child: VerticalDivider(width: 1, color: context.color.divider),
+          ),
+          _SourcesButton(sources: sources, onOpen: controller.onOpenSource),
+        ],
       ],
     );
   }
 }
 
 class _ActionIcon extends StatelessWidget {
-  const _ActionIcon({required this.icon, required this.onTap});
+  const _ActionIcon({
+    required this.icon,
+    required this.onTap,
+    this.active = false,
+  });
 
   final IconData icon;
   final VoidCallback onTap;
+  final bool active;
 
   @override
   Widget build(BuildContext context) {
@@ -288,8 +318,122 @@ class _ActionIcon extends StatelessWidget {
       onTap: onTap,
       radius: 18,
       child: Padding(
-        padding: const EdgeInsets.only(right: 16),
-        child: Icon(icon, size: 20, color: context.color.textBody),
+        padding: const EdgeInsets.only(right: 14),
+        child: Icon(
+          icon,
+          size: 20,
+          color: active
+              ? context.color.buttonHighlight
+              : context.color.textBody,
+        ),
+      ),
+    );
+  }
+}
+
+/// Favicon of the first web source and a caret; opens the list of sources.
+class _SourcesButton extends StatelessWidget {
+  const _SourcesButton({required this.sources, required this.onOpen});
+
+  final List<ChatSource> sources;
+  final ValueChanged<ChatSource> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkResponse(
+      onTap: () => _showSheet(context),
+      radius: 22,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _Favicon(source: sources.first, size: 22),
+            const SizedBox(width: 6),
+            Icon(
+              PhosphorIconsRegular.caretRight,
+              size: 16,
+              color: context.color.textBody,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: context.color.sidebarBackground,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: CustomText(
+                'chat_sources'.tr,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: context.color.textNatural,
+              ),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final source in sources)
+                    ListTile(
+                      leading: _Favicon(source: source, size: 24),
+                      title: CustomText(
+                        source.title,
+                        maxLines: 1,
+                        fontSize: 15,
+                        color: context.color.textNatural,
+                      ),
+                      trailing: Icon(
+                        PhosphorIconsRegular.arrowUpRight,
+                        size: 18,
+                        color: context.color.textBody,
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        onOpen(source);
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Site icon for a source, falling back to a globe.
+class _Favicon extends StatelessWidget {
+  const _Favicon({required this.source, required this.size});
+
+  final ChatSource source;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final globe = Icon(
+      PhosphorIconsRegular.globe,
+      size: size,
+      color: context.color.textBody,
+    );
+    // Gemini's grounding titles are the site's domain.
+    return ClipOval(
+      child: Image.network(
+        'https://www.google.com/s2/favicons?sz=64&domain=${source.title}',
+        width: size,
+        height: size,
+        errorBuilder: (_, _, _) => globe,
       ),
     );
   }

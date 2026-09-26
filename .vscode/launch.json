@@ -5,7 +5,7 @@
       "name": "aurenix",
       "request": "launch",
       "type": "dart",
-      "args": ["--dart-define-from-file=env.json"]
+      "args": ["--dart-define-from-file=.env"]
     }
   ]
 }

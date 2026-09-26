@@ -24,6 +24,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Aurenix uses the microphone so you can talk to it.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Aurenix turns your voice into text for your messages.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
