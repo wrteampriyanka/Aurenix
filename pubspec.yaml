@@ -37,6 +37,8 @@ dependencies:
   get: ^4.7.3
   phosphoricons_flutter: ^1.0.0
   flutter_svg: ^2.3.0
+  http: ^1.6.0
+  flutter_markdown_plus: ^1.0.12
 
 dev_dependencies:
   flutter_test:

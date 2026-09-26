@@ -53,5 +53,10 @@
   "sidebar_education": "Education",
   "sidebar_view_ai": "View AI",
   "sidebar_chats": "Chats",
-  "sidebar_no_chats": "No chats found"
+  "sidebar_no_chats": "No chats found",
+  "chat_disclaimer": "AI can make mistakes. Please make sure to reverify output given by AI.",
+  "chat_thinking": "Thinking...",
+  "chat_searching_web": "Searching Web",
+  "chat_copied": "Copied to clipboard",
+  "chat_error": "Something went wrong. Please try again."
 }

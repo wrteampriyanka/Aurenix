@@ -9,6 +9,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../onboarding/widgets/wave_orb.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/app_sidebar.dart';
+import '../widgets/chat_messages.dart';
 import '../widgets/sidebar_drawer.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -53,49 +54,60 @@ class _HomeBody extends StatelessWidget {
             children: [
               _TopBar(controller: controller),
               Expanded(
-                child: Center(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: [
-                        const WaveOrb(
-                          size: 196,
-                          showRing: false,
-                          showDots: true,
-                        ),
-                        const SizedBox(height: 28),
-                        // Narrow like the design, so it wraps after "you".
-                        SizedBox(
-                          width: 250,
-                          child: CustomText(
-                            'home_prompt'.tr,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                            textAlign: TextAlign.center,
-                            color: context.color.textBody,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            for (final action in HomeController.actions)
-                              _ActionChip(
-                                action: action,
-                                onTap: () => controller.onAction(action),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                child: Obx(
+                  () => controller.messages.isEmpty
+                      ? _Welcome(controller: controller)
+                      : ChatMessages(controller: controller),
                 ),
               ),
               _InputBar(controller: controller),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Welcome extends StatelessWidget {
+  const _Welcome({required this.controller});
+
+  final HomeController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            const WaveOrb(size: 196, showRing: false, showDots: true),
+            const SizedBox(height: 28),
+            // Narrow like the design, so it wraps after "you".
+            SizedBox(
+              width: 250,
+              child: CustomText(
+                'home_prompt'.tr,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                textAlign: TextAlign.center,
+                color: context.color.textBody,
+              ),
+            ),
+            const SizedBox(height: 32),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                for (final action in HomeController.actions)
+                  _ActionChip(
+                    action: action,
+                    onTap: () => controller.onAction(action),
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -284,30 +296,28 @@ class _InputBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             child: Container(
-              height: 52,
+              padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
               decoration: BoxDecoration(
                 color: context.color.inputFill,
-                borderRadius: BorderRadius.circular(26),
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: context.color.inputBorder),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: controller.onAttach,
-                    icon: Icon(
-                      PhosphorIconsRegular.plus,
-                      size: 22,
-                      color: context.color.textNatural,
-                    ),
-                  ),
-                  Expanded(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: TextField(
                       controller: controller.messageController,
                       cursorColor: context.color.primary,
+                      minLines: 1,
+                      maxLines: 5,
                       textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => controller.onSend(),
                       style: TextStyle(
                         color: context.color.textNatural,
                         fontSize: 15,
@@ -323,20 +333,100 @@ class _InputBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: controller.onMic,
-                    icon: Icon(
-                      PhosphorIconsRegular.microphone,
-                      size: 22,
-                      color: context.color.textNatural,
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: controller.onAttach,
+                        icon: Icon(
+                          PhosphorIconsRegular.plus,
+                          size: 22,
+                          color: context.color.textNatural,
+                        ),
+                      ),
+                      Obx(() {
+                        final action = controller.selectedAction.value;
+                        return action == null
+                            ? const SizedBox.shrink()
+                            : _ActionTag(
+                                action: action,
+                                onClear: controller.onClearAction,
+                              );
+                      }),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: controller.onMic,
+                        icon: Icon(
+                          PhosphorIconsRegular.microphone,
+                          size: 22,
+                          color: context.color.textNatural,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 12),
-          _VoiceButton(onTap: controller.onVoice),
+          Obx(
+            () => controller.isGenerating.value
+                ? _RoundButton(
+                    icon: PhosphorIconsFill.pause,
+                    onTap: controller.onStop,
+                  )
+                : controller.hasText.value
+                ? _RoundButton(
+                    icon: PhosphorIconsRegular.arrowUp,
+                    onTap: controller.onSend,
+                  )
+                : _RoundButton(
+                    icon: PhosphorIconsRegular.waveform,
+                    onTap: controller.onVoice,
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The chip picked on the welcome screen, e.g. "Research", with a remove x.
+class _ActionTag extends StatelessWidget {
+  const _ActionTag({required this.action, required this.onClear});
+
+  final HomeAction action;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 5, 4, 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: context.color.tileBorder),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SvgPicture.asset(action.icon, width: 16, height: 16),
+          const SizedBox(width: 8),
+          CustomText(
+            action.labelKey.tr,
+            fontSize: 13,
+            color: context.color.textNatural,
+          ),
+          InkResponse(
+            onTap: onClear,
+            radius: 14,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Icon(
+                PhosphorIconsRegular.x,
+                size: 14,
+                color: context.color.textBody,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -344,9 +434,10 @@ class _InputBar extends StatelessWidget {
 }
 
 /// Round blue button with the same gradient as [AppButton].
-class _VoiceButton extends StatelessWidget {
-  const _VoiceButton({required this.onTap});
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({required this.icon, required this.onTap});
 
+  final IconData icon;
   final VoidCallback onTap;
 
   @override
@@ -370,11 +461,7 @@ class _VoiceButton extends StatelessWidget {
           onTap: onTap,
           child: SizedBox.square(
             dimension: 52,
-            child: Icon(
-              PhosphorIconsRegular.waveform,
-              size: 24,
-              color: context.color.textNatural,
-            ),
+            child: Icon(icon, size: 24, color: context.color.textNatural),
           ),
         ),
       ),
