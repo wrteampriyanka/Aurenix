@@ -22,4 +22,9 @@ class AppAssets {
       'assets/images/home_screen_icon/generate_images.svg';
   static const String integrationIcon =
       'assets/images/home_screen_icon/integration.svg';
+  static const String attachIcon = 'assets/images/home_screen_icon/attach.svg';
+
+  static const String figmaColorLogo = 'assets/images/figma.svg';
+  static const String zyncLogo = 'assets/images/zync.png';
+  static const String googleDriveLogo = 'assets/images/googledrive.svg';
 }

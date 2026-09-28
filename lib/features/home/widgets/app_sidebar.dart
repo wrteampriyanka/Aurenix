@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
@@ -6,15 +8,13 @@ import '../../../commons/widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../controllers/sidebar_controller.dart';
 
-/// Menu, chats and profile shown in the home drawer and on the search screen.
+/// Menu, chats and profile shown in the home drawer.
 ///
-/// In the drawer the search field is a button that opens the search screen;
-/// on the search screen ([isSearch]) it is a live field that filters the
-/// chats, with a back button in front of it.
+/// Tapping the search pill turns the drawer into a full-screen search in
+/// place: the pill lights up and becomes a live field, and a back button
+/// slides in front of it. See [SidebarController.search].
 class AppSidebar extends GetView<SidebarController> {
-  const AppSidebar({super.key, this.isSearch = false});
-
-  final bool isSearch;
+  const AppSidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +26,8 @@ class AppSidebar extends GetView<SidebarController> {
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
             child: Row(
               children: [
-                if (isSearch) ...[
-                  _RoundButton(
-                    icon: PhosphorIconsRegular.caretLeft,
-                    onTap: controller.onSearchBack,
-                  ),
-                  const SizedBox(width: 10),
-                ],
-                Expanded(child: _SearchField(isSearch: isSearch)),
+                _BackButton(controller: controller),
+                const Expanded(child: _SearchField()),
               ],
             ),
           ),
@@ -74,6 +68,43 @@ BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
   border: Border.all(color: context.color.tileBorder),
 );
 
+/// Back button that grows in front of the search field while searching.
+class _BackButton extends StatelessWidget {
+  const _BackButton({required this.controller});
+
+  final SidebarController controller;
+
+  static const _interval = Interval(0.35, 1, curve: Curves.easeOutCubic);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: controller.search,
+      builder: (context, child) {
+        final t = _interval.transform(controller.search.value);
+        if (t == 0) return const SizedBox.shrink();
+        return ClipRect(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            widthFactor: t,
+            child: Opacity(
+              opacity: t,
+              child: Transform.scale(scale: 0.5 + 0.5 * t, child: child),
+            ),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 10),
+        child: _RoundButton(
+          icon: PhosphorIconsRegular.caretLeft,
+          onTap: controller.onSearchBack,
+        ),
+      ),
+    );
+  }
+}
+
 class _RoundButton extends StatelessWidget {
   const _RoundButton({required this.icon, required this.onTap});
 
@@ -97,52 +128,139 @@ class _RoundButton extends StatelessWidget {
   }
 }
 
+/// Search pill: a button in the drawer, a live field while searching.
+///
+/// Its border and glow light up with [SidebarController.search], and the
+/// magnifying glass gives a small tilt on the way.
 class _SearchField extends GetView<SidebarController> {
-  const _SearchField({required this.isSearch});
+  const _SearchField();
 
-  final bool isSearch;
-
-  static const double _radius = 22;
-
-  OutlineInputBorder _border(Color color) => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(_radius),
-    borderSide: BorderSide(color: color),
-  );
+  static const double _height = 44;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 44,
-      child: TextField(
-        // The drawer only shows the field; typing happens on the search screen.
-        controller: isSearch ? controller.searchController : null,
-        readOnly: !isSearch,
-        autofocus: isSearch,
-        onTap: isSearch ? null : controller.onSearch,
-        textInputAction: TextInputAction.search,
-        cursorColor: context.color.primary,
-        style: TextStyle(color: context.color.textNatural, fontSize: 14),
-        decoration: InputDecoration(
-          hintText: 'sidebar_search_hint'.tr,
-          hintStyle: TextStyle(color: context.color.textBody, fontSize: 14),
-          filled: true,
-          fillColor: context.color.tileFill,
-          contentPadding: EdgeInsets.zero,
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 14, right: 10),
-            child: Icon(
-              PhosphorIconsRegular.magnifyingGlass,
-              size: 20,
-              color: context.color.textNatural,
+    final color = context.color;
+    return AnimatedBuilder(
+      animation: controller.search,
+      builder: (context, _) {
+        final t = Curves.easeInOut.transform(controller.search.value);
+        final wiggle = math.sin(t * math.pi);
+        return Container(
+          height: _height,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: color.tileFill,
+            borderRadius: BorderRadius.circular(_height / 2),
+            border: Border.all(
+              color: Color.lerp(color.tileBorder, color.primary, t)!,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: color.primary.withValues(alpha: 0.28 * t),
+                blurRadius: 18 * t,
+                spreadRadius: -2,
+              ),
+            ],
           ),
-          prefixIconConstraints: const BoxConstraints(),
-          border: _border(context.color.tileBorder),
-          enabledBorder: _border(context.color.tileBorder),
-          focusedBorder: _border(
-            isSearch ? context.color.primary : context.color.tileBorder,
+          child: Material(
+            type: MaterialType.transparency,
+            child: Obx(() {
+              final searching = controller.isSearching.value;
+              return InkWell(
+                onTap: searching ? null : controller.onSearch,
+                child: Row(
+                  children: [
+                    const SizedBox(width: 14),
+                    Transform.rotate(
+                      angle: wiggle * -0.35,
+                      child: Transform.scale(
+                        scale: 1 + wiggle * 0.25,
+                        child: Icon(
+                          PhosphorIconsRegular.magnifyingGlass,
+                          size: 20,
+                          color: Color.lerp(
+                            color.textNatural,
+                            color.primary,
+                            t,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // The hint and the field look the same, so swapping
+                    // them is invisible.
+                    Expanded(
+                      child: searching
+                          ? TextField(
+                              controller: controller.searchController,
+                              focusNode: controller.searchFocus,
+                              textInputAction: TextInputAction.search,
+                              cursorColor: color.primary,
+                              style: TextStyle(
+                                color: color.textNatural,
+                                fontSize: 14,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'sidebar_search_hint'.tr,
+                                hintStyle: TextStyle(
+                                  color: color.textBody,
+                                  fontSize: 14,
+                                ),
+                                hintMaxLines: 1,
+                                border: InputBorder.none,
+                                isCollapsed: true,
+                              ),
+                            )
+                          : CustomText(
+                              'sidebar_search_hint'.tr,
+                              maxLines: 1,
+                              fontSize: 14,
+                              color: color.textBody,
+                            ),
+                    ),
+                    _ClearButton(controller: controller),
+                  ],
+                ),
+              );
+            }),
           ),
+        );
+      },
+    );
+  }
+}
+
+/// Pops in at the end of the search field once something is typed.
+class _ClearButton extends StatelessWidget {
+  const _ClearButton({required this.controller});
+
+  final SidebarController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => AnimatedSwitcher(
+        duration: const Duration(milliseconds: 220),
+        transitionBuilder: (child, animation) => ScaleTransition(
+          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          child: FadeTransition(opacity: animation, child: child),
         ),
+        child: controller.query.value.isEmpty
+            ? const SizedBox(key: ValueKey('empty'), width: 14)
+            : InkResponse(
+                key: const ValueKey('clear'),
+                onTap: controller.searchController.clear,
+                radius: 18,
+                child: SizedBox(
+                  width: 40,
+                  height: _SearchField._height,
+                  child: Icon(
+                    PhosphorIconsFill.xCircle,
+                    size: 18,
+                    color: context.color.textBody,
+                  ),
+                ),
+              ),
       ),
     );
   }
@@ -232,32 +350,58 @@ class _ChatsCard extends GetView<SidebarController> {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: _cardDecoration(context),
-      child: Obx(() {
-        final chats = controller.filteredChats;
-        if (chats.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.all(12),
-            child: CustomText(
-              'sidebar_no_chats'.tr,
-              fontSize: 14,
-              textAlign: TextAlign.center,
-              color: context.color.textBody,
+      // Results resize and cross-fade as the query changes.
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.topCenter,
+        child: Obx(() {
+          final chats = controller.filteredChats;
+          final selectedId = controller.selectedChatId.value;
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            layoutBuilder: (current, previous) => Stack(
+              alignment: Alignment.topCenter,
+              children: [...previous, ?current],
             ),
-          );
-        }
-        final selectedId = controller.selectedChatId.value;
-        return Column(
-          children: [
-            for (final chat in chats)
-              _ChatRow(
-                chat: chat,
-                selected: chat.id == selectedId,
-                onTap: () => controller.onChat(chat),
-                onMore: () => controller.onChatMore(chat),
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween(
+                  begin: const Offset(0, 0.04),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
               ),
-          ],
-        );
-      }),
+            ),
+            child: chats.isEmpty
+                ? Padding(
+                    key: const ValueKey('empty'),
+                    padding: const EdgeInsets.all(12),
+                    child: CustomText(
+                      'sidebar_no_chats'.tr,
+                      fontSize: 14,
+                      textAlign: TextAlign.center,
+                      color: context.color.textBody,
+                    ),
+                  )
+                : Column(
+                    key: ValueKey(chats.map((c) => c.id).join(',')),
+                    children: [
+                      for (final chat in chats)
+                        _ChatRow(
+                          chat: chat,
+                          selected: chat.id == selectedId,
+                          onTap: () => controller.onChat(chat),
+                          onMore: () => controller.onChatMore(chat),
+                        ),
+                    ],
+                  ),
+          );
+        }),
+      ),
     );
   }
 }

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../commons/widgets/app_button.dart';
+import '../../../commons/widgets/app_plain_background.dart';
 import '../../../commons/widgets/app_text_field.dart';
-import '../../../commons/widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
 import '../controllers/reset_password_controller.dart';
@@ -17,12 +16,12 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.color.backgroundBase,
-      body: _PlainBackground(
+      body: AppPlainBackground(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _TopBar(),
+              AppBackHeader(title: 'reset_password_title'.tr),
               Divider(height: 1, color: context.color.strokeDark),
               Expanded(
                 child: SingleChildScrollView(
@@ -42,73 +41,6 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Plain dark screen with a soft glow behind the status bar, as in the design.
-class _PlainBackground extends StatelessWidget {
-  const _PlainBackground({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: const Alignment(0, -1.05),
-            radius: 0.55,
-            colors: [
-              context.color.topGlow.withValues(alpha: 0.7),
-              context.color.backgroundBase,
-            ],
-          ),
-        ),
-        child: child,
-      ),
-    );
-  }
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Row(
-        children: [
-          Material(
-            color: context.color.inputFill,
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: Get.back,
-              child: SizedBox.square(
-                dimension: 44,
-                child: Icon(
-                  PhosphorIconsRegular.caretLeft,
-                  size: 20,
-                  color: context.color.textNatural,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          CustomText(
-            'reset_password_title'.tr,
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: context.color.textNatural,
-          ),
-        ],
       ),
     );
   }

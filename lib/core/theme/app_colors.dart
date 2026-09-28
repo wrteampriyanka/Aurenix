@@ -81,6 +81,32 @@ class AppColors {
   final Color sidebarCard = const Color(0x08FFFFFF);
   final Color sidebarSelected = const Color(0xFF28303F);
   final Color sidebarScrim = const Color(0x99000000);
+
+  // Services bottom sheet (the + in the home input)
+  final Color sheetBackground = const Color(0xFF12151C);
+  final Color sheetCard = const Color(0xFF1E222B);
+  final Color sheetHandle = const Color(0xFF2E3441);
+  final Color serviceAttach = const Color(0xFF2563EB);
+  final Color serviceCapture = const Color(0xFF5B21B6);
+  final Color serviceCode = const Color(0xFFEF4444);
+  final Color serviceIntegration = const Color(0xFF22C55E);
+  final Color serviceResearch = const Color(0xFFF59E0B);
+  final Color serviceGenerateImage = const Color(0xFFA855F7);
+
+  // Profile
+  final Color profileMenuCard = const Color(0xFF1C2029);
+  // Profile card: frosted top that fades out, with a border fading the same way.
+  final Color profileCardFill = const Color(0x14FFFFFF);
+  final Color profileCardBorder = const Color(0x33FFFFFF);
+  final Color profileCardDivider = const Color(0x14FFFFFF);
+  // Upgrade button: dark pill with a soft grey glow.
+  final Color upgradeButton = const Color(0xFF0B0D12);
+  final Color upgradeButtonHighlight = const Color(0xFF3A3F4B);
+  final Color upgradeButtonBorder = const Color(0x33FFFFFF);
+
+  // AppSwitch
+  final Color switchTrackOff = const Color(0xFF3A4150);
+  final Color switchThumb = const Color(0xFFFFFFFF);
 }
 
 extension AppColorsContextX on BuildContext {

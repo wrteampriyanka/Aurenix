@@ -8,7 +8,8 @@ import '../../utils/elapsed_time_mixin.dart';
 import 'custom_text.dart';
 
 /// Primary pill button with a leading animated circular icon.
-/// Colours and text style are fixed; only [label], [icon] and [onPressed] vary.
+/// Uses the primary blue by default; pass [color], [highlightColor] and
+/// [borderColor] for a different look (e.g. the dark upgrade button).
 /// Pass `icon: null` for a plain text button without the leading circle.
 ///
 /// While enabled, the leading circle emits a soft ripple ring and the icon
@@ -20,12 +21,26 @@ class AppButton extends StatefulWidget {
     this.onPressed,
     this.icon = PhosphorIconsRegular.arrowRight,
     this.height = 58,
+    this.width = double.infinity,
+    this.fontSize = 20,
+    this.color,
+    this.highlightColor,
+    this.borderColor,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
   final double height;
+  final double width;
+  final double fontSize;
+
+  /// Base of the gradient. Defaults to the primary blue.
+  final Color? color;
+
+  /// Top-left glow of the gradient. Defaults to the button highlight.
+  final Color? highlightColor;
+  final Color? borderColor;
 
   @override
   State<AppButton> createState() => _AppButtonState();
@@ -55,11 +70,16 @@ class _AppButtonState extends State<AppButton>
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: radius,
-            border: Border.all(color: context.color.buttonBorder),
+            border: Border.all(
+              color: widget.borderColor ?? context.color.buttonBorder,
+            ),
             gradient: RadialGradient(
               center: const Alignment(-0.7, -1.4),
               radius: 1.6,
-              colors: [context.color.buttonHighlight, context.color.primary],
+              colors: [
+                widget.highlightColor ?? context.color.buttonHighlight,
+                widget.color ?? context.color.primary,
+              ],
               stops: const [0, 0.55],
             ),
           ),
@@ -74,7 +94,7 @@ class _AppButtonState extends State<AppButton>
               onTapCancel: () => _setPressed(false),
               child: SizedBox(
                 height: widget.height,
-                width: double.infinity,
+                width: widget.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -91,7 +111,7 @@ class _AppButtonState extends State<AppButton>
                       child: CustomText(
                         widget.label,
                         maxLines: 1,
-                        fontSize: 20,
+                        fontSize: widget.fontSize,
                         fontWeight: FontWeight.w400,
                         color: context.color.textNatural,
                       ),

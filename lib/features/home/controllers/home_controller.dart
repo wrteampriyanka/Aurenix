@@ -1,16 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_assets.dart';
+import '../../../core/routes/app_routes.dart';
 import '../../../core/services/api_service.dart';
+import '../widgets/services_sheet.dart';
 import 'sidebar_controller.dart';
 
 /// A quick action chip under the orb.
@@ -96,15 +99,25 @@ class HomeController extends GetxController
   );
   final isDrawerOpen = false.obs;
 
+  static const codeAction = HomeAction(
+    labelKey: 'home_code',
+    icon: AppAssets.codeIcon,
+  );
+  static const generateImagesAction = HomeAction(
+    labelKey: 'home_generate_images',
+    icon: AppAssets.generateImagesIcon,
+  );
+  static const integrationAction = HomeAction(
+    labelKey: 'home_integration',
+    icon: AppAssets.integrationIcon,
+  );
+
   static const actions = [
-    HomeAction(labelKey: 'home_code', icon: AppAssets.codeIcon),
+    codeAction,
     researchAction,
     HomeAction(labelKey: 'home_canvas', icon: AppAssets.canvasIcon),
-    HomeAction(
-      labelKey: 'home_generate_images',
-      icon: AppAssets.generateImagesIcon,
-    ),
-    HomeAction(labelKey: 'home_integration', icon: AppAssets.integrationIcon),
+    generateImagesAction,
+    integrationAction,
   ];
 
   @override
@@ -117,6 +130,7 @@ class HomeController extends GetxController
     // Picking a chat in the sidebar (or on search) shows it here.
     ever(Get.find<SidebarController>().selectedChatId, (_) => closeDrawer());
     _tts.setErrorHandler((_) => _stopSpeaking());
+    ServicesSheet.precache();
   }
 
   void onMenu() => drawer.isDismissed ? drawer.forward() : closeDrawer();
@@ -206,6 +220,8 @@ class HomeController extends GetxController
   /// Each speak call returns once it is read out. On iOS it plays through
   /// the speaker even in silent mode and after the mic set up recording.
   Future<void> _prepareTts() async {
+    // Live talk shares the engine, so take the handler back.
+    _tts.setErrorHandler((_) => _stopSpeaking());
     await _tts.awaitSpeakCompletion(true);
     if (GetPlatform.isIOS) {
       await _tts.setSharedInstance(true);
@@ -258,26 +274,12 @@ class HomeController extends GetxController
     if (isListening.value) return _stopListening(cancel: false);
     bool available;
     try {
-      available = await _speech.initialize(
-        onStatus: (status) {
-          if (status == SpeechToText.doneStatus ||
-              status == SpeechToText.notListeningStatus) {
-            isListening.value = false;
-          }
-        },
-        onError: (error) {
-          if (!isListening.value) return;
-          isListening.value = false;
-          Get.rawSnackbar(
-            message: switch (error.errorMsg) {
-              'error_no_match' ||
-              'error_speech_timeout' => 'chat_voice_empty'.tr,
-              'error_permission' => 'chat_mic_unavailable'.tr,
-              final msg => msg,
-            },
-          );
-        },
-      );
+      available = await _speech.initialize();
+      // The plugin is shared with live talk and only takes the listeners
+      // on its first initialize, so set them every time.
+      _speech
+        ..statusListener = _onSpeechStatus
+        ..errorListener = _onSpeechError;
     } catch (_) {
       // e.g. the plugin is missing after a hot reload, or no recognizer.
       available = false;
@@ -300,6 +302,25 @@ class HomeController extends GetxController
         listenMode: ListenMode.dictation,
         pauseFor: const Duration(seconds: 5),
       ),
+    );
+  }
+
+  void _onSpeechStatus(String status) {
+    if (status == SpeechToText.doneStatus ||
+        status == SpeechToText.notListeningStatus) {
+      isListening.value = false;
+    }
+  }
+
+  void _onSpeechError(SpeechRecognitionError error) {
+    if (!isListening.value) return;
+    isListening.value = false;
+    Get.rawSnackbar(
+      message: switch (error.errorMsg) {
+        'error_no_match' || 'error_speech_timeout' => 'chat_voice_empty'.tr,
+        'error_permission' => 'chat_mic_unavailable'.tr,
+        final msg => msg,
+      },
     );
   }
 
@@ -426,13 +447,38 @@ class HomeController extends GetxController
 
   void onCloseDisclaimer() => showDisclaimer.value = false;
 
-  /// The round waveform button starts voice input too.
-  void onVoice() => onMic();
+  /// The round waveform button opens live talk.
+  Future<void> onVoice() async {
+    if (isListening.value) onCancelVoice();
+    await _stopSpeaking();
+    Get.toNamed(AppRoutes.liveTalk);
+  }
+
+  /// Opens the services sheet from the + in the input.
+  void onAttach() => showModalBottomSheet<void>(
+    context: Get.context!,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black54,
+    sheetAnimationStyle: const AnimationStyle(
+      duration: Duration(milliseconds: 450),
+      reverseDuration: Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    ),
+    builder: (_) => const ServicesSheet(),
+  );
+
+  /// A tile in the services sheet picks its action, like the welcome chips.
+  void onService(HomeAction? action) {
+    Get.back();
+    if (action != null) onAction(action);
+  }
 
   // TODO: wire these up once the menus exist.
   void onModelTap() {}
   void onMore() {}
-  void onAttach() {}
 
   @override
   void onClose() {

@@ -30,10 +30,19 @@ class ChatSummary {
   final String title;
 }
 
-/// State shared by the home drawer and the search screen.
-class SidebarController extends GetxController {
+/// State of the home drawer, including its in-place search.
+class SidebarController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   final searchController = TextEditingController();
+  final searchFocus = FocusNode();
   final query = ''.obs;
+
+  /// Search mode: 0 regular drawer, 1 full-screen search.
+  late final search = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 450),
+  );
+  final isSearching = false.obs;
 
   static const actions = [
     SidebarItem(
@@ -99,18 +108,27 @@ class SidebarController extends GetxController {
     searchController.addListener(() => query.value = searchController.text);
   }
 
-  void onSearch() => Get.toNamed(AppRoutes.search);
+  /// Expands the drawer into search, opening the keyboard once it settles
+  /// so it does not fight the animation.
+  void onSearch() {
+    isSearching.value = true;
+    search.forward().then((_) {
+      if (isSearching.value) searchFocus.requestFocus();
+    });
+  }
 
-  /// Leaves the search screen, clearing the query for next time.
+  /// Shrinks search back to the drawer, clearing the query for next time.
   void onSearchBack() {
+    searchFocus.unfocus();
     searchController.clear();
-    Get.back();
+    isSearching.value = false;
+    search.reverse();
   }
 
   /// Selects [chat]; the home screen closes the drawer to show it.
   void onChat(ChatSummary chat) {
     selectedChatId.value = chat.id;
-    if (Get.currentRoute == AppRoutes.search) onSearchBack();
+    if (isSearching.value) onSearchBack();
   }
 
   void onProfile() => Get.toNamed(AppRoutes.profile);
@@ -122,6 +140,8 @@ class SidebarController extends GetxController {
   @override
   void onClose() {
     searchController.dispose();
+    searchFocus.dispose();
+    search.dispose();
     super.onClose();
   }
 }

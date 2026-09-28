@@ -4,10 +4,12 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../commons/widgets/app_background.dart';
+import '../../../commons/widgets/app_top_bar.dart';
 import '../../../commons/widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../onboarding/widgets/wave_orb.dart';
 import '../controllers/home_controller.dart';
+import '../controllers/sidebar_controller.dart';
 import '../widgets/app_sidebar.dart';
 import '../widgets/chat_messages.dart';
 import '../widgets/sidebar_drawer.dart';
@@ -17,20 +19,25 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final sidebar = Get.find<SidebarController>();
     final scaffold = Scaffold(
       backgroundColor: context.color.sidebarBackground,
       body: SidebarDrawer(
         animation: controller.drawer,
+        expand: sidebar.search,
         sidebar: const AppSidebar(),
         child: _HomeBody(controller: controller),
       ),
     );
-    // Back closes the drawer first.
+    // Back leaves search, then closes the drawer.
     return Obx(
       () => PopScope(
         canPop: !controller.isDrawerOpen.value,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) controller.closeDrawer();
+          if (didPop) return;
+          sidebar.isSearching.value
+              ? sidebar.onSearchBack()
+              : controller.closeDrawer();
         },
         child: scaffold,
       ),
@@ -52,7 +59,12 @@ class _HomeBody extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              _TopBar(controller: controller),
+              AppTopBar(
+                onMenu: controller.onMenu,
+                onModelTap: controller.onModelTap,
+                onNewChat: controller.onNewChat,
+                onMore: controller.onMore,
+              ),
               Expanded(
                 child: Obx(
                   () => controller.messages.isEmpty
@@ -109,140 +121,6 @@ class _Welcome extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar({required this.controller});
-
-  final HomeController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: Row(
-        children: [
-          _GlassButton(
-            icon: PhosphorIconsRegular.sidebarSimple,
-            onTap: controller.onMenu,
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: controller.onModelTap,
-              behavior: HitTestBehavior.opaque,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: CustomText(
-                      'home_model_name'.tr,
-                      maxLines: 1,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: context.color.textNatural,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    PhosphorIconsRegular.caretDown,
-                    size: 18,
-                    color: context.color.textNatural,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          _GlassPill(
-            children: [
-              _PillIcon(
-                icon: PhosphorIconsRegular.chatCircleText,
-                onTap: controller.onNewChat,
-              ),
-              SizedBox(
-                height: 24,
-                child: VerticalDivider(
-                  width: 1,
-                  color: context.color.tileBorder,
-                ),
-              ),
-              _PillIcon(
-                icon: PhosphorIconsRegular.dotsThree,
-                onTap: controller.onMore,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Frosted decoration shared by the top bar buttons.
-BoxDecoration _glass(BuildContext context, BoxShape shape) => BoxDecoration(
-  shape: shape,
-  borderRadius: shape == BoxShape.rectangle ? BorderRadius.circular(24) : null,
-  color: context.color.tileFillHighlight,
-  border: Border.all(color: context.color.tileBorder),
-);
-
-class _GlassButton extends StatelessWidget {
-  const _GlassButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: _glass(context, BoxShape.circle),
-      child: Material(
-        type: MaterialType.transparency,
-        shape: const CircleBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox.square(
-            dimension: 48,
-            child: Icon(icon, size: 22, color: context.color.textNatural),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GlassPill extends StatelessWidget {
-  const _GlassPill({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: _glass(context, BoxShape.rectangle),
-      child: Row(mainAxisSize: MainAxisSize.min, children: children),
-    );
-  }
-}
-
-class _PillIcon extends StatelessWidget {
-  const _PillIcon({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkResponse(
-      onTap: onTap,
-      radius: 22,
-      child: SizedBox(
-        width: 44,
-        height: 46,
-        child: Icon(icon, size: 22, color: context.color.textNatural),
       ),
     );
   }

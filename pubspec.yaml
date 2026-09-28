@@ -66,7 +66,7 @@ flutter:
     - assets/images/app_icon/
     - assets/images/platfom_logo/
     - assets/images/log_in_icon/
-    - assets/images/forggotpasword.svg
+    - assets/images/
     - assets/images/home_screen_icon/
     - assets/translations/
 
