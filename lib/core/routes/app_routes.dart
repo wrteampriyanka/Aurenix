@@ -1,6 +1,7 @@
 abstract class AppRoutes {
   AppRoutes._();
 
+  static const aboutUs = '/about-us';
   static const archiveChats = '/archive-chats';
   static const budget = '/budget';
   static const categories = '/categories';
@@ -13,6 +14,7 @@ abstract class AppRoutes {
   static const memories = '/memories';
   static const onboarding = '/onboarding';
   static const otp = '/otp';
+  static const privacyPolicy = '/privacy-policy';
   static const profile = '/profile';
   static const register = '/register';
   static const resetPassword = '/reset-password';

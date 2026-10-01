@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../core/theme/app_colors.dart';
+import 'app_detail_app_bar.dart';
 import 'custom_text.dart';
 
 /// Plain dark screen with a soft glow behind the status bar, used by the
@@ -21,13 +22,7 @@ class AppPlainBackground extends StatelessWidget {
       ),
       child: ColoredBox(
         color: context.color.backgroundBase,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            const _TopGlow(),
-            child,
-          ],
-        ),
+        child: Stack(fit: StackFit.expand, children: [const _TopGlow(), child]),
       ),
     );
   }
@@ -40,7 +35,6 @@ class _TopGlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final glow = context.color.topGlow;
     return Positioned(
       top: 0,
       left: 0,
@@ -49,24 +43,29 @@ class _TopGlow extends StatelessWidget {
       child: IgnorePointer(
         child: DecoratedBox(
           decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: const Alignment(0.3, -1.4),
-              radius: 1.1,
-              // Stretch the circle into a wide, shallow ellipse.
-              transform: const _ScaleX(2.4),
-              colors: [
-                glow.withValues(alpha: 0.5),
-                glow.withValues(alpha: 0.22),
-                glow.withValues(alpha: 0.06),
-                glow.withValues(alpha: 0),
-              ],
-              stops: const [0, 0.35, 0.7, 1],
-            ),
+            gradient: topGlowGradient(context.color.topGlow),
           ),
         ),
       ),
     );
   }
+}
+
+/// The teal glow painted behind the status bar, stretched into a wide,
+/// shallow ellipse.
+Gradient topGlowGradient(Color glow) {
+  return RadialGradient(
+    center: const Alignment(0.3, -1.4),
+    radius: 1.1,
+    transform: const _ScaleX(2.4),
+    colors: [
+      glow.withValues(alpha: 0.5),
+      glow.withValues(alpha: 0.22),
+      glow.withValues(alpha: 0.06),
+      glow.withValues(alpha: 0),
+    ],
+    stops: const [0, 0.35, 0.7, 1],
+  );
 }
 
 /// Scales a gradient horizontally around the centre of its bounds.
@@ -132,8 +131,8 @@ class AppBackHeader extends StatelessWidget {
   }
 }
 
-/// Shell shared by the profile detail screens: plain background, back
-/// header, a divider, a scrolling body and an optional pinned [bottom].
+/// Shell shared by the profile detail screens: plain background, the
+/// rounded [AppDetailAppBar], a scrolling body and an optional pinned [bottom].
 class AppDetailPage extends StatelessWidget {
   const AppDetailPage({
     super.key,
@@ -146,10 +145,10 @@ class AppDetailPage extends StatelessWidget {
 
   final String title;
 
-  /// Scrolling content below the divider.
+  /// Scrolling content below the app bar.
   final Widget child;
 
-  /// Pinned under the divider, above the scrolling content.
+  /// Pinned under the app bar, above the scrolling content.
   final Widget? header;
 
   /// Pinned to the bottom of the screen, e.g. a save button.
@@ -159,26 +158,39 @@ class AppDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.color.backgroundBase,
-      body: AppPlainBackground(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AppBackHeader(title: title),
-              Divider(height: 1, color: context.color.strokeDark),
-              ?header,
-              Expanded(
-                child: SingleChildScrollView(padding: padding, child: child),
-              ),
-              if (bottom != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                  child: bottom,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: context.color.backgroundBase,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppDetailAppBar(title: title),
+            Expanded(
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ?header,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: padding,
+                        child: child,
+                      ),
+                    ),
+                    if (bottom != null)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                        child: bottom,
+                      ),
+                  ],
                 ),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

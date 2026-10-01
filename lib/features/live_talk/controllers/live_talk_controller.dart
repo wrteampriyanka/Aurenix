@@ -1,25 +1,53 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:audio_session/audio_session.dart';
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import '../../../core/services/api_service.dart';
+import '../widgets/audio_output_sheet.dart';
 
 enum LiveStatus { idle, listening, thinking, speaking }
 
+/// Somewhere the voice can play: the phone speaker or connected headphones.
+class AudioOutput {
+  const AudioOutput({
+    required this.id,
+    required this.name,
+    this.isSpeaker = false,
+  });
+
+  static const speaker = AudioOutput(id: 'speaker', name: '', isSpeaker: true);
+
+  final String id;
+  final String name;
+  final bool isSpeaker;
+}
+
 /// Hands-free voice chat: listens, sends what was said to the AI, reads the
-/// reply aloud, then listens again.
-class LiveTalkController extends GetxController {
+/// reply aloud, then listens again. With the camera on, each question goes
+/// with a photo of what the camera sees.
+class LiveTalkController extends GetxController with WidgetsBindingObserver {
   final status = LiveStatus.idle.obs;
 
   /// What the user is saying, then the AI reply while it is read out.
   final caption = ''.obs;
 
   final showCaptions = true.obs;
-  final isSpeakerOn = true.obs;
   final isMuted = false.obs;
+
+  /// Filled each time the output sheet opens, speaker first.
+  final outputs = <AudioOutput>[AudioOutput.speaker].obs;
+  final selectedOutput = AudioOutput.speaker.id.obs;
+
+  /// Set while the camera is on and its preview can be shown.
+  final camera = Rxn<CameraController>();
 
   final _speech = SpeechToText();
   final _tts = FlutterTts();
@@ -30,6 +58,17 @@ class LiveTalkController extends GetxController {
   /// Bumped to drop callbacks from a turn that was interrupted.
   var _turn = 0;
   var _closed = false;
+
+  var _cameraStarting = false;
+
+  /// The camera was on when the app went to the background.
+  var _reopenCamera = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    WidgetsBinding.instance.addObserver(this);
+  }
 
   @override
   void onReady() {
@@ -93,11 +132,16 @@ class LiveTalkController extends GetxController {
     }
   }
 
-  void _ask(String text) {
+  Future<void> _ask(String text) async {
     final turn = ++_turn;
     status.value = LiveStatus.thinking;
     _speech.stop();
-    _history.add(ChatTurn(role: ChatRole.user, text: text));
+    final image = await _snapshot();
+    if (turn != _turn) return;
+    // Only the latest photo is sent; earlier ones would make every request
+    // bigger, and the replies already describe what they showed.
+    final index = _history.length;
+    _history.add(ChatTurn(role: ChatRole.user, text: text, image: image));
 
     final buffer = StringBuffer();
     _reply = ApiService.instance
@@ -111,6 +155,7 @@ class LiveTalkController extends GetxController {
           },
           onDone: () {
             if (turn != _turn) return;
+            _history[index] = ChatTurn(role: ChatRole.user, text: text);
             final reply = _plainText(buffer.toString());
             _history.add(ChatTurn(role: ChatRole.model, text: reply));
             _speak(turn, reply);
@@ -123,16 +168,14 @@ class LiveTalkController extends GetxController {
     _reply = null;
     status.value = LiveStatus.speaking;
     caption.value = text;
-    if (isSpeakerOn.value) {
-      try {
-        await _prepareTts();
-        for (final part in _speechParts(text)) {
-          if (turn != _turn) return;
-          if (await _tts.speak(part) != 1) break;
-        }
-      } catch (_) {
-        // Keep the conversation going with the caption only.
+    try {
+      await _prepareTts();
+      for (final part in _speechParts(text)) {
+        if (turn != _turn) return;
+        if (await _tts.speak(part) != 1) break;
       }
+    } catch (_) {
+      // Keep the conversation going with the caption only.
     }
     if (turn != _turn) return;
     status.value = LiveStatus.idle;
@@ -188,12 +231,68 @@ class LiveTalkController extends GetxController {
 
   void onToggleCaptions() => showCaptions.toggle();
 
-  void onToggleSpeaker() {
-    isSpeakerOn.toggle();
-    if (!isSpeakerOn.value && status.value == LiveStatus.speaking) {
-      _tts.stop();
+
+  Future<void> onAudioOutput() async {
+    await _loadOutputs();
+    await showModalBottomSheet<void>(
+      context: Get.context!,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black54,
+      elevation: 0,
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 450),
+        reverseDuration: Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      ),
+      builder: (_) => const AudioOutputSheet(),
+    );
+  }
+
+  // TODO: route the voice to the picked output. The system currently plays
+  // it on whatever it considers active (usually the last connected device).
+  void onSelectOutput(AudioOutput output) {
+    selectedOutput.value = output.id;
+    Get.back();
+  }
+
+  Future<void> _loadOutputs() async {
+    final found = <AudioOutput>[AudioOutput.speaker];
+    try {
+      final session = await AudioSession.instance;
+      final devices = await session.getDevices(includeInputs: false);
+      final names = <String>{};
+      for (final device in devices) {
+        // A Bluetooth headset shows up once per profile, so key by name.
+        if (_isHeadphones(device) && names.add(device.name)) {
+          found.add(AudioOutput(id: device.name, name: device.name));
+        }
+      }
+    } catch (_) {
+      // The speaker alone is still a valid choice.
+    }
+    outputs.assignAll(found);
+    if (!found.any((o) => o.id == selectedOutput.value)) {
+      selectedOutput.value = AudioOutput.speaker.id;
     }
   }
+
+  // By name, since the audio_session device type enum is experimental.
+  static const _headphoneTypes = {
+    'wiredHeadset',
+    'wiredHeadphones',
+    'bluetoothA2dp',
+    'bluetoothSco',
+    'bluetoothLe',
+    'usbAudio',
+    'hearingAid',
+    'airPlay',
+    'carAudio',
+  };
+
+  static bool _isHeadphones(AudioDevice device) =>
+      _headphoneTypes.contains(device.type.name);
 
   /// Muting stops listening (and cuts off a reply); unmuting listens again.
   Future<void> onToggleMic() async {
@@ -206,8 +305,76 @@ class LiveTalkController extends GetxController {
     }
   }
 
-  // TODO: wire these up once video, screen sharing and voice settings exist.
-  void onCamera() => Get.rawSnackbar(message: 'live_coming_soon'.tr);
+  /// A JPEG of what the camera sees, or null when it is off.
+  Future<Uint8List?> _snapshot() async {
+    final controller = camera.value;
+    if (controller == null || controller.value.isTakingPicture) return null;
+    try {
+      final file = await controller.takePicture();
+      final bytes = await file.readAsBytes();
+      File(file.path).delete().ignore();
+      return bytes;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> onCamera() =>
+      camera.value == null ? _openCamera() : _closeCamera();
+
+  Future<void> _openCamera() async {
+    if (_cameraStarting || _closed) return;
+    _cameraStarting = true;
+    CameraController? controller;
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) throw CameraException('none', null);
+      controller = CameraController(
+        cameras.firstWhere(
+          (c) => c.lensDirection == CameraLensDirection.back,
+          orElse: () => cameras.first,
+        ),
+        ResolutionPreset.medium,
+        // The microphone belongs to speech recognition.
+        enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.jpeg,
+      );
+      await controller.initialize();
+      if (_closed) return await controller.dispose();
+      camera.value = controller;
+    } catch (e) {
+      debugPrint('Live talk camera failed: $e');
+      controller?.dispose();
+      final denied = e is CameraException && e.code.startsWith('CameraAccess');
+      Get.rawSnackbar(
+        message: (denied ? 'live_camera_denied' : 'live_camera_unavailable').tr,
+      );
+    } finally {
+      _cameraStarting = false;
+    }
+  }
+
+  Future<void> _closeCamera() async {
+    final controller = camera.value;
+    // Drop the preview before disposing what it shows.
+    camera.value = null;
+    await controller?.dispose();
+  }
+
+  /// The camera is released while the app is in the background, as the
+  /// platforms require, and comes back on return.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive && camera.value != null) {
+      _reopenCamera = true;
+      _closeCamera();
+    } else if (state == AppLifecycleState.resumed && _reopenCamera) {
+      _reopenCamera = false;
+      _openCamera();
+    }
+  }
+
+  // TODO: wire these up once screen sharing and voice settings exist.
   void onScreenShare() => Get.rawSnackbar(message: 'live_coming_soon'.tr);
   void onSettings() => Get.rawSnackbar(message: 'live_coming_soon'.tr);
 
@@ -216,7 +383,9 @@ class LiveTalkController extends GetxController {
   @override
   void onClose() {
     _closed = true;
+    WidgetsBinding.instance.removeObserver(this);
     _interrupt();
+    _closeCamera();
     super.onClose();
   }
 }

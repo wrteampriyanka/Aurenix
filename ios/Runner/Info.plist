@@ -24,6 +24,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Aurenix uses the camera so you can show it what you are talking about.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Aurenix uses the microphone so you can talk to it.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

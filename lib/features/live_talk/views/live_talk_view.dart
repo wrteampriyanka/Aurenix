@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
@@ -58,13 +59,9 @@ class _TopActions extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          Obx(
-            () => _CircleButton(
-              icon: controller.isSpeakerOn.value
-                  ? PhosphorIconsRegular.speakerHigh
-                  : PhosphorIconsRegular.speakerSlash,
-              onTap: controller.onToggleSpeaker,
-            ),
+          _CircleButton(
+            icon: PhosphorIconsRegular.speakerHigh,
+            onTap: controller.onAudioOutput,
           ),
           const SizedBox(width: 14),
           _CircleButton(
@@ -84,55 +81,130 @@ class _Center extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Obx(() {
+      final camera = controller.camera.value;
+      if (camera != null) return _CameraCenter(controller, camera);
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const WaveOrb(size: 196, showRing: false, showDots: true),
+            const SizedBox(height: 28),
+            Flexible(child: _Caption(controller: controller, showPrompt: true)),
+            const SizedBox(height: 12),
+            _Status(controller: controller),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+/// What the camera sees, filling the space above the caption.
+class _CameraCenter extends StatelessWidget {
+  const _CameraCenter(this.controller, this.camera);
+
+  final LiveTalkController controller;
+  final CameraController camera;
+
+  @override
+  Widget build(BuildContext context) {
+    // The preview size is reported in landscape; the screen is portrait.
+    final size = camera.value.previewSize;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const WaveOrb(size: 196, showRing: false, showDots: true),
-          const SizedBox(height: 28),
-          Flexible(
-            child: Obx(() {
-              final caption = controller.caption.value;
-              if (!controller.showCaptions.value || caption.isEmpty) {
-                // Narrow like the design, so it wraps after "you".
-                return SizedBox(
-                  width: 250,
-                  child: CustomText(
-                    'home_prompt'.tr,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    textAlign: TextAlign.center,
-                    color: context.color.textNatural,
-                  ),
-                );
-              }
-              return SingleChildScrollView(
-                reverse: true,
-                child: CustomText(
-                  caption,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  textAlign: TextAlign.center,
-                  color: context.color.textNatural,
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 12),
-          Obx(
-            () => CustomText(
-              switch (controller.status.value) {
-                _ when controller.isMuted.value => 'live_muted'.tr,
-                LiveStatus.listening => 'live_listening'.tr,
-                LiveStatus.thinking => 'live_thinking'.tr,
-                LiveStatus.speaking || LiveStatus.idle => '',
-              },
-              fontSize: 14,
-              color: context.color.textBody,
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: SizedBox.expand(
+                child: size == null
+                    ? CameraPreview(camera)
+                    : FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          width: size.height,
+                          height: size.width,
+                          child: CameraPreview(camera),
+                        ),
+                      ),
+              ),
             ),
           ),
+          const SizedBox(height: 20),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 96),
+            child: _Caption(controller: controller, showPrompt: false),
+          ),
+          const SizedBox(height: 10),
+          _Status(controller: controller),
         ],
+      ),
+    );
+  }
+}
+
+/// What the user is saying, or the reply being read out.
+class _Caption extends StatelessWidget {
+  const _Caption({required this.controller, required this.showPrompt});
+
+  final LiveTalkController controller;
+
+  /// Show the "how can I help" prompt while there is no caption.
+  final bool showPrompt;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final caption = controller.caption.value;
+      if (!controller.showCaptions.value || caption.isEmpty) {
+        if (!showPrompt) return const SizedBox.shrink();
+        // Narrow like the design, so it wraps after "you".
+        return SizedBox(
+          width: 250,
+          child: CustomText(
+            'home_prompt'.tr,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            textAlign: TextAlign.center,
+            color: context.color.textNatural,
+          ),
+        );
+      }
+      return SingleChildScrollView(
+        reverse: true,
+        child: CustomText(
+          caption,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          textAlign: TextAlign.center,
+          color: context.color.textNatural,
+        ),
+      );
+    });
+  }
+}
+
+/// Listening, thinking or muted, under the caption.
+class _Status extends StatelessWidget {
+  const _Status({required this.controller});
+
+  final LiveTalkController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => CustomText(
+        switch (controller.status.value) {
+          _ when controller.isMuted.value => 'live_muted'.tr,
+          LiveStatus.listening => 'live_listening'.tr,
+          LiveStatus.thinking => 'live_thinking'.tr,
+          LiveStatus.speaking || LiveStatus.idle => '',
+        },
+        fontSize: 14,
+        color: context.color.textBody,
       ),
     );
   }
@@ -162,9 +234,12 @@ class _BottomActions extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: _PillButton(
-              icon: PhosphorIconsRegular.camera,
-              onTap: controller.onCamera,
+            child: Obx(
+              () => _PillButton(
+                icon: PhosphorIconsRegular.camera,
+                active: controller.camera.value != null,
+                onTap: controller.onCamera,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -218,16 +293,27 @@ class _CircleButton extends StatelessWidget {
 }
 
 class _PillButton extends StatelessWidget {
-  const _PillButton({required this.icon, required this.onTap});
+  const _PillButton({
+    required this.icon,
+    required this.onTap,
+    this.active = false,
+  });
 
   final IconData icon;
   final VoidCallback onTap;
+
+  /// Outlined, like the camera while it is on.
+  final bool active;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: context.color.tileFillHighlight,
-      shape: const StadiumBorder(),
+      shape: StadiumBorder(
+        side: active
+            ? BorderSide(color: context.color.buttonHighlight)
+            : BorderSide.none,
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,

@@ -40,6 +40,16 @@ class ProfileController extends GetxController {
     PhosphorIconsRegular.database,
   );
 
+  static const privacyPolicy = ProfileMenuItem(
+    'profile_privacy_policy',
+    PhosphorIconsRegular.shieldCheck,
+  );
+
+  static const aboutUs = ProfileMenuItem(
+    'profile_about_us',
+    PhosphorIconsRegular.info,
+  );
+
   static const settingsItems = [
     customizeAi,
     archiveChats,
@@ -50,8 +60,8 @@ class ProfileController extends GetxController {
 
   static const accountItems = [
     dataControl,
-    ProfileMenuItem('profile_privacy_policy', PhosphorIconsRegular.shieldCheck),
-    ProfileMenuItem('profile_about_us', PhosphorIconsRegular.info),
+    privacyPolicy,
+    aboutUs,
     logout,
   ];
 
@@ -86,5 +96,7 @@ class ProfileController extends GetxController {
     if (item == customizeAi) Get.toNamed(AppRoutes.customizeAi);
     if (item == archiveChats) Get.toNamed(AppRoutes.archiveChats);
     if (item == dataControl) Get.toNamed(AppRoutes.dataControl);
+    if (item == privacyPolicy) Get.toNamed(AppRoutes.privacyPolicy);
+    if (item == aboutUs) Get.toNamed(AppRoutes.aboutUs);
   }
 }

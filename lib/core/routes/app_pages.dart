@@ -15,6 +15,7 @@ import '../../features/edit_profile/bindings/edit_profile_binding.dart';
 import '../../features/edit_profile/views/edit_profile_view.dart';
 import '../../features/home/bindings/home_binding.dart';
 import '../../features/home/views/home_view.dart';
+import '../../features/legal/views/legal_view.dart';
 import '../../features/live_talk/bindings/live_talk_binding.dart';
 import '../../features/live_talk/views/live_talk_view.dart';
 import '../../features/login/bindings/login_binding.dart';
@@ -50,54 +51,55 @@ class AppPages {
   static const _authTransitionDuration = Duration(milliseconds: 450);
   static const _authTransitionCurve = Curves.easeInOut;
 
-  // Profile screens fade in while sliding a little from the right, instead of
-  // the platform zoom, which flashes a dark fill between the two screens.
-  static final _screenTransition = _FadeSlideTransition();
-  static const _screenTransitionDuration = Duration(milliseconds: 380);
-  static const _screenTransitionCurve = Curves.easeOutCubic;
+  // Screens slide in over the one below, which drifts left and dims, instead
+  // of the platform zoom, which flashes a dark fill between the two screens.
+  static final _screenTransition = _SlideParallaxTransition();
+  static const _screenTransitionDuration = Duration(milliseconds: 420);
+  static const _screenTransitionCurve = Curves.fastEaseInToSlowEaseOut;
+
+  /// A screen that uses [_screenTransition] and can be swiped back from the
+  /// left edge.
+  static GetPage _screen(
+    String name,
+    GetPageBuilder page, [
+    Bindings? binding,
+  ]) => GetPage(
+    name: name,
+    page: page,
+    binding: binding,
+    customTransition: _screenTransition,
+    transitionDuration: _screenTransitionDuration,
+    curve: _screenTransitionCurve,
+    popGesture: true,
+  );
 
   static final routes = <GetPage>[
-    GetPage(
-      name: AppRoutes.archiveChats,
-      page: () => const ArchiveChatsView(),
-      binding: ArchiveChatsBinding(),
-      customTransition: _screenTransition,
-      transitionDuration: _screenTransitionDuration,
-      curve: _screenTransitionCurve,
+    _screen(AppRoutes.aboutUs, () => const LegalView(page: LegalPage.aboutUs)),
+    _screen(
+      AppRoutes.archiveChats,
+      () => const ArchiveChatsView(),
+      ArchiveChatsBinding(),
     ),
-    GetPage(
-      name: AppRoutes.budget,
-      page: () => const BudgetView(),
-      binding: BudgetBinding(),
+    _screen(AppRoutes.budget, () => const BudgetView(), BudgetBinding()),
+    _screen(
+      AppRoutes.categories,
+      () => const CategoriesView(),
+      CategoriesBinding(),
     ),
-    GetPage(
-      name: AppRoutes.categories,
-      page: () => const CategoriesView(),
-      binding: CategoriesBinding(),
+    _screen(
+      AppRoutes.customizeAi,
+      () => const CustomizeAiView(),
+      CustomizeAiBinding(),
     ),
-    GetPage(
-      name: AppRoutes.customizeAi,
-      page: () => const CustomizeAiView(),
-      binding: CustomizeAiBinding(),
-      customTransition: _screenTransition,
-      transitionDuration: _screenTransitionDuration,
-      curve: _screenTransitionCurve,
+    _screen(
+      AppRoutes.dataControl,
+      () => const DataControlView(),
+      DataControlBinding(),
     ),
-    GetPage(
-      name: AppRoutes.dataControl,
-      page: () => const DataControlView(),
-      binding: DataControlBinding(),
-      customTransition: _screenTransition,
-      transitionDuration: _screenTransitionDuration,
-      curve: _screenTransitionCurve,
-    ),
-    GetPage(
-      name: AppRoutes.editProfile,
-      page: () => const EditProfileView(),
-      binding: EditProfileBinding(),
-      customTransition: _screenTransition,
-      transitionDuration: _screenTransitionDuration,
-      curve: _screenTransitionCurve,
+    _screen(
+      AppRoutes.editProfile,
+      () => const EditProfileView(),
+      EditProfileBinding(),
     ),
     GetPage(
       name: AppRoutes.home,
@@ -121,14 +123,7 @@ class AppPages {
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
-    GetPage(
-      name: AppRoutes.memories,
-      page: () => const MemoriesView(),
-      binding: MemoriesBinding(),
-      customTransition: _screenTransition,
-      transitionDuration: _screenTransitionDuration,
-      curve: _screenTransitionCurve,
-    ),
+    _screen(AppRoutes.memories, () => const MemoriesView(), MemoriesBinding()),
     GetPage(
       name: AppRoutes.onboarding,
       page: () => const OnboardingView(),
@@ -142,14 +137,11 @@ class AppPages {
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
-    GetPage(
-      name: AppRoutes.profile,
-      page: () => const ProfileView(),
-      binding: ProfileBinding(),
-      customTransition: _screenTransition,
-      transitionDuration: _screenTransitionDuration,
-      curve: _screenTransitionCurve,
+    _screen(
+      AppRoutes.privacyPolicy,
+      () => const LegalView(page: LegalPage.privacyPolicy),
     ),
+    _screen(AppRoutes.profile, () => const ProfileView(), ProfileBinding()),
     GetPage(
       name: AppRoutes.register,
       page: () => const RegisterView(),
@@ -166,30 +158,35 @@ class AppPages {
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
-    GetPage(
-      name: AppRoutes.savings,
-      page: () => const SavingsView(),
-      binding: SavingsBinding(),
-    ),
+    _screen(AppRoutes.savings, () => const SavingsView(), SavingsBinding()),
     GetPage(
       name: AppRoutes.splash,
       page: () => const SplashView(),
       binding: SplashBinding(),
     ),
-    GetPage(
-      name: AppRoutes.transactions,
-      page: () => const TransactionsView(),
-      binding: TransactionsBinding(),
+    _screen(
+      AppRoutes.transactions,
+      () => const TransactionsView(),
+      TransactionsBinding(),
     ),
   ];
 }
 
-/// Fades the page in while it slides a short way in from the right.
-class _FadeSlideTransition extends CustomTransition {
-  static final _offset = Tween<Offset>(
-    begin: const Offset(0.08, 0),
+/// Slides the page in from the right edge. While another page covers it,
+/// the page drifts a little to the left and dims, so the two move together.
+///
+/// Popping plays the same curve mirrored, so the page leaves quickly and
+/// settles gently, and a back swipe tracks the finger with no curve.
+class _SlideParallaxTransition extends CustomTransition {
+  static final _enter = Tween<Offset>(
+    begin: const Offset(1, 0),
     end: Offset.zero,
   );
+  static final _behind = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(-0.3, 0),
+  );
+  static final _dim = Tween<double>(begin: 0, end: 0.35);
 
   @override
   Widget buildTransition(
@@ -200,14 +197,38 @@ class _FadeSlideTransition extends CustomTransition {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final curved = CurvedAnimation(
-      parent: animation,
-      curve: curve ?? Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
+    final route = ModalRoute.of(context);
+    final dragging = route is GetPageRoute && route.popGestureInProgress;
+    final c = curve ?? Curves.fastEaseInToSlowEaseOut;
+
+    final primary = dragging
+        ? animation
+        : CurvedAnimation(parent: animation, curve: c, reverseCurve: c.flipped);
+    final secondary = CurvedAnimation(
+      parent: secondaryAnimation,
+      curve: c,
+      reverseCurve: c.flipped,
     );
-    return FadeTransition(
-      opacity: curved,
-      child: SlideTransition(position: _offset.animate(curved), child: child),
+
+    return SlideTransition(
+      position: _behind.animate(secondary),
+      child: SlideTransition(
+        position: _enter.animate(primary),
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            child,
+            Positioned.fill(
+              child: IgnorePointer(
+                child: FadeTransition(
+                  opacity: _dim.animate(secondary),
+                  child: const ColoredBox(color: Colors.black),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

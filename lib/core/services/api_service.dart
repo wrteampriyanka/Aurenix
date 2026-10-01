@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
@@ -8,14 +9,24 @@ enum ChatRole { user, model }
 
 /// One turn of the conversation sent to the AI.
 class ChatTurn {
-  const ChatTurn({required this.role, required this.text});
+  const ChatTurn({required this.role, required this.text, this.image});
 
   final ChatRole role;
   final String text;
 
+  /// A JPEG photo sent along with [text], e.g. a camera frame.
+  final Uint8List? image;
+
   Map<String, dynamic> toJson() => {
     'role': role.name,
     'parts': [
+      if (image != null)
+        {
+          'inline_data': {
+            'mime_type': 'image/jpeg',
+            'data': base64Encode(image!),
+          },
+        },
       {'text': text},
     ],
   };
