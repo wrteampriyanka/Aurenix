@@ -7,6 +7,7 @@ class StorageService {
   static final StorageService instance = StorageService._();
 
   static const voiceKey = 'voice_id';
+  static const languageKey = 'language_code';
 
   SharedPreferences? _prefs;
 

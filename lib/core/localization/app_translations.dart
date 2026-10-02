@@ -6,7 +6,8 @@ import 'package:get/get.dart';
 class AppTranslations extends Translations {
   AppTranslations._(this._keys);
 
-  static const List<String> _locales = ['en_US'];
+  /// One entry per file in `assets/translations/`.
+  static const List<String> _locales = ['en_US', 'hi_IN', 'ar_SA'];
 
   final Map<String, Map<String, String>> _keys;
 

@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/routes/app_routes.dart';
+import '../../../core/services/language_service.dart';
 import '../../edit_profile/controllers/edit_profile_controller.dart';
+import '../widgets/language_sheet.dart';
 
 /// A row in one of the profile menu cards.
 class ProfileMenuItem {
@@ -60,10 +62,15 @@ class ProfileController extends GetxController {
     PhosphorIconsRegular.waveform,
   );
 
+  static const language = ProfileMenuItem(
+    'profile_language',
+    PhosphorIconsRegular.globe,
+  );
+
   static const settingsItems = [
     customizeAi,
     archiveChats,
-    ProfileMenuItem('profile_language', PhosphorIconsRegular.globe),
+    language,
     voiceSettings,
     connectedApps,
   ];
@@ -93,6 +100,14 @@ class ProfileController extends GetxController {
 
   void onUpgrade() => Get.toNamed(AppRoutes.upgrade);
 
+  /// Lets them pick English, Hindi or Arabic; the app switches at once.
+  Future<void> onLanguage() async {
+    final picked = await LanguageSheet.show(
+      selected: LanguageService.instance.selected.value,
+    );
+    if (picked != null) await LanguageService.instance.select(picked);
+  }
+
   // TODO: wire these up once the screens exist.
   void onModelTap() {}
   void onMore() {}
@@ -103,6 +118,7 @@ class ProfileController extends GetxController {
     if (item == archiveChats) Get.toNamed(AppRoutes.archiveChats);
     if (item == connectedApps) Get.toNamed(AppRoutes.connectedApps);
     if (item == voiceSettings) Get.toNamed(AppRoutes.voiceSettings);
+    if (item == language) onLanguage();
     if (item == dataControl) Get.toNamed(AppRoutes.dataControl);
     if (item == privacyPolicy) Get.toNamed(AppRoutes.privacyPolicy);
     if (item == aboutUs) Get.toNamed(AppRoutes.aboutUs);

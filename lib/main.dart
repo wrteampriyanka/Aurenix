@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'core/constants/app_constants.dart';
 import 'core/localization/app_translations.dart';
 import 'core/routes/app_pages.dart';
+import 'core/services/language_service.dart';
 import 'core/storage/storage_service.dart';
 import 'core/theme/app_theme.dart';
 
@@ -43,8 +44,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       translations: widget.translations,
-      locale: const Locale('en', 'US'),
-      fallbackLocale: const Locale('en', 'US'),
+      locale: LanguageService.instance.locale,
+      fallbackLocale: LanguageService.fallback.locale,
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
     );
