@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../widgets/custom_text.dart';
-import '../../../features/budget/controllers/budget_controller.dart';
+import 'controllers/budget_controller.dart';
 
 class BudgetScreen extends GetView<BudgetController> {
   const BudgetScreen({super.key});

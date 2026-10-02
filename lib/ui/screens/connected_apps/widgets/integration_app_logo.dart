@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../features/connected_apps/services/connected_apps_service.dart';
+import '../services/connected_apps_service.dart';
 
 /// Draws an [IntegrationApp]'s SVG or PNG logo at [size].
 class IntegrationAppLogo extends StatelessWidget {

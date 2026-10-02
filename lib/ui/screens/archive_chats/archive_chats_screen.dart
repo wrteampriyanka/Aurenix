@@ -6,8 +6,8 @@ import '../widgets/app_plain_background.dart';
 import '../widgets/app_search_field.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/home/controllers/sidebar_controller.dart';
-import '../../../features/archive_chats/controllers/archive_chats_controller.dart';
+import '../home/controllers/sidebar_controller.dart';
+import 'controllers/archive_chats_controller.dart';
 
 class ArchiveChatsScreen extends GetView<ArchiveChatsController> {
   const ArchiveChatsScreen({super.key});

@@ -7,7 +7,7 @@ import '../widgets/app_search_field.dart';
 import '../widgets/app_settings_tile.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/memories/controllers/memories_controller.dart';
+import 'controllers/memories_controller.dart';
 
 class MemoriesScreen extends GetView<MemoriesController> {
   const MemoriesScreen({super.key});

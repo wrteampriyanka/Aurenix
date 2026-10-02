@@ -3,9 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../ui/screens/widgets/app_picker_sheet.dart';
-import '../../../core/routes/app_routes.dart';
-import '../../../ui/screens/projects/widgets/create_project_sheet.dart';
+import '../../widgets/bottom_sheets/app_picker_sheet.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../widgets/bottom_sheets/create_project_sheet.dart';
 import 'home_controller.dart';
 
 /// What a sidebar menu row does when tapped.

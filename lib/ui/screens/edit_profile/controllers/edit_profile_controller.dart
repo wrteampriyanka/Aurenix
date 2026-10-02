@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../../utils/validators.dart';
+import '../../../../utils/validators.dart';
 
 /// Editable user details, passed in as the route argument and returned
 /// from the screen when the changes are saved.

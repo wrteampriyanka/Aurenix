@@ -7,7 +7,7 @@ import '../widgets/app_plain_background.dart';
 import '../widgets/app_text_field.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../../../features/reset_password/controllers/reset_password_controller.dart';
+import 'controllers/reset_password_controller.dart';
 
 class ResetPasswordScreen extends GetView<ResetPasswordController> {
   const ResetPasswordScreen({super.key});

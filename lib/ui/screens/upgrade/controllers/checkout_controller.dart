@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../ui/screens/widgets/app_picker_sheet.dart';
+import '../../widgets/bottom_sheets/app_picker_sheet.dart';
 import '../models/country.dart';
 import '../models/upgrade_plan.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../../core/routes/app_routes.dart';
+import '../../../../core/routes/app_routes.dart';
 
 class CustomizeAiController extends GetxController {
   static const personalityKeys = [

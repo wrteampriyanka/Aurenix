@@ -7,7 +7,7 @@ import '../widgets/app_otp_field.dart';
 import '../widgets/app_terms_footer.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/otp/controllers/otp_controller.dart';
+import 'controllers/otp_controller.dart';
 
 class OtpScreen extends GetView<OtpController> {
   const OtpScreen({super.key});

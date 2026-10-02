@@ -8,7 +8,7 @@ import '../widgets/custom_text.dart';
 import '../../../core/services/voice_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../onboarding/widgets/wave_orb.dart';
-import '../../../features/voice_settings/controllers/voice_settings_controller.dart';
+import 'controllers/voice_settings_controller.dart';
 
 class VoiceSettingsScreen extends GetView<VoiceSettingsController> {
   const VoiceSettingsScreen({super.key});

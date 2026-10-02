@@ -7,7 +7,7 @@ import '../widgets/app_plain_background.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../onboarding/widgets/wave_orb.dart';
-import '../../../features/live_talk/controllers/live_talk_controller.dart';
+import 'controllers/live_talk_controller.dart';
 
 class LiveTalkScreen extends GetView<LiveTalkController> {
   const LiveTalkScreen({super.key});

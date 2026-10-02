@@ -5,8 +5,8 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../widgets/app_plain_background.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/home/controllers/sidebar_controller.dart';
-import '../../../features/projects/controllers/projects_controller.dart';
+import '../home/controllers/sidebar_controller.dart';
+import 'controllers/projects_controller.dart';
 
 class ProjectsScreen extends GetView<ProjectsController> {
   const ProjectsScreen({super.key});

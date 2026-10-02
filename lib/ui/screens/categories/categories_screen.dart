@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../widgets/custom_text.dart';
-import '../../../features/categories/controllers/categories_controller.dart';
+import 'controllers/categories_controller.dart';
 
 class CategoriesScreen extends GetView<CategoriesController> {
   const CategoriesScreen({super.key});

@@ -6,7 +6,7 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../widgets/custom_text.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../features/home/controllers/home_controller.dart';
+import '../controllers/home_controller.dart';
 
 /// The conversation: user bubbles on the right, AI replies full width.
 class ChatMessages extends StatelessWidget {

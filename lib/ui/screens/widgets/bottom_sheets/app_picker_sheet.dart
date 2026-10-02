@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/app_colors.dart';
-import 'app_search_field.dart';
-import 'custom_text.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../app_search_field.dart';
+import '../custom_text.dart';
 
 /// Floating sheet with a search field over a list of options. Opens scrolled
 /// to the current [selected] option and resolves with the one tapped, or

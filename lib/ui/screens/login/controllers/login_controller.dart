@@ -2,9 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../../core/routes/app_routes.dart';
+import '../../../../core/routes/app_routes.dart';
 import '../../otp/controllers/otp_controller.dart';
-import '../../../ui/screens/login/widgets/forgot_password_sheet.dart';
+import '../../widgets/bottom_sheets/forgot_password_sheet.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();

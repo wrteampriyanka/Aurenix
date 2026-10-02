@@ -5,7 +5,7 @@ import '../widgets/app_background.dart';
 import '../widgets/app_button.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/onboarding/controllers/onboarding_controller.dart';
+import 'controllers/onboarding_controller.dart';
 import 'widgets/integration_hub.dart';
 import 'widgets/wave_orb.dart';
 

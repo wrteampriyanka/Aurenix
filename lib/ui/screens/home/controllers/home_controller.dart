@@ -13,11 +13,11 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/constants/app_assets.dart';
-import '../../../core/routes/app_routes.dart';
-import '../../../core/services/api_service.dart';
-import '../../../core/services/voice_service.dart';
-import '../../../ui/screens/home/widgets/services_sheet.dart';
+import '../../../../core/constants/app_assets.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/services/voice_service.dart';
+import '../../widgets/bottom_sheets/services_sheet.dart';
 import 'sidebar_controller.dart';
 
 /// A quick action chip under the orb.

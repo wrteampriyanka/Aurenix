@@ -7,7 +7,7 @@ import '../widgets/app_plain_background.dart';
 import '../widgets/app_settings_tile.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/data_control/controllers/data_control_controller.dart';
+import 'controllers/data_control_controller.dart';
 
 class DataControlScreen extends GetView<DataControlController> {
   const DataControlScreen({super.key});

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../widgets/app_button.dart';
-import '../../widgets/app_text_field.dart';
-import '../../widgets/custom_text.dart';
+import '../app_button.dart';
+import '../app_text_field.dart';
+import '../custom_text.dart';
 import '../../../../core/theme/app_colors.dart';
 
 /// Bottom sheet asking for a new project's name. Resolves with the trimmed

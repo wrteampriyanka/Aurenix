@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../widgets/custom_text.dart';
+import '../custom_text.dart';
 import '../../../../core/services/language_service.dart';
 import '../../../../core/theme/app_colors.dart';
 

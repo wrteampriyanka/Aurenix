@@ -12,7 +12,7 @@ import '../widgets/or_divider.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../../../features/login/controllers/login_controller.dart';
+import 'controllers/login_controller.dart';
 
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});

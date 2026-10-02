@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
-import '../../../core/services/voice_service.dart';
+import '../../../../core/services/voice_service.dart';
 
 /// Voice Preferences: swipe through the voices, each one introduces itself
 /// as it comes into view, and Save keeps the one on screen.

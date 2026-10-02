@@ -9,7 +9,7 @@ import '../widgets/app_fading_card.dart';
 import '../widgets/app_top_bar.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/profile/controllers/profile_controller.dart';
+import 'controllers/profile_controller.dart';
 
 class ProfileScreen extends GetView<ProfileController> {
   const ProfileScreen({super.key});

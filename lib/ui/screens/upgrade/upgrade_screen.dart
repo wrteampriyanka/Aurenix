@@ -7,8 +7,8 @@ import '../widgets/app_button.dart';
 import '../widgets/app_fading_card.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/upgrade/controllers/upgrade_controller.dart';
-import '../../../features/upgrade/models/upgrade_plan.dart';
+import 'controllers/upgrade_controller.dart';
+import 'models/upgrade_plan.dart';
 import 'widgets/upgrade_widgets.dart';
 
 class UpgradeScreen extends GetView<UpgradeController> {

@@ -12,7 +12,7 @@ import '../widgets/or_divider.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../../../features/register/controllers/register_controller.dart';
+import 'controllers/register_controller.dart';
 
 class RegisterScreen extends GetView<RegisterController> {
   const RegisterScreen({super.key});

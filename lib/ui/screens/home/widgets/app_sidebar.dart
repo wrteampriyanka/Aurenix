@@ -6,7 +6,7 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../widgets/custom_text.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../features/home/controllers/sidebar_controller.dart';
+import '../controllers/sidebar_controller.dart';
 
 /// Menu, chats and profile shown in the home drawer.
 ///

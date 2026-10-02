@@ -5,7 +5,7 @@ import '../widgets/app_plain_background.dart';
 import '../widgets/app_search_field.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/connected_apps/controllers/connected_apps_controller.dart';
+import 'controllers/connected_apps_controller.dart';
 import 'widgets/integration_app_logo.dart';
 
 class ConnectedAppsScreen extends GetView<ConnectedAppsController> {

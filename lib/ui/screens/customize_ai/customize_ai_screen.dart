@@ -8,7 +8,7 @@ import '../widgets/app_settings_tile.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/customize_ai/controllers/customize_ai_controller.dart';
+import 'controllers/customize_ai_controller.dart';
 
 class CustomizeAiScreen extends GetView<CustomizeAiController> {
   const CustomizeAiScreen({super.key});

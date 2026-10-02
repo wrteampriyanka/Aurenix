@@ -9,7 +9,7 @@ import '../widgets/app_text_field.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../../../features/edit_profile/controllers/edit_profile_controller.dart';
+import 'controllers/edit_profile_controller.dart';
 
 class EditProfileScreen extends GetView<EditProfileController> {
   const EditProfileScreen({super.key});

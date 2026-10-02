@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../widgets/custom_text.dart';
+import '../custom_text.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../features/live_talk/controllers/live_talk_controller.dart';
+import '../../live_talk/controllers/live_talk_controller.dart';
 
 /// Floating sheet opened by the speaker button, listing where the voice
 /// can play: the phone speaker plus any connected headphones.

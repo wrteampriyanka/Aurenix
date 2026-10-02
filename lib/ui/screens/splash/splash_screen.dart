@@ -6,7 +6,7 @@ import '../widgets/custom_text.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../features/splash/controllers/splash_controller.dart';
+import 'controllers/splash_controller.dart';
 
 class SplashScreen extends GetView<SplashController> {
   const SplashScreen({super.key});
