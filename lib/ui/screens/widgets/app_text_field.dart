@@ -20,6 +20,8 @@ class AppTextField extends StatelessWidget {
     this.inputFormatters,
     this.maxLines = 1,
     this.minLines,
+    this.readOnly = false,
+    this.focusNode,
   });
 
   final String hint;
@@ -37,6 +39,12 @@ class AppTextField extends StatelessWidget {
   /// Pass more than 1 (or null to grow freely) for a multi-line field.
   final int? maxLines;
   final int? minLines;
+
+  /// Shows the value but refuses edits and never opens the keyboard.
+  final bool readOnly;
+
+  /// Lets the caller move focus here, e.g. once a sheet has opened.
+  final FocusNode? focusNode;
 
   static const double _radius = 14;
 
@@ -102,6 +110,8 @@ class AppTextField extends StatelessWidget {
       inputFormatters: inputFormatters,
       maxLines: maxLines,
       minLines: minLines,
+      readOnly: readOnly,
+      focusNode: focusNode,
       cursorColor: context.color.primary,
       style: textStyle(context),
       decoration: decoration(

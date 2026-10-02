@@ -45,6 +45,7 @@ class Project {
     required this.name,
     required this.icon,
     required this.iconColor,
+    this.memory = ProjectMemory.all,
     this.chatCount = 0,
   });
 
@@ -52,6 +53,9 @@ class Project {
   final String name;
   final IconData icon;
   final Color iconColor;
+
+  /// How much of the user's history the project may draw on.
+  final ProjectMemory memory;
   final int chatCount;
 }
 
@@ -105,14 +109,6 @@ class SidebarController extends GetxController
 
   /// How many projects the sidebar lists before "View All".
   static const sidebarProjectCount = 2;
-
-  /// Tints given to new projects in turn.
-  static const _projectColors = [
-    Color(0xFF38BDF8),
-    Color(0xFF22C55E),
-    Color(0xFFA855F7),
-    Color(0xFFF59E0B),
-  ];
 
   // TODO: load the user's projects once the API exists.
   final projects = <Project>[
@@ -223,17 +219,25 @@ class SidebarController extends GetxController
     _home.closeDrawer();
   }
 
-  /// Asks for a name and adds the project to the top of the list.
+  /// Guards against opening two sheets at the same time.
+  bool _isCreatingProject = false;
+
+  /// Walks the user through the create-project steps and adds the result to
+  /// the top of the list.
   Future<void> onCreateProject() async {
-    final name = await CreateProjectSheet.show();
-    if (name == null) return;
+    if (_isCreatingProject) return;
+    _isCreatingProject = true;
+    final draft = await CreateProjectSheet.show();
+    _isCreatingProject = false;
+    if (draft == null) return;
     projects.insert(
       0,
       Project(
         id: DateTime.now().microsecondsSinceEpoch.toString(),
-        name: name,
-        icon: PhosphorIconsRegular.folder,
-        iconColor: _projectColors[projects.length % _projectColors.length],
+        name: draft.name,
+        icon: draft.icon,
+        iconColor: draft.iconColor,
+        memory: draft.memory,
       ),
     );
   }
