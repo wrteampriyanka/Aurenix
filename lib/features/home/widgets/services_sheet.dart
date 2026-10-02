@@ -6,6 +6,8 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../commons/widgets/custom_text.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../connected_apps/services/connected_apps_service.dart';
+import '../../connected_apps/widgets/integration_app_logo.dart';
 import '../controllers/home_controller.dart';
 
 /// A coloured tile at the top of the services sheet.
@@ -13,9 +15,9 @@ class _Service {
   const _Service({
     required this.labelKey,
     required this.color,
+    required this.onTap,
     this.svg,
     this.icon,
-    this.action,
   });
 
   final String labelKey;
@@ -25,80 +27,50 @@ class _Service {
   final String? svg;
   final IconData? icon;
 
-  /// Picked in the input when tapped; null just closes the sheet for now.
-  final HomeAction? action;
-}
-
-/// An integrated app card under "Integrated Apps".
-class _App {
-  const _App({
-    required this.nameKey,
-    required this.descriptionKey,
-    required this.logo,
-  });
-
-  final String nameKey;
-  final String descriptionKey;
-  final String logo;
+  /// What the tile does; each one closes the sheet first.
+  final void Function(HomeController) onTap;
 }
 
 /// Bottom sheet opened by the + in the home input.
 class ServicesSheet extends GetView<HomeController> {
   const ServicesSheet({super.key});
 
-  // TODO: attach a document and capture an image once pickers are added.
   static final _services = [
     _Service(
       labelKey: 'services_attach_document',
       svg: AppAssets.attachIcon,
       color: (c) => c.serviceAttach,
+      onTap: (c) => c.onAttachDocument(),
     ),
     _Service(
       labelKey: 'services_capture_image',
       icon: PhosphorIconsRegular.camera,
       color: (c) => c.serviceCapture,
+      onTap: (c) => c.onCaptureImage(),
     ),
     _Service(
       labelKey: 'services_generate_code',
       svg: AppAssets.codeIcon,
       color: (c) => c.serviceCode,
-      action: HomeController.codeAction,
+      onTap: (c) => c.onService(HomeController.codeAction),
     ),
     _Service(
       labelKey: 'services_integration',
       svg: AppAssets.integrationIcon,
       color: (c) => c.serviceIntegration,
-      action: HomeController.integrationAction,
+      onTap: (c) => c.onIntegrations(),
     ),
     _Service(
       labelKey: 'services_ai_research',
       svg: AppAssets.researchIcon,
       color: (c) => c.serviceResearch,
-      action: HomeController.researchAction,
+      onTap: (c) => c.onService(HomeController.researchAction),
     ),
     _Service(
       labelKey: 'services_generate_image',
       svg: AppAssets.generateImagesIcon,
       color: (c) => c.serviceGenerateImage,
-      action: HomeController.generateImagesAction,
-    ),
-  ];
-
-  static const _apps = [
-    _App(
-      nameKey: 'services_figma',
-      descriptionKey: 'services_figma_desc',
-      logo: AppAssets.figmaColorLogo,
-    ),
-    _App(
-      nameKey: 'services_zync',
-      descriptionKey: 'services_zync_desc',
-      logo: AppAssets.zyncLogo,
-    ),
-    _App(
-      nameKey: 'services_google_drive',
-      descriptionKey: 'services_google_drive_desc',
-      logo: AppAssets.googleDriveLogo,
+      onTap: (c) => c.onService(HomeController.generateImagesAction),
     ),
   ];
 
@@ -107,7 +79,7 @@ class ServicesSheet extends GetView<HomeController> {
   static void precache() {
     final paths = {
       for (final service in _services) ?service.svg,
-      for (final app in _apps)
+      for (final app in ConnectedAppsService.apps)
         if (app.logo.endsWith('.svg')) app.logo,
     };
     for (final path in paths) {
@@ -121,6 +93,7 @@ class ServicesSheet extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final apps = ConnectedAppsService.to.connectedApps;
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.sizeOf(context).height * 0.85,
@@ -155,24 +128,21 @@ class ServicesSheet extends GetView<HomeController> {
                         for (final service in _services)
                           _ServiceTile(
                             service: service,
-                            onTap: () => controller.onService(service.action),
+                            onTap: () => service.onTap(controller),
                           ),
                       ]),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(6, 6, 6, 12),
-                        child: CustomText(
-                          'services_integrated_apps'.tr,
-                          fontSize: 12,
-                          color: context.color.textBody,
-                        ),
-                      ),
-                      // TODO: open the app once integrations are connected.
-                      ..._pairs([
-                        for (final app in _apps)
-                          _AppCard(
-                            app: app,
-                            onTap: () => controller.onService(null),
+                      if (apps.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(6, 6, 6, 12),
+                          child: CustomText(
+                            'services_integrated_apps'.tr,
+                            fontSize: 12,
+                            color: context.color.textBody,
                           ),
+                        ),
+                      ..._pairs([
+                        for (final app in apps)
+                          _AppCard(app: app, onTap: controller.onIntegrations),
                       ]),
                     ]),
                   ),
@@ -279,7 +249,7 @@ class _ServiceTile extends StatelessWidget {
 class _AppCard extends StatelessWidget {
   const _AppCard({required this.app, required this.onTap});
 
-  final _App app;
+  final IntegrationApp app;
   final VoidCallback onTap;
 
   @override
@@ -297,9 +267,7 @@ class _AppCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  app.logo.endsWith('.svg')
-                      ? SvgPicture.asset(app.logo, width: 20, height: 20)
-                      : Image.asset(app.logo, width: 20, height: 20),
+                  IntegrationAppLogo(app: app, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: CustomText(

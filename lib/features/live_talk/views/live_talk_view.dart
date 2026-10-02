@@ -89,7 +89,12 @@ class _Center extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const WaveOrb(size: 196, showRing: false, showDots: true),
+            const WaveOrb(
+              size: 196,
+              showRing: false,
+              showDots: true,
+              speed: 2.5,
+            ),
             const SizedBox(height: 28),
             Flexible(child: _Caption(controller: controller, showPrompt: true)),
             const SizedBox(height: 12),

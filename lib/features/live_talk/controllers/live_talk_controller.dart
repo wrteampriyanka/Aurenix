@@ -10,7 +10,9 @@ import 'package:get/get.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../../../core/routes/app_routes.dart';
 import '../../../core/services/api_service.dart';
+import '../../../core/services/voice_service.dart';
 import '../widgets/audio_output_sheet.dart';
 
 enum LiveStatus { idle, listening, thinking, speaking }
@@ -141,7 +143,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     // Only the latest photo is sent; earlier ones would make every request
     // bigger, and the replies already describe what they showed.
     final index = _history.length;
-    _history.add(ChatTurn(role: ChatRole.user, text: text, image: image));
+    _history.add(ChatTurn(role: ChatRole.user, text: text, file: image));
 
     final buffer = StringBuffer();
     _reply = ApiService.instance
@@ -190,6 +192,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
         IosTextToSpeechAudioCategoryOptions.duckOthers,
       ], IosTextToSpeechAudioMode.spokenAudio);
     }
+    await VoiceService.instance.apply(_tts);
   }
 
   /// Sentence sized parts, since Android refuses to read long text at once.
@@ -230,7 +233,6 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
   }
 
   void onToggleCaptions() => showCaptions.toggle();
-
 
   Future<void> onAudioOutput() async {
     await _loadOutputs();
@@ -374,9 +376,17 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  // TODO: wire these up once screen sharing and voice settings exist.
+  // TODO: wire this up once screen sharing exists.
   void onScreenShare() => Get.rawSnackbar(message: 'live_coming_soon'.tr);
-  void onSettings() => Get.rawSnackbar(message: 'live_coming_soon'.tr);
+
+  /// Opens Voice Preferences. The conversation pauses so the mic doesn't
+  /// pick up the voice previews, and picks up again on return.
+  Future<void> onSettings() async {
+    await _interrupt();
+    caption.value = '';
+    await Get.toNamed(AppRoutes.voiceSettings);
+    if (!_closed) _listen();
+  }
 
   void onEnd() => Get.back();
 

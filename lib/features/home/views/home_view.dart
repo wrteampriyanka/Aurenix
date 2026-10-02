@@ -187,6 +187,17 @@ class _InputBar extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Obx(() {
+                    final file = controller.attachment.value;
+                    if (file == null) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                      child: _AttachmentChip(
+                        attachment: file,
+                        onRemove: controller.onRemoveAttachment,
+                      ),
+                    );
+                  }),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Obx(
@@ -281,7 +292,7 @@ class _InputBar extends StatelessWidget {
                     icon: PhosphorIconsFill.pause,
                     onTap: controller.onStop,
                   )
-                : controller.hasText.value
+                : controller.canSend
                 ? _RoundButton(
                     icon: PhosphorIconsRegular.arrowUp,
                     onTap: controller.onSend,
@@ -345,6 +356,72 @@ class _VoiceWaveform extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// The photo or document waiting to be sent, with a remove x.
+class _AttachmentChip extends StatelessWidget {
+  const _AttachmentChip({required this.attachment, required this.onRemove});
+
+  final ChatAttachment attachment;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(6, 6, 4, 6),
+      decoration: BoxDecoration(
+        color: context.color.tileFill,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: context.color.tileBorder),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: attachment.isImage
+                ? Image.memory(
+                    attachment.bytes,
+                    width: 36,
+                    height: 36,
+                    fit: BoxFit.cover,
+                    cacheWidth: 108,
+                  )
+                : SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Icon(
+                      PhosphorIconsRegular.fileText,
+                      size: 22,
+                      color: context.color.textNatural,
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: CustomText(
+              attachment.name,
+              maxLines: 1,
+              fontSize: 13,
+              color: context.color.textNatural,
+            ),
+          ),
+          InkResponse(
+            onTap: onRemove,
+            radius: 14,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Icon(
+                PhosphorIconsRegular.x,
+                size: 14,
+                color: context.color.textBody,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

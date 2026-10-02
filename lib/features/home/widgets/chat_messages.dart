@@ -94,21 +94,82 @@ class _UserBubble extends StatelessWidget {
         constraints: BoxConstraints(
           maxWidth: MediaQuery.sizeOf(context).width * 0.75,
         ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: context.color.sidebarSelected,
-            borderRadius: BorderRadius.circular(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (message.attachment case final file?) ...[
+              _SentAttachment(attachment: file),
+              if (message.text.isNotEmpty) const SizedBox(height: 6),
+            ],
+            if (message.text.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: context.color.sidebarSelected,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: SelectableText(
+                  message.text.value,
+                  style: TextStyle(
+                    color: context.color.textNatural,
+                    fontSize: 15,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A photo shown as a thumbnail, a document as a file row.
+class _SentAttachment extends StatelessWidget {
+  const _SentAttachment({required this.attachment});
+
+  final ChatAttachment attachment;
+
+  @override
+  Widget build(BuildContext context) {
+    if (attachment.isImage) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.memory(
+          attachment.bytes,
+          width: 200,
+          fit: BoxFit.cover,
+          cacheWidth: 600,
+        ),
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: context.color.sidebarSelected,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            PhosphorIconsRegular.fileText,
+            size: 20,
+            color: context.color.textNatural,
           ),
-          child: SelectableText(
-            message.text.value,
-            style: TextStyle(
+          const SizedBox(width: 8),
+          Flexible(
+            child: CustomText(
+              attachment.name,
+              maxLines: 1,
+              fontSize: 14,
               color: context.color.textNatural,
-              fontSize: 15,
-              height: 1.3,
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -133,6 +194,13 @@ class _AiMessage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (status != null) _Status(text: status),
+          for (final image in message.images) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.memory(image.bytes, fit: BoxFit.contain),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (text.isNotEmpty) _Markdown(text: text),
           if (error != null) ...[
             if (text.isNotEmpty) const SizedBox(height: 8),

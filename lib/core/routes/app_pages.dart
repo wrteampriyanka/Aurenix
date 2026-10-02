@@ -7,6 +7,8 @@ import '../../features/budget/bindings/budget_binding.dart';
 import '../../features/budget/views/budget_view.dart';
 import '../../features/categories/bindings/categories_binding.dart';
 import '../../features/categories/views/categories_view.dart';
+import '../../features/connected_apps/bindings/connected_apps_binding.dart';
+import '../../features/connected_apps/views/connected_apps_view.dart';
 import '../../features/customize_ai/bindings/customize_ai_binding.dart';
 import '../../features/customize_ai/views/customize_ai_view.dart';
 import '../../features/data_control/bindings/data_control_binding.dart';
@@ -38,6 +40,8 @@ import '../../features/splash/bindings/splash_binding.dart';
 import '../../features/splash/views/splash_view.dart';
 import '../../features/transactions/bindings/transactions_binding.dart';
 import '../../features/transactions/views/transactions_view.dart';
+import '../../features/voice_settings/bindings/voice_settings_binding.dart';
+import '../../features/voice_settings/views/voice_settings_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -85,6 +89,11 @@ class AppPages {
       AppRoutes.categories,
       () => const CategoriesView(),
       CategoriesBinding(),
+    ),
+    _screen(
+      AppRoutes.connectedApps,
+      () => const ConnectedAppsView(),
+      ConnectedAppsBinding(),
     ),
     _screen(
       AppRoutes.customizeAi,
@@ -168,6 +177,14 @@ class AppPages {
       AppRoutes.transactions,
       () => const TransactionsView(),
       TransactionsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.voiceSettings,
+      page: () => const VoiceSettingsView(),
+      binding: VoiceSettingsBinding(),
+      transition: Transition.downToUp,
+      transitionDuration: _screenTransitionDuration,
+      curve: _screenTransitionCurve,
     ),
   ];
 }

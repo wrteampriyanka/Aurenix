@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../commons/widgets/app_button.dart';
 import '../../../commons/widgets/app_plain_background.dart';
+import '../../../commons/widgets/app_search_field.dart';
 import '../../../commons/widgets/app_settings_tile.dart';
 import '../../../commons/widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
@@ -25,7 +25,9 @@ class MemoriesView extends GetView<MemoriesController> {
           color: context.color.upgradeButton,
           highlightColor: context.color.upgradeButtonHighlight,
           borderColor: context.color.upgradeButtonBorder,
-          onPressed: controller.memories.isEmpty ? null : controller.onRemoveAll,
+          onPressed: controller.memories.isEmpty
+              ? null
+              : controller.onRemoveAll,
         ),
       ),
       child: Column(
@@ -49,7 +51,10 @@ class MemoriesView extends GetView<MemoriesController> {
             ),
           ),
           const SizedBox(height: 20),
-          _SearchField(controller: controller),
+          AppSearchField(
+            controller: controller.searchController,
+            hintText: 'memories_search_hint'.tr,
+          ),
           const SizedBox(height: 20),
           CustomText(
             'memories_all'.tr,
@@ -59,70 +64,6 @@ class MemoriesView extends GetView<MemoriesController> {
           ),
           const SizedBox(height: 12),
           _MemoriesList(controller: controller),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchField extends StatelessWidget {
-  const _SearchField({required this.controller});
-
-  final MemoriesController controller;
-
-  static const double _height = 48;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = context.color;
-    return Container(
-      height: _height,
-      decoration: BoxDecoration(
-        color: color.inputFill,
-        borderRadius: BorderRadius.circular(_height / 2),
-        border: Border.all(color: color.inputBorder),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 14),
-          Icon(
-            PhosphorIconsRegular.magnifyingGlass,
-            size: 22,
-            color: color.textNatural,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              controller: controller.searchController,
-              textInputAction: TextInputAction.search,
-              cursorColor: color.primary,
-              style: TextStyle(color: color.textNatural, fontSize: 15),
-              decoration: InputDecoration(
-                hintText: 'memories_search_hint'.tr,
-                hintStyle: TextStyle(color: color.textBody, fontSize: 15),
-                hintMaxLines: 1,
-                border: InputBorder.none,
-                isCollapsed: true,
-              ),
-            ),
-          ),
-          Obx(
-            () => controller.query.value.isEmpty
-                ? const SizedBox(width: 14)
-                : InkResponse(
-                    onTap: controller.searchController.clear,
-                    radius: 18,
-                    child: SizedBox(
-                      width: 40,
-                      height: _height,
-                      child: Icon(
-                        PhosphorIconsFill.xCircle,
-                        size: 18,
-                        color: color.textBody,
-                      ),
-                    ),
-                  ),
-          ),
         ],
       ),
     );

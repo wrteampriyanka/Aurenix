@@ -5,6 +5,7 @@ abstract class AppRoutes {
   static const archiveChats = '/archive-chats';
   static const budget = '/budget';
   static const categories = '/categories';
+  static const connectedApps = '/connected-apps';
   static const customizeAi = '/customize-ai';
   static const dataControl = '/data-control';
   static const editProfile = '/edit-profile';
@@ -21,4 +22,5 @@ abstract class AppRoutes {
   static const savings = '/savings';
   static const splash = '/splash';
   static const transactions = '/transactions';
+  static const voiceSettings = '/voice-settings';
 }

@@ -1,6 +1,25 @@
-/// Wrapper around local persistence (e.g. GetStorage / SharedPreferences).
+import 'package:shared_preferences/shared_preferences.dart';
+
+/// Wrapper around local persistence. Call [init] once before [runApp].
 class StorageService {
   StorageService._();
 
   static final StorageService instance = StorageService._();
+
+  static const voiceKey = 'voice_id';
+
+  SharedPreferences? _prefs;
+
+  Future<void> init() async {
+    try {
+      _prefs = await SharedPreferences.getInstance();
+    } catch (_) {
+      // Settings then last for this run only.
+    }
+  }
+
+  String? getString(String key) => _prefs?.getString(key);
+
+  Future<void> setString(String key, String value) async =>
+      _prefs?.setString(key, value);
 }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../commons/widgets/app_plain_background.dart';
+import '../../../commons/widgets/app_search_field.dart';
 import '../../../commons/widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../home/controllers/sidebar_controller.dart';
@@ -17,74 +18,13 @@ class ArchiveChatsView extends GetView<ArchiveChatsController> {
       title: 'archive_chats_title'.tr,
       header: Padding(
         padding: const EdgeInsets.all(16),
-        child: _SearchField(controller: controller),
+        child: AppSearchField(
+          controller: controller.searchController,
+          hintText: 'archive_chats_search_hint'.tr,
+        ),
       ),
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: _ChatsCard(controller: controller),
-    );
-  }
-}
-
-class _SearchField extends StatelessWidget {
-  const _SearchField({required this.controller});
-
-  final ArchiveChatsController controller;
-
-  static const double _height = 48;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = context.color;
-    return Container(
-      height: _height,
-      decoration: BoxDecoration(
-        color: color.inputFill,
-        borderRadius: BorderRadius.circular(_height / 2),
-        border: Border.all(color: color.inputBorder),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 14),
-          Icon(
-            PhosphorIconsRegular.magnifyingGlass,
-            size: 22,
-            color: color.textNatural,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              controller: controller.searchController,
-              textInputAction: TextInputAction.search,
-              cursorColor: color.primary,
-              style: TextStyle(color: color.textNatural, fontSize: 15),
-              decoration: InputDecoration(
-                hintText: 'archive_chats_search_hint'.tr,
-                hintStyle: TextStyle(color: color.textBody, fontSize: 15),
-                hintMaxLines: 1,
-                border: InputBorder.none,
-                isCollapsed: true,
-              ),
-            ),
-          ),
-          Obx(
-            () => controller.query.value.isEmpty
-                ? const SizedBox(width: 14)
-                : InkResponse(
-                    onTap: controller.searchController.clear,
-                    radius: 18,
-                    child: SizedBox(
-                      width: 40,
-                      height: _height,
-                      child: Icon(
-                        PhosphorIconsFill.xCircle,
-                        size: 18,
-                        color: color.textBody,
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      ),
     );
   }
 }

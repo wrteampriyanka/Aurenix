@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -13,6 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/services/api_service.dart';
+import '../../../core/services/voice_service.dart';
 import '../widgets/services_sheet.dart';
 import 'sidebar_controller.dart';
 
@@ -27,16 +31,41 @@ class HomeAction {
   final String icon;
 }
 
+/// A photo or document sent along with a message.
+class ChatAttachment {
+  const ChatAttachment({
+    required this.name,
+    required this.bytes,
+    required this.mimeType,
+  });
+
+  final String name;
+  final Uint8List bytes;
+  final String mimeType;
+
+  bool get isImage => mimeType.startsWith('image/');
+}
+
 /// A message in the current conversation.
 class ChatMessage {
-  ChatMessage.user(String text)
+  ChatMessage.user(String text, {this.attachment})
     : isUser = true,
       text = text.obs,
       isStreaming = false.obs;
 
-  ChatMessage.ai() : isUser = false, text = ''.obs, isStreaming = true.obs;
+  ChatMessage.ai()
+    : isUser = false,
+      attachment = null,
+      text = ''.obs,
+      isStreaming = true.obs;
 
   final bool isUser;
+
+  /// Photo or document the user sent with the message.
+  final ChatAttachment? attachment;
+
+  /// Pictures drawn for a "Generate image" reply.
+  final images = <GeneratedImage>[].obs;
 
   /// Grows while the reply streams in.
   final RxString text;
@@ -63,7 +92,14 @@ class HomeController extends GetxController
   /// Chip picked from the welcome screen, shown as a tag in the input.
   final selectedAction = Rxn<HomeAction>();
 
-  StreamSubscription<ChatChunk>? _reply;
+  /// Photo or document to send with the next message.
+  final attachment = Rxn<ChatAttachment>();
+
+  /// Whether the send button shows: there is text or an attachment.
+  bool get canSend => hasText.value || attachment.value != null;
+
+  /// Stops the reply in progress, streamed or a generated image.
+  StreamSubscription<Object?>? _reply;
 
   final _speech = SpeechToText();
   final _tts = FlutterTts();
@@ -146,8 +182,12 @@ class HomeController extends GetxController
     if (last == null || !last.isStreaming.value || last.text.isNotEmpty) {
       return null;
     }
+    if (last.images.isNotEmpty) return null;
+    if (_generatingImage) return 'chat_generating_image'.tr;
     return _searchWeb ? 'chat_searching_web'.tr : 'chat_thinking'.tr;
   }
+
+  bool _generatingImage = false;
 
   void onSend() {
     if (isListening.value) {
@@ -155,12 +195,14 @@ class HomeController extends GetxController
       return;
     }
     final text = messageController.text.trim();
-    if (text.isEmpty) return;
+    final file = attachment.value;
+    if (text.isEmpty && file == null) return;
     // Sending a new message replaces the reply still streaming in.
     if (isGenerating.value) onStop();
     _acceptSpeech = false;
     messageController.clear();
-    messages.add(ChatMessage.user(text));
+    attachment.value = null;
+    messages.add(ChatMessage.user(text, attachment: file));
     _generate();
   }
 
@@ -229,6 +271,7 @@ class HomeController extends GetxController
         IosTextToSpeechAudioCategoryOptions.duckOthers,
       ], IosTextToSpeechAudioMode.spokenAudio);
     }
+    await VoiceService.instance.apply(_tts);
   }
 
   /// Splits [text] at sentence ends into parts short enough for Android,
@@ -252,8 +295,24 @@ class HomeController extends GetxController
     return parts;
   }
 
-  void onShare(ChatMessage message) =>
-      SharePlus.instance.share(ShareParams(text: message.text.value));
+  void onShare(ChatMessage message) {
+    final text = message.text.value;
+    SharePlus.instance.share(
+      ShareParams(
+        text: text.isEmpty ? null : text,
+        files: message.images.isEmpty
+            ? null
+            : [
+                for (final (i, image) in message.images.indexed)
+                  XFile.fromData(
+                    image.bytes,
+                    mimeType: image.mimeType,
+                    name: 'aurenix_${i + 1}.${image.mimeType.split('/').last}',
+                  ),
+              ],
+      ),
+    );
+  }
 
   Future<void> onOpenSource(ChatSource source) async {
     final opened = await launchUrl(
@@ -381,19 +440,52 @@ class HomeController extends GetxController
   void _generate() {
     final history = [
       for (final m in messages)
-        if (m.error.value == null && m.text.isNotEmpty)
+        if (m.error.value == null &&
+            (m.text.isNotEmpty || m.attachment != null))
           ChatTurn(
             role: m.isUser ? ChatRole.user : ChatRole.model,
             text: m.text.value,
+            file: m.attachment?.bytes,
+            mimeType: m.attachment?.mimeType ?? 'image/jpeg',
           ),
     ];
     final reply = ChatMessage.ai();
     messages.add(reply);
     isGenerating.value = true;
+    _generatingImage = selectedAction.value == generateImagesAction;
     _scrollToBottom();
 
+    if (_generatingImage) {
+      // Only the latest message: older photos would be redrawn otherwise.
+      _reply = ApiService.instance
+          .generateImage([history.last])
+          .asStream()
+          .listen(
+            (result) {
+              reply.text.value = result.text;
+              reply.images.addAll(result.images);
+              _scrollToBottom();
+            },
+            onError: (Object e) {
+              reply.error.value = e is ApiException
+                  ? e.message
+                  : 'chat_error'.tr;
+              _finish(reply);
+            },
+            onDone: () => _finish(reply),
+            cancelOnError: true,
+          );
+      return;
+    }
+
     _reply = ApiService.instance
-        .streamChat(history, searchWeb: _searchWeb)
+        .streamChat(
+          history,
+          searchWeb: _searchWeb,
+          instruction: selectedAction.value == codeAction
+              ? _codeInstruction
+              : null,
+        )
         .listen(
           (chunk) {
             reply.text.value += chunk.text;
@@ -412,6 +504,11 @@ class HomeController extends GetxController
           cancelOnError: true,
         );
   }
+
+  static const _codeInstruction =
+      'The user wants code. Reply with complete, working code in fenced '
+      'Markdown code blocks tagged with the language, then briefly explain '
+      'how it works and how to run it.';
 
   void _finish(ChatMessage reply) {
     _reply = null;
@@ -437,6 +534,7 @@ class HomeController extends GetxController
     _reply = null;
     isGenerating.value = false;
     messages.clear();
+    attachment.value = null;
     selectedAction.value = null;
     messageController.clear();
   }
@@ -471,10 +569,87 @@ class HomeController extends GetxController
   );
 
   /// A tile in the services sheet picks its action, like the welcome chips.
-  void onService(HomeAction? action) {
+  void onService(HomeAction action) {
     Get.back();
-    if (action != null) onAction(action);
+    onAction(action);
   }
+
+  /// Closes the services sheet and opens the integrations screen.
+  void onIntegrations() {
+    Get.back();
+    Get.toNamed(AppRoutes.connectedApps);
+  }
+
+  /// Types Gemini reads inline, by file extension.
+  static const _documentTypes = {
+    'pdf': 'application/pdf',
+    'txt': 'text/plain',
+    'md': 'text/markdown',
+    'csv': 'text/csv',
+    'html': 'text/html',
+    'json': 'application/json',
+    'xml': 'text/xml',
+    'rtf': 'text/rtf',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'webp': 'image/webp',
+    'heic': 'image/heic',
+  };
+
+  /// Requests with more than this inline are refused by the API.
+  static const _maxAttachmentBytes = 15 * 1024 * 1024;
+
+  /// Picks a document to send with the next message.
+  Future<void> onAttachDocument() async {
+    Get.back();
+    try {
+      final file = await FilePicker.pickFile(
+        type: FileType.custom,
+        allowedExtensions: _documentTypes.keys.toList(),
+      );
+      if (file == null) return;
+      final mimeType = _documentTypes[file.extension?.toLowerCase()];
+      if (mimeType == null) {
+        Get.rawSnackbar(message: 'chat_file_unsupported'.tr);
+        return;
+      }
+      _setAttachment(file.name, await file.readAsBytes(), mimeType);
+    } catch (_) {
+      Get.rawSnackbar(message: 'chat_file_failed'.tr);
+    }
+  }
+
+  /// Takes a photo to send with the next message.
+  Future<void> onCaptureImage() async {
+    Get.back();
+    try {
+      final photo = await ImagePicker().pickImage(
+        source: ImageSource.camera,
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 85,
+      );
+      if (photo == null) return;
+      _setAttachment(photo.name, await photo.readAsBytes(), 'image/jpeg');
+    } catch (_) {
+      Get.rawSnackbar(message: 'chat_camera_unavailable'.tr);
+    }
+  }
+
+  void _setAttachment(String name, Uint8List bytes, String mimeType) {
+    if (bytes.length > _maxAttachmentBytes) {
+      Get.rawSnackbar(message: 'chat_file_too_large'.tr);
+      return;
+    }
+    attachment.value = ChatAttachment(
+      name: name,
+      bytes: bytes,
+      mimeType: mimeType,
+    );
+  }
+
+  void onRemoveAttachment() => attachment.value = null;
 
   // TODO: wire these up once the menus exist.
   void onModelTap() {}

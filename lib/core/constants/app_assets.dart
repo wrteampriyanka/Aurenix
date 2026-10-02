@@ -27,4 +27,8 @@ class AppAssets {
   static const String figmaColorLogo = 'assets/images/figma.svg';
   static const String zyncLogo = 'assets/images/zync.png';
   static const String googleDriveLogo = 'assets/images/googledrive.svg';
+  static const String firebaseLogo = 'assets/images/fierbase.svg';
+  static const String gitlabLogo = 'assets/images/gitlab.svg';
+  static const String slackLogo = 'assets/images/slack.svg';
+  static const String teamsLogo = 'assets/images/teams.svg';
 }

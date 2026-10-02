@@ -50,20 +50,25 @@ class ProfileController extends GetxController {
     PhosphorIconsRegular.info,
   );
 
+  static const connectedApps = ProfileMenuItem(
+    'profile_connected_apps',
+    PhosphorIconsRegular.puzzlePiece,
+  );
+
+  static const voiceSettings = ProfileMenuItem(
+    'profile_voice_settings',
+    PhosphorIconsRegular.waveform,
+  );
+
   static const settingsItems = [
     customizeAi,
     archiveChats,
     ProfileMenuItem('profile_language', PhosphorIconsRegular.globe),
-    ProfileMenuItem('profile_voice_settings', PhosphorIconsRegular.waveform),
-    ProfileMenuItem('profile_connected_apps', PhosphorIconsRegular.puzzlePiece),
+    voiceSettings,
+    connectedApps,
   ];
 
-  static const accountItems = [
-    dataControl,
-    privacyPolicy,
-    aboutUs,
-    logout,
-  ];
+  static const accountItems = [dataControl, privacyPolicy, aboutUs, logout];
 
   void onBack() => Get.back();
 
@@ -95,6 +100,8 @@ class ProfileController extends GetxController {
     if (item == logout) Get.offAllNamed(AppRoutes.login);
     if (item == customizeAi) Get.toNamed(AppRoutes.customizeAi);
     if (item == archiveChats) Get.toNamed(AppRoutes.archiveChats);
+    if (item == connectedApps) Get.toNamed(AppRoutes.connectedApps);
+    if (item == voiceSettings) Get.toNamed(AppRoutes.voiceSettings);
     if (item == dataControl) Get.toNamed(AppRoutes.dataControl);
     if (item == privacyPolicy) Get.toNamed(AppRoutes.privacyPolicy);
     if (item == aboutUs) Get.toNamed(AppRoutes.aboutUs);

@@ -15,17 +15,20 @@ import '../../../utils/elapsed_time_mixin.dart';
 ///
 /// Set [showRing] to false to drop the ring and let the orb fill [size],
 /// and [showDots] to add a faint dot matrix inside the orb (home screen).
+/// [speed] scales how fast the waves and glow move (1 is the default pace).
 class WaveOrb extends StatefulWidget {
   const WaveOrb({
     super.key,
     this.size = 240,
     this.showRing = true,
     this.showDots = false,
+    this.speed = 1,
   });
 
   final double size;
   final bool showRing;
   final bool showDots;
+  final double speed;
 
   @override
   State<WaveOrb> createState() => _WaveOrbState();
@@ -51,6 +54,7 @@ class _WaveOrbState extends State<WaveOrb>
             ring: context.color.orbRing,
             showRing: widget.showRing,
             showDots: widget.showDots,
+            speed: widget.speed,
           ),
         ),
       ),
@@ -67,6 +71,7 @@ class _WaveOrbPainter extends CustomPainter {
     required this.ring,
     required this.showRing,
     required this.showDots,
+    required this.speed,
   }) : super(repaint: time);
 
   final ValueNotifier<double> time;
@@ -76,10 +81,11 @@ class _WaveOrbPainter extends CustomPainter {
   final Color ring;
   final bool showRing;
   final bool showDots;
+  final double speed;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final t = time.value;
+    final t = time.value * speed;
     final center = size.center(Offset.zero);
     final ringRadius = size.width / 2 - 0.5;
     final radius = showRing ? ringRadius * 0.8 : size.width / 2;
@@ -193,7 +199,8 @@ class _WaveOrbPainter extends CustomPainter {
       ),
     ];
 
-    final ramp = _rampIn(t);
+    // Ramp in on real time so a faster orb still eases in over 2 s.
+    final ramp = _rampIn(time.value);
     for (final wave in waves) {
       final k = 2 * math.pi / (wave.wavelength ?? _wavelength);
       // The crests stay fixed in place; nothing slides left or right.
@@ -341,7 +348,8 @@ class _WaveOrbPainter extends CustomPainter {
       oldDelegate.deep != deep ||
       oldDelegate.ring != ring ||
       oldDelegate.showRing != showRing ||
-      oldDelegate.showDots != showDots;
+      oldDelegate.showDots != showDots ||
+      oldDelegate.speed != speed;
 }
 
 @immutable

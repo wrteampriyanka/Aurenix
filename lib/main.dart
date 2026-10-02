@@ -4,10 +4,12 @@ import 'package:get/get.dart';
 import 'core/constants/app_constants.dart';
 import 'core/localization/app_translations.dart';
 import 'core/routes/app_pages.dart';
+import 'core/storage/storage_service.dart';
 import 'core/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await StorageService.instance.init();
   final translations = await AppTranslations.load();
   runApp(MyApp(translations: translations));
 }
