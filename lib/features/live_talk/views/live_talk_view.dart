@@ -84,6 +84,9 @@ class _Center extends StatelessWidget {
     return Obx(() {
       final camera = controller.camera.value;
       if (camera != null) return _CameraCenter(controller, camera);
+      if (controller.isSharingScreen.value) {
+        return _ScreenShareCenter(controller: controller);
+      }
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
@@ -135,6 +138,79 @@ class _CameraCenter extends StatelessWidget {
                           child: CameraPreview(camera),
                         ),
                       ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 96),
+            child: _Caption(controller: controller, showPrompt: false),
+          ),
+          const SizedBox(height: 10),
+          _Status(controller: controller),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown while the screen is shared: there is no preview of the screen
+/// itself, so say what is happening and how to use it.
+class _ScreenShareCenter extends StatelessWidget {
+  const _ScreenShareCenter({required this.controller});
+
+  final LiveTalkController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              decoration: BoxDecoration(
+                color: context.color.tileFill,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: context.color.buttonHighlight),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: context.color.primary,
+                    ),
+                    child: Icon(
+                      PhosphorIconsRegular.screencast,
+                      size: 32,
+                      color: context.color.textNatural,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  CustomText(
+                    'live_share_title'.tr,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    textAlign: TextAlign.center,
+                    color: context.color.textNatural,
+                  ),
+                  const SizedBox(height: 10),
+                  CustomText(
+                    (GetPlatform.isIOS
+                            ? 'live_share_hint_ios'
+                            : 'live_share_hint')
+                        .tr,
+                    fontSize: 14,
+                    textAlign: TextAlign.center,
+                    color: context.color.textBody,
+                  ),
+                ],
               ),
             ),
           ),
@@ -249,9 +325,12 @@ class _BottomActions extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: _PillButton(
-              icon: PhosphorIconsRegular.screencast,
-              onTap: controller.onScreenShare,
+            child: Obx(
+              () => _PillButton(
+                icon: PhosphorIconsRegular.screencast,
+                active: controller.isSharingScreen.value,
+                onTap: controller.onScreenShare,
+              ),
             ),
           ),
           const SizedBox(width: 12),

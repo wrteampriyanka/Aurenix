@@ -4,6 +4,11 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Showing things to the AI in live talk. -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Screen sharing in live talk keeps capturing while the user is in
+         other apps, which needs a foreground service. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
     <!-- Finding and pairing Bluetooth headphones in live talk. -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
@@ -38,6 +43,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Screen capture for live talk; see ScreenShareService. -->
+        <service
+            android:name=".ScreenShareService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection|microphone"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

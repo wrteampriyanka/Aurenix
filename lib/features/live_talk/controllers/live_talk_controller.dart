@@ -12,6 +12,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import '../../../core/routes/app_routes.dart';
 import '../../../core/services/api_service.dart';
+import '../../../core/services/screen_share_service.dart';
 import '../../../core/services/voice_service.dart';
 import '../widgets/audio_output_sheet.dart';
 
@@ -34,7 +35,8 @@ class AudioOutput {
 
 /// Hands-free voice chat: listens, sends what was said to the AI, reads the
 /// reply aloud, then listens again. With the camera on, each question goes
-/// with a photo of what the camera sees.
+/// with a photo of what the camera sees; with the screen shared, with a
+/// screenshot instead.
 class LiveTalkController extends GetxController with WidgetsBindingObserver {
   final status = LiveStatus.idle.obs;
 
@@ -51,6 +53,9 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
   /// Set while the camera is on and its preview can be shown.
   final camera = Rxn<CameraController>();
 
+  /// The screen is being captured; see [ScreenShareService].
+  final isSharingScreen = false.obs;
+
   final _speech = SpeechToText();
   final _tts = FlutterTts();
   final _history = <ChatTurn>[];
@@ -62,6 +67,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
   var _closed = false;
 
   var _cameraStarting = false;
+  var _shareStarting = false;
 
   /// The camera was on when the app went to the background.
   var _reopenCamera = false;
@@ -70,6 +76,8 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
+    // The system can end the share on its own, e.g. from the status bar.
+    ScreenShareService.instance.onStopped = () => isSharingScreen.value = false;
   }
 
   @override
@@ -307,8 +315,10 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  /// A JPEG of what the camera sees, or null when it is off.
+  /// A JPEG of the shared screen or of what the camera sees, or null when
+  /// neither is on.
   Future<Uint8List?> _snapshot() async {
+    if (isSharingScreen.value) return ScreenShareService.instance.capture();
     final controller = camera.value;
     if (controller == null || controller.value.isTakingPicture) return null;
     try {
@@ -329,6 +339,8 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     _cameraStarting = true;
     CameraController? controller;
     try {
+      // One view at a time: the camera replaces the screen.
+      await _stopScreenShare();
       final cameras = await availableCameras();
       if (cameras.isEmpty) throw CameraException('none', null);
       controller = CameraController(
@@ -376,8 +388,41 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  // TODO: wire this up once screen sharing exists.
-  void onScreenShare() => Get.rawSnackbar(message: 'live_coming_soon'.tr);
+  Future<void> onScreenShare() =>
+      isSharingScreen.value ? _stopScreenShare() : _startScreenShare();
+
+  /// Asks for consent, then sends a screenshot with each question until
+  /// the user stops. On Android the share follows the user into other apps.
+  Future<void> _startScreenShare() async {
+    if (_shareStarting || _closed) return;
+    _shareStarting = true;
+    try {
+      // One view at a time: the screen replaces the camera. Clear the
+      // flag too, since the consent dialog pauses the app.
+      await _closeCamera();
+      _reopenCamera = false;
+      final started = await ScreenShareService.instance.start(
+        channelName: 'live_share_channel'.tr,
+        title: 'live_share_notification_title'.tr,
+        text: 'live_share_notification_text'.tr,
+      );
+      if (_closed) return await ScreenShareService.instance.stop();
+      if (started == null) {
+        Get.rawSnackbar(message: 'live_share_unavailable'.tr);
+      }
+      // False means the user declined, which needs no message.
+      if (started != true) return;
+      isSharingScreen.value = true;
+    } finally {
+      _shareStarting = false;
+    }
+  }
+
+  Future<void> _stopScreenShare() async {
+    if (!isSharingScreen.value) return;
+    isSharingScreen.value = false;
+    await ScreenShareService.instance.stop();
+  }
 
   /// Opens Voice Preferences. The conversation pauses so the mic doesn't
   /// pick up the voice previews, and picks up again on return.
@@ -394,8 +439,10 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
   void onClose() {
     _closed = true;
     WidgetsBinding.instance.removeObserver(this);
+    ScreenShareService.instance.onStopped = null;
     _interrupt();
     _closeCamera();
+    _stopScreenShare();
     super.onClose();
   }
 }
