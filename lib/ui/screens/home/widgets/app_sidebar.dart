@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import '../controllers/sidebar_controller.dart';
+import '../../widgets/custom_text.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../features/home/controllers/sidebar_controller.dart';
 
 /// Menu, chats and profile shown in the home drawer.
 ///

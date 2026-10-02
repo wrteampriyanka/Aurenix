@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// Rounded search pill with a magnifier, and a clear button that shows up
 /// once something is typed.

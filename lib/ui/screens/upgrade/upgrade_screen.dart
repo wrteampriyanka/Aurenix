@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_background.dart';
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_fading_card.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_background.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_fading_card.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/upgrade_controller.dart';
-import '../models/upgrade_plan.dart';
-import '../widgets/upgrade_widgets.dart';
+import '../../../features/upgrade/controllers/upgrade_controller.dart';
+import '../../../features/upgrade/models/upgrade_plan.dart';
+import 'widgets/upgrade_widgets.dart';
 
-class UpgradeView extends GetView<UpgradeController> {
-  const UpgradeView({super.key});
+class UpgradeScreen extends GetView<UpgradeController> {
+  const UpgradeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

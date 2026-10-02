@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/app_plain_background.dart';
-import '../../../commons/widgets/app_search_field.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_plain_background.dart';
+import '../widgets/app_search_field.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/connected_apps_controller.dart';
-import '../widgets/integration_app_logo.dart';
+import '../../../features/connected_apps/controllers/connected_apps_controller.dart';
+import 'widgets/integration_app_logo.dart';
 
-class ConnectedAppsView extends GetView<ConnectedAppsController> {
-  const ConnectedAppsView({super.key});
+class ConnectedAppsScreen extends GetView<ConnectedAppsController> {
+  const ConnectedAppsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

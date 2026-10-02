@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_plain_background.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_plain_background.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../onboarding/widgets/wave_orb.dart';
-import '../controllers/live_talk_controller.dart';
+import '../onboarding/widgets/wave_orb.dart';
+import '../../../features/live_talk/controllers/live_talk_controller.dart';
 
-class LiveTalkView extends GetView<LiveTalkController> {
-  const LiveTalkView({super.key});
+class LiveTalkScreen extends GetView<LiveTalkController> {
+  const LiveTalkScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

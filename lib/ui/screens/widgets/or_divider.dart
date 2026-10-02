@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'custom_text.dart';
-import '../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// Dashed horizontal line with an "OR" pill in the middle.
 class OrDivider extends StatelessWidget {

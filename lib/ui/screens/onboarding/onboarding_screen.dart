@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/app_background.dart';
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_background.dart';
+import '../widgets/app_button.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/onboarding_controller.dart';
-import '../widgets/integration_hub.dart';
-import '../widgets/wave_orb.dart';
+import '../../../features/onboarding/controllers/onboarding_controller.dart';
+import 'widgets/integration_hub.dart';
+import 'widgets/wave_orb.dart';
 
-class OnboardingView extends GetView<OnboardingController> {
-  const OnboardingView({super.key});
+class OnboardingScreen extends GetView<OnboardingController> {
+  const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

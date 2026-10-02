@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
 import 'app_switch.dart';
 import 'custom_text.dart';
 
@@ -102,11 +102,7 @@ class AppSettingsTile extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: context.color.tileFillHighlight,
                   ),
-                  child: Icon(
-                    icon,
-                    size: 22,
-                    color: context.color.textNatural,
-                  ),
+                  child: Icon(icon, size: 22, color: context.color.textNatural),
                 ),
               SizedBox(width: subtitle == null ? 16 : 14),
               Expanded(

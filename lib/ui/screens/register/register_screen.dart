@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_background.dart';
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_social_button.dart';
-import '../../../commons/widgets/app_terms_footer.dart';
-import '../../../commons/widgets/app_text_field.dart';
-import '../../../commons/widgets/custom_text.dart';
-import '../../../commons/widgets/or_divider.dart';
+import '../widgets/app_background.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_social_button.dart';
+import '../widgets/app_terms_footer.dart';
+import '../widgets/app_text_field.dart';
+import '../widgets/custom_text.dart';
+import '../widgets/or_divider.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../controllers/register_controller.dart';
+import '../../../features/register/controllers/register_controller.dart';
 
-class RegisterView extends GetView<RegisterController> {
-  const RegisterView({super.key});
+class RegisterScreen extends GetView<RegisterController> {
+  const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

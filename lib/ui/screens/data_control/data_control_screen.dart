@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_plain_background.dart';
-import '../../../commons/widgets/app_settings_tile.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_plain_background.dart';
+import '../widgets/app_settings_tile.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/data_control_controller.dart';
+import '../../../features/data_control/controllers/data_control_controller.dart';
 
-class DataControlView extends GetView<DataControlController> {
-  const DataControlView({super.key});
+class DataControlScreen extends GetView<DataControlController> {
+  const DataControlScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

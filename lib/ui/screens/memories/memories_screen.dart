@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_plain_background.dart';
-import '../../../commons/widgets/app_search_field.dart';
-import '../../../commons/widgets/app_settings_tile.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_plain_background.dart';
+import '../widgets/app_search_field.dart';
+import '../widgets/app_settings_tile.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/memories_controller.dart';
+import '../../../features/memories/controllers/memories_controller.dart';
 
-class MemoriesView extends GetView<MemoriesController> {
-  const MemoriesView({super.key});
+class MemoriesScreen extends GetView<MemoriesController> {
+  const MemoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

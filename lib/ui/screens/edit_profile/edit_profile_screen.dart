@@ -3,16 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_plain_background.dart';
-import '../../../commons/widgets/app_text_field.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_plain_background.dart';
+import '../widgets/app_text_field.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../controllers/edit_profile_controller.dart';
+import '../../../features/edit_profile/controllers/edit_profile_controller.dart';
 
-class EditProfileView extends GetView<EditProfileController> {
-  const EditProfileView({super.key});
+class EditProfileScreen extends GetView<EditProfileController> {
+  const EditProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

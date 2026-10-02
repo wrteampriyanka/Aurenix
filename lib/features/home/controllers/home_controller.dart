@@ -17,7 +17,7 @@ import '../../../core/constants/app_assets.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/services/voice_service.dart';
-import '../widgets/services_sheet.dart';
+import '../../../ui/screens/home/widgets/services_sheet.dart';
 import 'sidebar_controller.dart';
 
 /// A quick action chip under the orb.

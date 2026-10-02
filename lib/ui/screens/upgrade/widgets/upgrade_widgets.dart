@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import '../models/upgrade_plan.dart';
+import '../../widgets/custom_text.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../features/upgrade/models/upgrade_plan.dart';
 
 /// Round frosted button at the top left of the upgrade screens (close/back).
 class UpgradeTopButton extends StatelessWidget {

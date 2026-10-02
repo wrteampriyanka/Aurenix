@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/custom_text.dart';
-import '../controllers/budget_controller.dart';
+import '../widgets/custom_text.dart';
+import '../../../features/budget/controllers/budget_controller.dart';
 
-class BudgetView extends GetView<BudgetController> {
-  const BudgetView({super.key});
+class BudgetScreen extends GetView<BudgetController> {
+  const BudgetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

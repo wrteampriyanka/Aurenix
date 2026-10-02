@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/splash_controller.dart';
+import '../../../features/splash/controllers/splash_controller.dart';
 
-class SplashView extends GetView<SplashController> {
-  const SplashView({super.key});
+class SplashScreen extends GetView<SplashController> {
+  const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

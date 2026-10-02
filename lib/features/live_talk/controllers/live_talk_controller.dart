@@ -14,7 +14,7 @@ import '../../../core/routes/app_routes.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/services/screen_share_service.dart';
 import '../../../core/services/voice_service.dart';
-import '../widgets/audio_output_sheet.dart';
+import '../../../ui/screens/live_talk/widgets/audio_output_sheet.dart';
 
 enum LiveStatus { idle, listening, thinking, speaking }
 

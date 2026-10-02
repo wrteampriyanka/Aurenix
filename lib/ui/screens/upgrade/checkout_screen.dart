@@ -4,18 +4,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_background.dart';
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_fading_card.dart';
-import '../../../commons/widgets/app_text_field.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_background.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_fading_card.dart';
+import '../widgets/app_text_field.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/checkout_controller.dart';
-import '../models/upgrade_plan.dart';
-import '../widgets/upgrade_widgets.dart';
+import '../../../features/upgrade/controllers/checkout_controller.dart';
+import '../../../features/upgrade/models/upgrade_plan.dart';
+import 'widgets/upgrade_widgets.dart';
 
-class CheckoutView extends GetView<CheckoutController> {
-  const CheckoutView({super.key});
+class CheckoutScreen extends GetView<CheckoutController> {
+  const CheckoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/app_background.dart';
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_otp_field.dart';
-import '../../../commons/widgets/app_terms_footer.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_background.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_otp_field.dart';
+import '../widgets/app_terms_footer.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/otp_controller.dart';
+import '../../../features/otp/controllers/otp_controller.dart';
 
-class OtpView extends GetView<OtpController> {
-  const OtpView({super.key});
+class OtpScreen extends GetView<OtpController> {
+  const OtpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
 import 'app_plain_background.dart';
 
 /// Top bar of the profile detail screens: reaches up behind the status bar,

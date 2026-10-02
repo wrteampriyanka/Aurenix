@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../utils/elapsed_time_mixin.dart';
+import '../../../utils/elapsed_time_mixin.dart';
 
 /// k_glowing_blurs.dart
 ///

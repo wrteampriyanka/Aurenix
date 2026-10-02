@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// On/off pill toggle: blue track with the thumb on the right when on,
 /// grey track with the thumb on the left when off.

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
+import 'app_composite_icon.dart';
 import 'custom_text.dart';
 
 /// Frosted top bar shared by home and profile: sidebar button, model name
@@ -60,7 +61,8 @@ class AppTopBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _PillIcon(
-                  icon: PhosphorIconsRegular.chatCircleText,
+                  icon: PhosphorIconsRegular.chatCircle,
+                  overlay: PhosphorIconsRegular.plus,
                   onTap: onNewChat,
                 ),
                 SizedBox(
@@ -127,9 +129,12 @@ class GlassButton extends StatelessWidget {
 }
 
 class _PillIcon extends StatelessWidget {
-  const _PillIcon({required this.icon, required this.onTap});
+  const _PillIcon({required this.icon, required this.onTap, this.overlay});
 
   final IconData icon;
+
+  /// Drawn small over the centre of [icon], see [AppCompositeIcon].
+  final IconData? overlay;
   final VoidCallback? onTap;
 
   @override
@@ -140,7 +145,13 @@ class _PillIcon extends StatelessWidget {
       child: SizedBox(
         width: 44,
         height: 46,
-        child: Icon(icon, size: 22, color: context.color.textNatural),
+        child: overlay == null
+            ? Icon(icon, size: 22, color: context.color.textNatural)
+            : AppCompositeIcon(
+                icon: icon,
+                overlay: overlay!,
+                color: context.color.textNatural,
+              ),
       ),
     );
   }

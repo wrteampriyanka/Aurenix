@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/app_info_sheet.dart';
+import '../../../ui/screens/widgets/app_info_sheet.dart';
 import '../services/connected_apps_service.dart';
-import '../widgets/integration_app_logo.dart';
+import '../../../ui/screens/connected_apps/widgets/integration_app_logo.dart';
 
 export '../services/connected_apps_service.dart' show IntegrationApp;
 

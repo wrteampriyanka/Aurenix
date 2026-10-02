@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/custom_text.dart';
-import '../controllers/categories_controller.dart';
+import '../widgets/custom_text.dart';
+import '../../../features/categories/controllers/categories_controller.dart';
 
-class CategoriesView extends GetView<CategoriesController> {
-  const CategoriesView({super.key});
+class CategoriesScreen extends GetView<CategoriesController> {
+  const CategoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

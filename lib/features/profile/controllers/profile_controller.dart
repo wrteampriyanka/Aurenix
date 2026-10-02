@@ -4,14 +4,18 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/routes/app_routes.dart';
 import '../../edit_profile/controllers/edit_profile_controller.dart';
-import '../widgets/language_sheet.dart';
+import '../../../ui/screens/profile/widgets/language_sheet.dart';
 
 /// A row in one of the profile menu cards.
+///
+/// [overlay], when set, is drawn small over the centre of [icon] so two
+/// Phosphor glyphs can be combined (a chat bubble with an arrow inside).
 class ProfileMenuItem {
-  const ProfileMenuItem(this.labelKey, this.icon);
+  const ProfileMenuItem(this.labelKey, this.icon, {this.overlay});
 
   final String labelKey;
   final IconData icon;
+  final IconData? overlay;
 }
 
 class ProfileController extends GetxController {
@@ -23,17 +27,18 @@ class ProfileController extends GetxController {
 
   static const logout = ProfileMenuItem(
     'profile_logout',
-    PhosphorIconsRegular.signOut,
+    PhosphorIconsRegular.door,
   );
 
   static const archiveChats = ProfileMenuItem(
     'profile_archive_chats',
-    PhosphorIconsRegular.arrowCircleDown,
+    PhosphorIconsRegular.chatCircle,
+    overlay: PhosphorIconsRegular.arrowDown,
   );
 
   static const customizeAi = ProfileMenuItem(
     'profile_customize_ai',
-    PhosphorIconsRegular.slidersHorizontal,
+    PhosphorIconsRegular.fadersHorizontal,
   );
 
   static const dataControl = ProfileMenuItem(
@@ -63,7 +68,7 @@ class ProfileController extends GetxController {
 
   static const language = ProfileMenuItem(
     'profile_language',
-    PhosphorIconsRegular.globe,
+    PhosphorIconsRegular.globeHemisphereWest,
   );
 
   static const settingsItems = [

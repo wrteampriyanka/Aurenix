@@ -2,52 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../features/archive_chats/bindings/archive_chats_binding.dart';
-import '../../features/archive_chats/views/archive_chats_view.dart';
+import '../../ui/screens/archive_chats/archive_chats_screen.dart';
 import '../../features/budget/bindings/budget_binding.dart';
-import '../../features/budget/views/budget_view.dart';
+import '../../ui/screens/budget/budget_screen.dart';
 import '../../features/categories/bindings/categories_binding.dart';
-import '../../features/categories/views/categories_view.dart';
+import '../../ui/screens/categories/categories_screen.dart';
 import '../../features/connected_apps/bindings/connected_apps_binding.dart';
-import '../../features/connected_apps/views/connected_apps_view.dart';
+import '../../ui/screens/connected_apps/connected_apps_screen.dart';
 import '../../features/customize_ai/bindings/customize_ai_binding.dart';
-import '../../features/customize_ai/views/customize_ai_view.dart';
+import '../../ui/screens/customize_ai/customize_ai_screen.dart';
 import '../../features/data_control/bindings/data_control_binding.dart';
-import '../../features/data_control/views/data_control_view.dart';
+import '../../ui/screens/data_control/data_control_screen.dart';
 import '../../features/edit_profile/bindings/edit_profile_binding.dart';
-import '../../features/edit_profile/views/edit_profile_view.dart';
+import '../../ui/screens/edit_profile/edit_profile_screen.dart';
 import '../../features/home/bindings/home_binding.dart';
-import '../../features/home/views/home_view.dart';
-import '../../features/legal/views/legal_view.dart';
+import '../../ui/screens/home/home_screen.dart';
+import '../../ui/screens/legal/legal_screen.dart';
 import '../../features/live_talk/bindings/live_talk_binding.dart';
-import '../../features/live_talk/views/live_talk_view.dart';
+import '../../ui/screens/live_talk/live_talk_screen.dart';
 import '../../features/login/bindings/login_binding.dart';
-import '../../features/login/views/login_view.dart';
+import '../../ui/screens/login/login_screen.dart';
 import '../../features/memories/bindings/memories_binding.dart';
-import '../../features/memories/views/memories_view.dart';
+import '../../ui/screens/memories/memories_screen.dart';
 import '../../features/onboarding/bindings/onboarding_binding.dart';
-import '../../features/onboarding/views/onboarding_view.dart';
+import '../../ui/screens/onboarding/onboarding_screen.dart';
 import '../../features/otp/bindings/otp_binding.dart';
-import '../../features/otp/views/otp_view.dart';
+import '../../ui/screens/otp/otp_screen.dart';
 import '../../features/profile/bindings/profile_binding.dart';
-import '../../features/profile/views/profile_view.dart';
+import '../../ui/screens/profile/profile_screen.dart';
 import '../../features/projects/bindings/projects_binding.dart';
-import '../../features/projects/views/projects_view.dart';
+import '../../ui/screens/projects/projects_screen.dart';
 import '../../features/register/bindings/register_binding.dart';
-import '../../features/register/views/register_view.dart';
+import '../../ui/screens/register/register_screen.dart';
 import '../../features/reset_password/bindings/reset_password_binding.dart';
-import '../../features/reset_password/views/reset_password_view.dart';
+import '../../ui/screens/reset_password/reset_password_screen.dart';
 import '../../features/savings/bindings/savings_binding.dart';
-import '../../features/savings/views/savings_view.dart';
+import '../../ui/screens/savings/savings_screen.dart';
 import '../../features/splash/bindings/splash_binding.dart';
-import '../../features/splash/views/splash_view.dart';
+import '../../ui/screens/splash/splash_screen.dart';
 import '../../features/transactions/bindings/transactions_binding.dart';
-import '../../features/transactions/views/transactions_view.dart';
+import '../../ui/screens/transactions/transactions_screen.dart';
 import '../../features/upgrade/bindings/checkout_binding.dart';
 import '../../features/upgrade/bindings/upgrade_binding.dart';
-import '../../features/upgrade/views/checkout_view.dart';
-import '../../features/upgrade/views/upgrade_view.dart';
+import '../../ui/screens/upgrade/checkout_screen.dart';
+import '../../ui/screens/upgrade/upgrade_screen.dart';
 import '../../features/voice_settings/bindings/voice_settings_binding.dart';
-import '../../features/voice_settings/views/voice_settings_view.dart';
+import '../../ui/screens/voice_settings/voice_settings_screen.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -105,48 +105,48 @@ class AppPages {
   );
 
   static final routes = <GetPage>[
-    _screen(AppRoutes.aboutUs, () => const LegalView(page: LegalPage.aboutUs)),
+    _screen(AppRoutes.aboutUs, () => const LegalScreen(page: LegalPage.aboutUs)),
     _screen(
       AppRoutes.archiveChats,
-      () => const ArchiveChatsView(),
+      () => const ArchiveChatsScreen(),
       ArchiveChatsBinding(),
     ),
-    _screen(AppRoutes.budget, () => const BudgetView(), BudgetBinding()),
+    _screen(AppRoutes.budget, () => const BudgetScreen(), BudgetBinding()),
     _screen(
       AppRoutes.categories,
-      () => const CategoriesView(),
+      () => const CategoriesScreen(),
       CategoriesBinding(),
     ),
-    _screen(AppRoutes.checkout, () => const CheckoutView(), CheckoutBinding()),
+    _screen(AppRoutes.checkout, () => const CheckoutScreen(), CheckoutBinding()),
     _screen(
       AppRoutes.connectedApps,
-      () => const ConnectedAppsView(),
+      () => const ConnectedAppsScreen(),
       ConnectedAppsBinding(),
     ),
     _screen(
       AppRoutes.customizeAi,
-      () => const CustomizeAiView(),
+      () => const CustomizeAiScreen(),
       CustomizeAiBinding(),
     ),
     _screen(
       AppRoutes.dataControl,
-      () => const DataControlView(),
+      () => const DataControlScreen(),
       DataControlBinding(),
     ),
     _screen(
       AppRoutes.editProfile,
-      () => const EditProfileView(),
+      () => const EditProfileScreen(),
       EditProfileBinding(),
     ),
     GetPage(
       name: AppRoutes.home,
-      page: () => const HomeView(),
+      page: () => const HomeScreen(),
       binding: HomeBinding(),
       customTransition: _StayBelowTransition(),
     ),
     GetPage(
       name: AppRoutes.liveTalk,
-      page: () => const LiveTalkView(),
+      page: () => const LiveTalkScreen(),
       binding: LiveTalkBinding(),
       transition: Transition.fadeIn,
       transitionDuration: _authTransitionDuration,
@@ -154,21 +154,21 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.login,
-      page: () => const LoginView(),
+      page: () => const LoginScreen(),
       binding: LoginBinding(),
       transition: _authTransition,
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
-    _screen(AppRoutes.memories, () => const MemoriesView(), MemoriesBinding()),
+    _screen(AppRoutes.memories, () => const MemoriesScreen(), MemoriesBinding()),
     GetPage(
       name: AppRoutes.onboarding,
-      page: () => const OnboardingView(),
+      page: () => const OnboardingScreen(),
       binding: OnboardingBinding(),
     ),
     GetPage(
       name: AppRoutes.otp,
-      page: () => const OtpView(),
+      page: () => const OtpScreen(),
       binding: OtpBinding(),
       transition: _authTransition,
       transitionDuration: _authTransitionDuration,
@@ -176,13 +176,13 @@ class AppPages {
     ),
     _screen(
       AppRoutes.privacyPolicy,
-      () => const LegalView(page: LegalPage.privacyPolicy),
+      () => const LegalScreen(page: LegalPage.privacyPolicy),
     ),
-    _screen(AppRoutes.profile, () => const ProfileView(), ProfileBinding()),
-    _screen(AppRoutes.projects, () => const ProjectsView(), ProjectsBinding()),
+    _screen(AppRoutes.profile, () => const ProfileScreen(), ProfileBinding()),
+    _screen(AppRoutes.projects, () => const ProjectsScreen(), ProjectsBinding()),
     GetPage(
       name: AppRoutes.register,
-      page: () => const RegisterView(),
+      page: () => const RegisterScreen(),
       binding: RegisterBinding(),
       transition: _authTransition,
       transitionDuration: _authTransitionDuration,
@@ -190,27 +190,27 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.resetPassword,
-      page: () => const ResetPasswordView(),
+      page: () => const ResetPasswordScreen(),
       binding: ResetPasswordBinding(),
       transition: _authTransition,
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
-    _screen(AppRoutes.savings, () => const SavingsView(), SavingsBinding()),
+    _screen(AppRoutes.savings, () => const SavingsScreen(), SavingsBinding()),
     GetPage(
       name: AppRoutes.splash,
-      page: () => const SplashView(),
+      page: () => const SplashScreen(),
       binding: SplashBinding(),
     ),
     _screen(
       AppRoutes.transactions,
-      () => const TransactionsView(),
+      () => const TransactionsScreen(),
       TransactionsBinding(),
     ),
-    _sheet(AppRoutes.upgrade, () => const UpgradeView(), UpgradeBinding()),
+    _sheet(AppRoutes.upgrade, () => const UpgradeScreen(), UpgradeBinding()),
     _sheet(
       AppRoutes.voiceSettings,
-      () => const VoiceSettingsView(),
+      () => const VoiceSettingsScreen(),
       VoiceSettingsBinding(),
     ),
   ];

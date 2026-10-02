@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_background.dart';
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_fading_card.dart';
-import '../../../commons/widgets/app_top_bar.dart';
-import '../../../commons/widgets/custom_text.dart';
+import '../widgets/app_background.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_composite_icon.dart';
+import '../widgets/app_fading_card.dart';
+import '../widgets/app_top_bar.dart';
+import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
-import '../controllers/profile_controller.dart';
+import '../../../features/profile/controllers/profile_controller.dart';
 
-class ProfileView extends GetView<ProfileController> {
-  const ProfileView({super.key});
+class ProfileScreen extends GetView<ProfileController> {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +108,7 @@ class _ProfileCard extends StatelessWidget {
                 ),
               ),
               GlassButton(
-                icon: PhosphorIconsRegular.pencilSimple,
+                icon: PhosphorIconsRegular.pencilSimpleLine,
                 onTap: controller.onEditProfile,
                 size: 40,
                 iconSize: 18,
@@ -204,11 +205,7 @@ class _MenuCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        items[i].icon,
-                        size: 22,
-                        color: context.color.textNatural,
-                      ),
+                      _MenuIcon(item: items[i]),
                       const SizedBox(width: 22),
                       Expanded(
                         child: CustomText(
@@ -232,5 +229,21 @@ class _MenuCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// The row's glyph, with the item's overlay glyph drawn small over its
+/// centre when it has one.
+class _MenuIcon extends StatelessWidget {
+  const _MenuIcon({required this.item});
+
+  final ProfileMenuItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = context.color.textNatural;
+    final overlay = item.overlay;
+    if (overlay == null) return Icon(item.icon, size: 22, color: color);
+    return AppCompositeIcon(icon: item.icon, overlay: overlay, color: color);
   }
 }

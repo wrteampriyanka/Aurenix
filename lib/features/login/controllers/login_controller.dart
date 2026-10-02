@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../core/routes/app_routes.dart';
 import '../../otp/controllers/otp_controller.dart';
-import '../widgets/forgot_password_sheet.dart';
+import '../../../ui/screens/login/widgets/forgot_password_sheet.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();

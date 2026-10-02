@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:get/get.dart';
 
-import '../../../commons/widgets/app_plain_background.dart';
+import '../widgets/app_plain_background.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// A static text document reached from the profile menu. Its body is
@@ -17,8 +17,8 @@ enum LegalPage {
   final String bodyKey;
 }
 
-class LegalView extends StatelessWidget {
-  const LegalView({super.key, required this.page});
+class LegalScreen extends StatelessWidget {
+  const LegalScreen({super.key, required this.page});
 
   final LegalPage page;
 

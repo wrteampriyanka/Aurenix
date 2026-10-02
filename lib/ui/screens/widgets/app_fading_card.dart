@@ -2,7 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// Frosted card whose fill and outline fade out towards the bottom right,
 /// used for the profile card and the upgrade plan cards.

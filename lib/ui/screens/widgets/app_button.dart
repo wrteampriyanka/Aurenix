@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../utils/elapsed_time_mixin.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../utils/elapsed_time_mixin.dart';
 import 'custom_text.dart';
 
 /// Primary pill button with a leading animated circular icon.

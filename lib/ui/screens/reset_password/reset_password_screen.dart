@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../commons/widgets/app_button.dart';
-import '../../../commons/widgets/app_plain_background.dart';
-import '../../../commons/widgets/app_text_field.dart';
+import '../widgets/app_button.dart';
+import '../widgets/app_plain_background.dart';
+import '../widgets/app_text_field.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../utils/validators.dart';
-import '../controllers/reset_password_controller.dart';
+import '../../../features/reset_password/controllers/reset_password_controller.dart';
 
-class ResetPasswordView extends GetView<ResetPasswordController> {
-  const ResetPasswordView({super.key});
+class ResetPasswordScreen extends GetView<ResetPasswordController> {
+  const ResetPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
