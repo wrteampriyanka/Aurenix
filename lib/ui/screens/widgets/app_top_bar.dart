@@ -15,12 +15,17 @@ class AppTopBar extends StatelessWidget {
     this.onModelTap,
     this.onNewChat,
     this.onMore,
+    this.trailing,
   });
 
   final VoidCallback onMenu;
   final VoidCallback? onModelTap;
   final VoidCallback? onNewChat;
   final VoidCallback? onMore;
+
+  /// Takes the place of the more button at the end of the pill, e.g. the
+  /// avatar of the preset the chat is using.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +77,17 @@ class AppTopBar extends StatelessWidget {
                     color: context.color.tileBorder,
                   ),
                 ),
-                _PillIcon(icon: PhosphorIconsRegular.dotsThree, onTap: onMore),
+                if (trailing case final trailing?)
+                  SizedBox(
+                    width: 44,
+                    height: 46,
+                    child: Center(child: trailing),
+                  )
+                else
+                  _PillIcon(
+                    icon: PhosphorIconsRegular.dotsThree,
+                    onTap: onMore,
+                  ),
               ],
             ),
           ),

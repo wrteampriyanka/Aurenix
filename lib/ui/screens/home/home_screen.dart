@@ -8,6 +8,8 @@ import '../widgets/app_top_bar.dart';
 import '../widgets/custom_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../onboarding/widgets/wave_orb.dart';
+import '../presets/controllers/presets_controller.dart';
+import '../presets/widgets/preset_widgets.dart';
 import 'controllers/home_controller.dart';
 import 'controllers/sidebar_controller.dart';
 import 'widgets/app_sidebar.dart';
@@ -59,19 +61,55 @@ class _HomeBody extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              AppTopBar(
-                onMenu: controller.onMenu,
-                onModelTap: controller.onModelTap,
-                onNewChat: controller.onNewChat,
-                onMore: controller.onMore,
-              ),
-              Expanded(
-                child: Obx(
-                  () => controller.messages.isEmpty
-                      ? _Welcome(controller: controller)
-                      : ChatMessages(controller: controller),
+              Obx(
+                () => AppTopBar(
+                  onMenu: controller.onMenu,
+                  onModelTap: controller.onModelTap,
+                  onNewChat: controller.onNewChat,
+                  onMore: controller.onMore,
+                  trailing: switch (controller.preset.value) {
+                    final preset? => PresetAvatar(
+                      image: preset.image,
+                      size: 30,
+                    ),
+                    null => null,
+                  },
                 ),
               ),
+              Obx(() {
+                if (controller.preset.value == null ||
+                    !controller.showPresetNotice.value) {
+                  return const SizedBox.shrink();
+                }
+                return ChatNotice(
+                  text: 'preset_chat_notice'.tr,
+                  onClose: controller.onClosePresetNotice,
+                );
+              }),
+              Expanded(
+                child: Obx(() {
+                  if (controller.messages.isNotEmpty) {
+                    return ChatMessages(controller: controller);
+                  }
+                  return switch (controller.preset.value) {
+                    final preset? => _PresetWelcome(
+                      preset: preset,
+                      onVisitSite: controller.onVisitPresetSite,
+                    ),
+                    null => _Welcome(controller: controller),
+                  };
+                }),
+              ),
+              Obx(() {
+                final preset = controller.preset.value;
+                if (preset == null || controller.messages.isNotEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return _QuickStarters(
+                  starters: preset.quickStarters,
+                  onTap: controller.onQuickStarter,
+                );
+              }),
               _InputBar(controller: controller),
             ],
           ),
@@ -122,6 +160,95 @@ class _Welcome extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Empty state of a preset chat: the preset's avatar in a glow, its name
+/// and description, and a link to its site.
+class _PresetWelcome extends StatelessWidget {
+  const _PresetWelcome({required this.preset, required this.onVisitSite});
+
+  final Preset preset;
+  final VoidCallback onVisitSite;
+
+  static const double _avatar = 84;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = context.color;
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          children: [
+            SizedBox(
+              width: _avatar * 2.2,
+              height: _avatar * 2.2,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          color.accentPurple.withValues(alpha: 0.45),
+                          color.accentPurple.withValues(alpha: 0),
+                        ],
+                        stops: const [0.2, 1],
+                      ),
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
+                  PresetAvatar(image: preset.image, size: _avatar),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            CustomText(
+              preset.name,
+              maxLines: 2,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              textAlign: TextAlign.center,
+              color: color.textNatural,
+            ),
+            const SizedBox(height: 8),
+            CustomText(
+              preset.description,
+              maxLines: 3,
+              fontSize: 14,
+              textAlign: TextAlign.center,
+              color: color.textBody,
+            ),
+            const SizedBox(height: 18),
+            PresetVisitSiteButton(onTap: onVisitSite),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Quick Starters" and the preset's prompt chips, just above the input.
+class _QuickStarters extends StatelessWidget {
+  const _QuickStarters({required this.starters, required this.onTap});
+
+  final List<String> starters;
+  final ValueChanged<String> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+          child: PresetSectionTitle('presets_quick_starters'.tr),
+        ),
+        PresetQuickStarters(starters: starters, onTap: onTap),
+      ],
     );
   }
 }

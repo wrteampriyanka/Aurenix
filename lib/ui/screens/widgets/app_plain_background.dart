@@ -8,11 +8,13 @@ import 'app_detail_app_bar.dart';
 import 'custom_text.dart';
 
 /// Plain dark screen with a soft glow behind the status bar, used by the
-/// form screens (reset password, edit profile).
+/// form screens (reset password, edit profile). The glow is teal unless
+/// [glow] says otherwise (the preset detail screen uses blue).
 class AppPlainBackground extends StatelessWidget {
-  const AppPlainBackground({super.key, required this.child});
+  const AppPlainBackground({super.key, required this.child, this.glow});
 
   final Widget child;
+  final Color? glow;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,13 @@ class AppPlainBackground extends StatelessWidget {
       ),
       child: ColoredBox(
         color: context.color.backgroundBase,
-        child: Stack(fit: StackFit.expand, children: [const _TopGlow(), child]),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _TopGlow(color: glow ?? context.color.topGlow),
+            child,
+          ],
+        ),
       ),
     );
   }
@@ -31,7 +39,9 @@ class AppPlainBackground extends StatelessWidget {
 /// Faint teal wash behind the status bar, a little right of centre and
 /// gone before the screen title, as in the design.
 class _TopGlow extends StatelessWidget {
-  const _TopGlow();
+  const _TopGlow({required this.color});
+
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +52,7 @@ class _TopGlow extends StatelessWidget {
       height: MediaQuery.paddingOf(context).top + 110,
       child: IgnorePointer(
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: topGlowGradient(context.color.topGlow),
-          ),
+          decoration: BoxDecoration(gradient: topGlowGradient(color)),
         ),
       ),
     );
@@ -84,16 +92,12 @@ class _ScaleX extends GradientTransform {
   }
 }
 
-/// Round back button followed by the screen title and an optional [action].
+/// Round back button followed by the screen [title] (if any) and an
+/// optional [action].
 class AppBackHeader extends StatelessWidget {
-  const AppBackHeader({
-    super.key,
-    required this.title,
-    this.onBack,
-    this.action,
-  });
+  const AppBackHeader({super.key, this.title, this.onBack, this.action});
 
-  final String title;
+  final String? title;
 
   /// Defaults to [Get.back].
   final VoidCallback? onBack;
@@ -126,7 +130,7 @@ class AppBackHeader extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: CustomText(
-              title,
+              title ?? '',
               maxLines: 1,
               fontSize: 22,
               fontWeight: FontWeight.w600,

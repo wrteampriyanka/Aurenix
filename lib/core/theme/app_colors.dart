@@ -104,6 +104,19 @@ class AppColors {
   final Color upgradeButtonHighlight = const Color(0xFF3A3F4B);
   final Color upgradeButtonBorder = const Color(0x33FFFFFF);
 
+  // Presets: star next to a preset's rating, the numbered badge on a
+  // ranked tile (lighter grey circle against the card), and the detail
+  // screen's rating bars.
+  final Color ratingStar = const Color(0xFFFBBF24);
+  final Color rankBadge = const Color(0xFF3A4150);
+  final Color rankBadgeBorder = const Color(0x1FFFFFFF);
+  final Color ratingBarTrack = const Color(0xFF232A3A);
+  final Color ratingBarFill = const Color(0xFF2563EB);
+  // Soft drop shadow under the detail header card, and the blue tint at
+  // the start of its category strip.
+  final Color cardShadow = const Color(0x66000000);
+  final Color cardStripTint = const Color(0x4D1D3B8A);
+
   // AppSwitch
   final Color switchTrackOff = const Color(0xFF3A4150);
   final Color switchThumb = const Color(0xFFFFFFFF);

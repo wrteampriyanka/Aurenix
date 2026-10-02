@@ -32,6 +32,12 @@ class AppAssets {
   static const String slackLogo = 'assets/images/slack.svg';
   static const String teamsLogo = 'assets/images/teams.svg';
 
+  // Preset avatars. They were delivered as SVGs wrapping a bitmap in a
+  // pattern fill, which flutter_svg cannot draw, so the bitmaps are used.
+  static const String presetGithub = 'assets/images/presets/preset_github.png';
+  static const String presetSpace = 'assets/images/presets/preset_space.png';
+  static const String presetGaming = 'assets/images/presets/preset_gaming.jpg';
+
   // PhonePe and Play Purchase are PNGs: their SVGs wrap a bitmap in a
   // pattern fill, which flutter_svg cannot draw.
   static const String playPurchaseLogo =

@@ -74,6 +74,7 @@ flutter:
     - assets/images/
     - assets/images/home_screen_icon/
     - assets/images/pyment/
+    - assets/images/presets/
     - assets/translations/
 
   # Register your custom fonts here

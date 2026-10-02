@@ -28,6 +28,10 @@ import '../../ui/screens/onboarding/bindings/onboarding_binding.dart';
 import '../../ui/screens/onboarding/onboarding_screen.dart';
 import '../../ui/screens/otp/bindings/otp_binding.dart';
 import '../../ui/screens/otp/otp_screen.dart';
+import '../../ui/screens/presets/bindings/preset_detail_binding.dart';
+import '../../ui/screens/presets/bindings/presets_binding.dart';
+import '../../ui/screens/presets/preset_detail_screen.dart';
+import '../../ui/screens/presets/presets_screen.dart';
 import '../../ui/screens/profile/bindings/profile_binding.dart';
 import '../../ui/screens/profile/profile_screen.dart';
 import '../../ui/screens/projects/bindings/projects_binding.dart';
@@ -65,6 +69,10 @@ class AppPages {
   // of the platform zoom, which flashes a dark fill between the two screens.
   static final _screenTransition = _SlideParallaxTransition();
   static const _screenTransitionDuration = Duration(milliseconds: 420);
+
+  /// Pages opened by a card that flies into them (preset detail): long
+  /// enough for the card to settle, short enough to feel snappy.
+  static const _growTransitionDuration = Duration(milliseconds: 480);
   static const _screenTransitionCurve = Curves.fastEaseInToSlowEaseOut;
 
   /// A screen that uses [_screenTransition] and can be swiped back from the
@@ -105,7 +113,10 @@ class AppPages {
   );
 
   static final routes = <GetPage>[
-    _screen(AppRoutes.aboutUs, () => const LegalScreen(page: LegalPage.aboutUs)),
+    _screen(
+      AppRoutes.aboutUs,
+      () => const LegalScreen(page: LegalPage.aboutUs),
+    ),
     _screen(
       AppRoutes.archiveChats,
       () => const ArchiveChatsScreen(),
@@ -117,7 +128,11 @@ class AppPages {
       () => const CategoriesScreen(),
       CategoriesBinding(),
     ),
-    _screen(AppRoutes.checkout, () => const CheckoutScreen(), CheckoutBinding()),
+    _screen(
+      AppRoutes.checkout,
+      () => const CheckoutScreen(),
+      CheckoutBinding(),
+    ),
     _screen(
       AppRoutes.connectedApps,
       () => const ConnectedAppsScreen(),
@@ -160,7 +175,11 @@ class AppPages {
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
-    _screen(AppRoutes.memories, () => const MemoriesScreen(), MemoriesBinding()),
+    _screen(
+      AppRoutes.memories,
+      () => const MemoriesScreen(),
+      MemoriesBinding(),
+    ),
     GetPage(
       name: AppRoutes.onboarding,
       page: () => const OnboardingScreen(),
@@ -174,12 +193,26 @@ class AppPages {
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
+    GetPage(
+      name: AppRoutes.presetDetail,
+      page: () => const PresetDetailScreen(),
+      binding: PresetDetailBinding(),
+      customTransition: _GrowTransition(),
+      transitionDuration: _growTransitionDuration,
+      curve: Curves.easeOutCubic,
+      popGesture: true,
+    ),
+    _screen(AppRoutes.presets, () => const PresetsScreen(), PresetsBinding()),
     _screen(
       AppRoutes.privacyPolicy,
       () => const LegalScreen(page: LegalPage.privacyPolicy),
     ),
     _screen(AppRoutes.profile, () => const ProfileScreen(), ProfileBinding()),
-    _screen(AppRoutes.projects, () => const ProjectsScreen(), ProjectsBinding()),
+    _screen(
+      AppRoutes.projects,
+      () => const ProjectsScreen(),
+      ProjectsBinding(),
+    ),
     GetPage(
       name: AppRoutes.register,
       page: () => const RegisterScreen(),
@@ -214,6 +247,53 @@ class AppPages {
       VoiceSettingsBinding(),
     ),
   ];
+}
+
+/// Fades the page in while it eases up from slightly smaller, with the
+/// page below staying put and dimming. Made for pages a tapped card flies
+/// into: the card's growth is the motion, so the page itself stays calm.
+class _GrowTransition extends CustomTransition {
+  static final _scale = Tween<double>(begin: 0.96, end: 1);
+  static final _dim = Tween<double>(begin: 0, end: 0.4);
+
+  @override
+  Widget buildTransition(
+    BuildContext context,
+    Curve? curve,
+    Alignment? alignment,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final c = curve ?? Curves.easeOutCubic;
+    final primary = CurvedAnimation(
+      parent: animation,
+      curve: c,
+      reverseCurve: c.flipped,
+    );
+    final fade = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0, 0.6, curve: Curves.easeOut),
+      reverseCurve: const Interval(0.4, 1, curve: Curves.easeIn),
+    );
+    return Stack(
+      fit: StackFit.passthrough,
+      children: [
+        FadeTransition(
+          opacity: fade,
+          child: ScaleTransition(scale: _scale.animate(primary), child: child),
+        ),
+        Positioned.fill(
+          child: IgnorePointer(
+            child: FadeTransition(
+              opacity: _dim.animate(secondaryAnimation),
+              child: const ColoredBox(color: Colors.black),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Slides the page in from the right edge. While another page covers it,

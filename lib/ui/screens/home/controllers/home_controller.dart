@@ -17,6 +17,7 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/services/voice_service.dart';
+import '../../presets/controllers/presets_controller.dart';
 import '../../widgets/bottom_sheets/services_sheet.dart';
 import 'sidebar_controller.dart';
 
@@ -100,6 +101,13 @@ class HomeController extends GetxController
 
   /// Whether the send button shows: there is text or an attachment.
   bool get canSend => hasText.value || attachment.value != null;
+
+  /// The preset this chat is using, if it was started from one.
+  final preset = Rxn<Preset>();
+
+  /// The strip under the top bar saying what a preset cannot see; closed
+  /// per preset chat.
+  final showPresetNotice = true.obs;
 
   /// Stops the reply in progress, streamed or a generated image.
   StreamSubscription<Object?>? _reply;
@@ -531,8 +539,38 @@ class HomeController extends GetxController
   }
 
   /// Clears the conversation. A [temporary] chat isn't saved to history.
+  /// Starts a chat with [preset], with [starter] typed into the input.
+  ///
+  /// Presets is reached from the sidebar, which stays open behind it, so
+  /// the drawer is snapped shut here: home is still covered, and the chat
+  /// must be what shows when it comes back.
+  void startPreset(Preset preset, [String? starter]) {
+    onNewChat();
+    this.preset.value = preset;
+    showPresetNotice.value = true;
+    if (starter != null) onQuickStarter(starter);
+    drawer.value = 0;
+    Get.find<SidebarController>().selectedChatId.value = null;
+  }
+
+  /// Puts a quick starter prompt into the input, ready to send.
+  void onQuickStarter(String starter) {
+    messageController.text = starter;
+    messageController.selection = TextSelection.collapsed(
+      offset: starter.length,
+    );
+  }
+
+  void onClosePresetNotice() => showPresetNotice.value = false;
+
+  Future<void> onVisitPresetSite() async {
+    final preset = this.preset.value;
+    if (preset != null) await openPresetSite(preset);
+  }
+
   void onNewChat({bool temporary = false}) {
     isTemporary.value = temporary;
+    preset.value = null;
     _reply?.cancel();
     _stopSpeaking();
     if (isListening.value) onCancelVoice();

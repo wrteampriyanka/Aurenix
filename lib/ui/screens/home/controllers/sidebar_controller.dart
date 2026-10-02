@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../widgets/bottom_sheets/app_picker_sheet.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../widgets/bottom_sheets/create_project_sheet.dart';
 import 'home_controller.dart';
@@ -210,7 +208,7 @@ class SidebarController extends GetxController
           duration: const Duration(seconds: 2),
         );
       case SidebarAction.presets:
-        _pickPreset();
+        Get.toNamed(AppRoutes.presets);
       case SidebarAction.newProject:
         onCreateProject();
       case SidebarAction.viewAll:
@@ -222,21 +220,6 @@ class SidebarController extends GetxController
   void _startChat({bool temporary = false}) {
     selectedChatId.value = null;
     _home.onNewChat(temporary: temporary);
-    _home.closeDrawer();
-  }
-
-  /// Lets the user pick one of the home actions (Code, Research, ...) to
-  /// tag the next message with.
-  Future<void> _pickPreset() async {
-    final action = await AppPickerSheet.show<HomeAction>(
-      title: 'sidebar_presets'.tr,
-      items: HomeController.actions,
-      labelOf: (a) => a.labelKey.tr,
-      selected: _home.selectedAction.value,
-      leadingOf: (a) => SvgPicture.asset(a.icon, width: 20, height: 20),
-    );
-    if (action == null) return;
-    _home.onAction(action);
     _home.closeDrawer();
   }
 

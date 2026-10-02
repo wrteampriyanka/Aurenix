@@ -41,11 +41,13 @@ class _MyAppState extends State<MyApp> {
     super.reassemble();
     if (!kDebugMode || _reloadingTranslations) return;
     _reloadingTranslations = true;
-    AppTranslations.load().then((translations) async {
-      Get.clearTranslations();
-      Get.addTranslations(translations.keys);
-      await Get.forceAppUpdate();
-    }).whenComplete(() => _reloadingTranslations = false);
+    AppTranslations.load()
+        .then((translations) async {
+          Get.clearTranslations();
+          Get.addTranslations(translations.keys);
+          await Get.forceAppUpdate();
+        })
+        .whenComplete(() => _reloadingTranslations = false);
   }
 
   @override

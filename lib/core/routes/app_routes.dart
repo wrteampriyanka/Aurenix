@@ -16,6 +16,8 @@ abstract class AppRoutes {
   static const memories = '/memories';
   static const onboarding = '/onboarding';
   static const otp = '/otp';
+  static const presetDetail = '/preset-detail';
+  static const presets = '/presets';
   static const privacyPolicy = '/privacy-policy';
   static const profile = '/profile';
   static const projects = '/projects';

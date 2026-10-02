@@ -20,7 +20,10 @@ class ChatMessages extends StatelessWidget {
       children: [
         Obx(
           () => controller.showDisclaimer.value
-              ? _Disclaimer(onClose: controller.onCloseDisclaimer)
+              ? ChatNotice(
+                  text: 'chat_disclaimer'.tr,
+                  onClose: controller.onCloseDisclaimer,
+                )
               : const SizedBox.shrink(),
         ),
         Expanded(
@@ -47,22 +50,31 @@ class ChatMessages extends StatelessWidget {
   }
 }
 
-class _Disclaimer extends StatelessWidget {
-  const _Disclaimer({required this.onClose});
+/// Full-width grey strip with a note and an x to dismiss it: the AI
+/// disclaimer above a chat, or what a preset cannot see.
+class ChatNotice extends StatelessWidget {
+  const ChatNotice({
+    super.key,
+    required this.text,
+    required this.onClose,
+    this.margin = const EdgeInsets.only(top: 12),
+  });
 
+  final String text;
   final VoidCallback onClose;
+  final EdgeInsetsGeometry margin;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+      margin: margin,
       padding: const EdgeInsets.fromLTRB(16, 10, 4, 10),
       color: context.color.tileFill,
       child: Row(
         children: [
           Expanded(
             child: CustomText(
-              'chat_disclaimer'.tr,
+              text,
               fontSize: 12,
               color: context.color.textBody,
             ),
