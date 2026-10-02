@@ -91,8 +91,9 @@ class ProfileController extends GetxController {
     age = result.age;
   }
 
+  void onUpgrade() => Get.toNamed(AppRoutes.upgrade);
+
   // TODO: wire these up once the screens exist.
-  void onUpgrade() {}
   void onModelTap() {}
   void onMore() {}
 

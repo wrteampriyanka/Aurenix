@@ -89,6 +89,9 @@ class HomeController extends GetxController
   final isGenerating = false.obs;
   final showDisclaimer = true.obs;
 
+  /// Whether this conversation is kept out of the chat history.
+  final isTemporary = false.obs;
+
   /// Chip picked from the welcome screen, shown as a tag in the input.
   final selectedAction = Rxn<HomeAction>();
 
@@ -527,7 +530,9 @@ class HomeController extends GetxController
     });
   }
 
-  void onNewChat() {
+  /// Clears the conversation. A [temporary] chat isn't saved to history.
+  void onNewChat({bool temporary = false}) {
+    isTemporary.value = temporary;
     _reply?.cancel();
     _stopSpeaking();
     if (isListening.value) onCancelVoice();

@@ -13,6 +13,7 @@ class AssistantVoice {
     required this.taglineKey,
     required this.isMale,
     required this.pitch,
+    required this.fallbackPitch,
     required this.rate,
   });
 
@@ -23,6 +24,10 @@ class AssistantVoice {
 
   /// 1 is the engine's normal pitch.
   final double pitch;
+
+  /// Used instead of [pitch] when no installed voice of the right gender
+  /// was found, so a boy still sounds lower than a girl.
+  final double fallbackPitch;
 
   /// 0.5 is the normal pace on both Android and iOS.
   final double rate;
@@ -41,7 +46,8 @@ class VoiceService {
       name: 'Victor',
       taglineKey: 'voice_tagline_victor',
       isMale: true,
-      pitch: 0.95,
+      pitch: 1.0,
+      fallbackPitch: 0.75,
       rate: 0.5,
     ),
     AssistantVoice(
@@ -49,7 +55,8 @@ class VoiceService {
       name: 'Aria',
       taglineKey: 'voice_tagline_aria',
       isMale: false,
-      pitch: 1.1,
+      pitch: 1.05,
+      fallbackPitch: 1.2,
       rate: 0.52,
     ),
     AssistantVoice(
@@ -57,7 +64,8 @@ class VoiceService {
       name: 'Orion',
       taglineKey: 'voice_tagline_orion',
       isMale: true,
-      pitch: 0.8,
+      pitch: 0.9,
+      fallbackPitch: 0.62,
       rate: 0.45,
     ),
     AssistantVoice(
@@ -65,7 +73,8 @@ class VoiceService {
       name: 'Luna',
       taglineKey: 'voice_tagline_luna',
       isMale: false,
-      pitch: 1.2,
+      pitch: 1.15,
+      fallbackPitch: 1.35,
       rate: 0.56,
     ),
   ];
@@ -82,68 +91,198 @@ class VoiceService {
     await StorageService.instance.setString(StorageService.voiceKey, voice.id);
   }
 
-  /// The installed English voices, loaded once.
-  List<Map<String, String>>? _installed;
+  /// The installed voice each assistant voice speaks with, by id, worked
+  /// out once. Missing when the phone has no voice left to give it.
+  Map<String, _SystemVoice>? _assigned;
 
   /// Sets [tts] up to speak as [voice], the selected one by default.
   Future<void> apply(FlutterTts tts, [AssistantVoice? voice]) async {
     voice ??= selected.value;
     try {
-      final installed = _installed ??= await _loadInstalled(tts);
-      final match = _systemVoiceFor(voice, installed);
-      if (match != null) await tts.setVoice(match);
-      await tts.setPitch(voice.pitch);
+      final assigned = _assigned ??= _assign(await _loadInstalled(tts));
+      final match = assigned[voice.id];
+      if (match != null) {
+        await tts.setVoice({'name': match.name, 'locale': match.locale});
+      }
+      // A voice of the right gender sounds right as it is; otherwise the
+      // pitch has to carry the boy or girl sound.
+      final genderMatched = match?.isMale == voice.isMale;
+      await tts.setPitch(genderMatched ? voice.pitch : voice.fallbackPitch);
       await tts.setSpeechRate(voice.rate);
     } catch (_) {
       // The engine's default voice still works.
     }
   }
 
-  static Future<List<Map<String, String>>> _loadInstalled(
-    FlutterTts tts,
-  ) async {
-    final raw = await tts.getVoices;
-    if (raw is! List) return const [];
-    final found = <Map<String, String>>[];
-    for (final item in raw) {
-      if (item is! Map) continue;
-      final voice = item.map((k, v) => MapEntry('$k', '$v'));
-      final locale = (voice['locale'] ?? '').toLowerCase().replaceAll('_', '-');
-      if (voice['name'] == null || !locale.startsWith('en')) continue;
-      // Android lists voices that need a download or the network to speak.
-      if (voice['network_required'] == '1' ||
-          voice['features']?.contains('notInstalled') == true) {
-        continue;
+  /// Gives each assistant voice its own installed voice, boys a male one
+  /// and girls a female one where the phone has them. No installed voice
+  /// is used twice.
+  static Map<String, _SystemVoice> _assign(List<_SystemVoice> installed) {
+    final used = <String>{};
+    final assigned = <String, _SystemVoice>{};
+    _SystemVoice? take(bool Function(_SystemVoice) test) {
+      for (final v in installed) {
+        if (!used.contains(v.speaker) && test(v)) {
+          used.add(v.speaker);
+          return v;
+        }
       }
-      found.add(voice);
+      return null;
     }
-    // US voices first, then a stable order so each voice keeps its match.
-    int rank(Map<String, String> v) =>
-        v['locale']!.toLowerCase().replaceAll('_', '-') == 'en-us' ? 0 : 1;
-    found.sort((a, b) {
-      final byLocale = rank(a) - rank(b);
-      return byLocale != 0 ? byLocale : a['name']!.compareTo(b['name']!);
-    });
-    return found;
+
+    // Matching genders first, so a boy never takes the only female voice.
+    for (final voice in voices) {
+      final match = take((v) => v.isMale == voice.isMale);
+      if (match != null) assigned[voice.id] = match;
+    }
+    for (final voice in voices) {
+      if (assigned.containsKey(voice.id)) continue;
+      final match = take((v) => v.isMale == null) ?? take((_) => true);
+      if (match != null) assigned[voice.id] = match;
+    }
+    return assigned;
   }
 
-  /// A different installed voice per assistant voice where the phone has
-  /// enough, matching gender where the platform reports it (iOS).
-  static Map<String, String>? _systemVoiceFor(
-    AssistantVoice voice,
-    List<Map<String, String>> installed,
-  ) {
-    if (installed.isEmpty) return null;
-    final gender = voice.isMale ? 'male' : 'female';
-    final sameGender = installed
-        .where((v) => v['gender']?.toLowerCase() == gender)
-        .toList();
-    final pool = sameGender.isNotEmpty ? sameGender : installed;
-    final peers = voices.where(
-      (v) => sameGender.isEmpty || v.isMale == voice.isMale,
-    );
-    final slot = peers.toList().indexOf(voice);
-    final picked = pool[slot % pool.length];
-    return {'name': picked['name']!, 'locale': picked['locale']!};
+  static Future<List<_SystemVoice>> _loadInstalled(FlutterTts tts) async {
+    final raw = await tts.getVoices;
+    if (raw is! List) return const [];
+    final bySpeaker = <String, _SystemVoice>{};
+    for (final item in raw) {
+      if (item is! Map) continue;
+      final map = item.map((k, v) => MapEntry('$k', '$v'));
+      final voice = _SystemVoice.from(map);
+      if (voice == null) continue;
+      // Android lists each speaker twice, on device and online; keep the
+      // better one.
+      final seen = bySpeaker[voice.speaker];
+      if (seen == null || voice.rank < seen.rank) {
+        bySpeaker[voice.speaker] = voice;
+      }
+    }
+    return bySpeaker.values.toList()..sort((a, b) => a.rank - b.rank);
   }
+}
+
+/// An English voice installed on the phone.
+class _SystemVoice {
+  const _SystemVoice({
+    required this.name,
+    required this.locale,
+    required this.speaker,
+    required this.isMale,
+    required this.rank,
+  });
+
+  final String name;
+  final String locale;
+
+  /// Who is speaking, the same for the on device and online copies.
+  final String speaker;
+
+  /// Null when neither the platform nor [_maleNames]/[_femaleNames] say.
+  final bool? isMale;
+
+  /// Lower is better: US English, then other accents; good quality first.
+  final int rank;
+
+  static _SystemVoice? from(Map<String, String> v) {
+    final name = v['name'];
+    final locale = v['locale'];
+    if (name == null || locale == null) return null;
+    final lang = locale.toLowerCase().replaceAll('_', '-');
+    if (!lang.startsWith('en')) return null;
+    final id = (v['identifier'] ?? '').toLowerCase();
+    // iOS joke voices (Bubbles, Zarvox, …) and the robotic Eloquence ones.
+    if (id.contains('speech.synthesis.voice') || id.contains('eloquence')) {
+      return null;
+    }
+    if (_skipNames.contains(name.toLowerCase())) return null;
+    if (v['features']?.contains('notInstalled') == true) return null;
+
+    final online =
+        v['network_required'] == '1' ||
+        v['network_required'] == 'true' ||
+        name.endsWith('-network');
+    // Google voices are named like en-us-x-iom-local; "iom" is the speaker.
+    final code = RegExp(r'-x-([a-z]+)').firstMatch(name.toLowerCase())?[1];
+    final speaker = code != null
+        ? '${lang.substring(0, lang.length.clamp(0, 5))}-$code'
+        : name.toLowerCase();
+
+    final gender = (v['gender'] ?? '').toLowerCase();
+    final firstName = name.split(RegExp(r'[\s(]')).first.toLowerCase();
+    final bool? isMale = switch (gender) {
+      'male' => true,
+      'female' => false,
+      _ when _maleNames.contains(code ?? firstName) => true,
+      _ when _femaleNames.contains(code ?? firstName) => false,
+      _ => null,
+    };
+
+    final quality = v['quality']?.toLowerCase() ?? '';
+    final good =
+        quality == 'premium' ||
+        quality == 'enhanced' ||
+        (int.tryParse(quality) ?? 0) >= 400;
+    final accent = switch (lang) {
+      'en-us' => 0,
+      'en-gb' => 1,
+      'en-au' => 2,
+      _ => 3,
+    };
+    return _SystemVoice(
+      name: name,
+      locale: locale,
+      speaker: speaker,
+      isMale: isMale,
+      rank: (online ? 100 : 0) + accent * 10 + (good ? 0 : 1),
+    );
+  }
+
+  /// Google speaker codes and Apple voice names known to be male.
+  static const _maleNames = {
+    'iol', 'iom', 'tpd', 'gbb', 'gbd', 'rjs', 'aub', 'aud', //
+    'daniel', 'aaron', 'arthur', 'gordon', 'rishi', 'alex', 'evan',
+    'nathan', 'tom', 'oliver', 'lee', 'james', 'malcolm',
+  };
+
+  /// Google speaker codes and Apple voice names known to be female.
+  static const _femaleNames = {
+    'iob', 'iog', 'sfg', 'tpc', 'tpf', 'gba', 'gbc', 'gbg', 'afh', 'aua',
+    'auc', //
+    'samantha', 'karen', 'moira', 'tessa', 'martha', 'catherine', 'nicky',
+    'zoe', 'ava', 'allison', 'susan', 'serena', 'kate', 'fiona', 'veena',
+    'victoria', 'joelle', 'noelle',
+  };
+
+  /// iOS novelty voices, in case the identifier doesn't give them away.
+  static const _skipNames = {
+    'albert',
+    'bad news',
+    'bahh',
+    'bells',
+    'boing',
+    'bubbles',
+    'cellos',
+    'good news',
+    'jester',
+    'organ',
+    'superstar',
+    'trinoids',
+    'whisper',
+    'wobble',
+    'zarvox',
+    'junior',
+    'ralph',
+    'kathy',
+    'fred',
+    'eddy',
+    'flo',
+    'grandma',
+    'grandpa',
+    'reed',
+    'rocko',
+    'sandy',
+    'shelley',
+  };
 }

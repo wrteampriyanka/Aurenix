@@ -84,14 +84,22 @@ class _ScaleX extends GradientTransform {
   }
 }
 
-/// Round back button followed by the screen title.
+/// Round back button followed by the screen title and an optional [action].
 class AppBackHeader extends StatelessWidget {
-  const AppBackHeader({super.key, required this.title, this.onBack});
+  const AppBackHeader({
+    super.key,
+    required this.title,
+    this.onBack,
+    this.action,
+  });
 
   final String title;
 
   /// Defaults to [Get.back].
   final VoidCallback? onBack;
+
+  /// Shown at the end of the row, e.g. a "Create New" button.
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +133,7 @@ class AppBackHeader extends StatelessWidget {
               color: context.color.textNatural,
             ),
           ),
+          ?action,
         ],
       ),
     );
@@ -140,6 +149,7 @@ class AppDetailPage extends StatelessWidget {
     required this.child,
     this.header,
     this.bottom,
+    this.action,
     this.padding = const EdgeInsets.fromLTRB(20, 16, 20, 16),
   });
 
@@ -154,6 +164,9 @@ class AppDetailPage extends StatelessWidget {
   /// Pinned to the bottom of the screen, e.g. a save button.
   final Widget? bottom;
 
+  /// Shown at the end of the app bar, e.g. a "Create New" button.
+  final Widget? action;
+
   final EdgeInsetsGeometry padding;
 
   @override
@@ -167,7 +180,7 @@ class AppDetailPage extends StatelessWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AppDetailAppBar(title: title),
+            AppDetailAppBar(title: title, action: action),
             Expanded(
               child: SafeArea(
                 top: false,

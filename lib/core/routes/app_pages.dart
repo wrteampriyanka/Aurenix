@@ -30,6 +30,8 @@ import '../../features/otp/bindings/otp_binding.dart';
 import '../../features/otp/views/otp_view.dart';
 import '../../features/profile/bindings/profile_binding.dart';
 import '../../features/profile/views/profile_view.dart';
+import '../../features/projects/bindings/projects_binding.dart';
+import '../../features/projects/views/projects_view.dart';
 import '../../features/register/bindings/register_binding.dart';
 import '../../features/register/views/register_view.dart';
 import '../../features/reset_password/bindings/reset_password_binding.dart';
@@ -40,6 +42,10 @@ import '../../features/splash/bindings/splash_binding.dart';
 import '../../features/splash/views/splash_view.dart';
 import '../../features/transactions/bindings/transactions_binding.dart';
 import '../../features/transactions/views/transactions_view.dart';
+import '../../features/upgrade/bindings/checkout_binding.dart';
+import '../../features/upgrade/bindings/upgrade_binding.dart';
+import '../../features/upgrade/views/checkout_view.dart';
+import '../../features/upgrade/views/upgrade_view.dart';
 import '../../features/voice_settings/bindings/voice_settings_binding.dart';
 import '../../features/voice_settings/views/voice_settings_view.dart';
 import 'app_routes.dart';
@@ -77,6 +83,27 @@ class AppPages {
     popGesture: true,
   );
 
+  // Full-screen sheets (closed with a ✕) rise from the bottom over the
+  // screen below, which stays put.
+  static final _sheetTransition = _SheetUpTransition();
+  static const _sheetTransitionDuration = Duration(milliseconds: 380);
+
+  /// A screen that uses [_sheetTransition]. It has no swipe back, since a
+  /// sideways swipe doesn't match a page that came up from the bottom.
+  static GetPage _sheet(
+    String name,
+    GetPageBuilder page, [
+    Bindings? binding,
+  ]) => GetPage(
+    name: name,
+    page: page,
+    binding: binding,
+    customTransition: _sheetTransition,
+    transitionDuration: _sheetTransitionDuration,
+    curve: Curves.easeOutCubic,
+    popGesture: false,
+  );
+
   static final routes = <GetPage>[
     _screen(AppRoutes.aboutUs, () => const LegalView(page: LegalPage.aboutUs)),
     _screen(
@@ -90,6 +117,7 @@ class AppPages {
       () => const CategoriesView(),
       CategoriesBinding(),
     ),
+    _screen(AppRoutes.checkout, () => const CheckoutView(), CheckoutBinding()),
     _screen(
       AppRoutes.connectedApps,
       () => const ConnectedAppsView(),
@@ -151,6 +179,7 @@ class AppPages {
       () => const LegalView(page: LegalPage.privacyPolicy),
     ),
     _screen(AppRoutes.profile, () => const ProfileView(), ProfileBinding()),
+    _screen(AppRoutes.projects, () => const ProjectsView(), ProjectsBinding()),
     GetPage(
       name: AppRoutes.register,
       page: () => const RegisterView(),
@@ -178,13 +207,11 @@ class AppPages {
       () => const TransactionsView(),
       TransactionsBinding(),
     ),
-    GetPage(
-      name: AppRoutes.voiceSettings,
-      page: () => const VoiceSettingsView(),
-      binding: VoiceSettingsBinding(),
-      transition: Transition.downToUp,
-      transitionDuration: _screenTransitionDuration,
-      curve: _screenTransitionCurve,
+    _sheet(AppRoutes.upgrade, () => const UpgradeView(), UpgradeBinding()),
+    _sheet(
+      AppRoutes.voiceSettings,
+      () => const VoiceSettingsView(),
+      VoiceSettingsBinding(),
     ),
   ];
 }
@@ -246,6 +273,37 @@ class _SlideParallaxTransition extends CustomTransition {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Slides the page up from the bottom edge with an ease-out, and back down
+/// with the mirrored curve. The page is isolated in a [RepaintBoundary] so
+/// moving it only re-composites it instead of repainting its contents.
+///
+/// GetX's [Transition.downToUp] ignores the route curve, so it moves at a
+/// flat linear speed, which reads as stiff.
+class _SheetUpTransition extends CustomTransition {
+  static final _enter = Tween<Offset>(
+    begin: const Offset(0, 1),
+    end: Offset.zero,
+  );
+
+  @override
+  Widget buildTransition(
+    BuildContext context,
+    Curve? curve,
+    Alignment? alignment,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final c = curve ?? Curves.easeOutCubic;
+    return SlideTransition(
+      position: _enter.animate(
+        CurvedAnimation(parent: animation, curve: c, reverseCurve: c.flipped),
+      ),
+      child: RepaintBoundary(child: child),
     );
   }
 }

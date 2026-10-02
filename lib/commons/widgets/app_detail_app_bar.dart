@@ -7,12 +7,20 @@ import 'app_plain_background.dart';
 /// carries the teal glow, and rounds off its bottom-left and bottom-right
 /// corners with a faint outline.
 class AppDetailAppBar extends StatelessWidget {
-  const AppDetailAppBar({super.key, required this.title, this.onBack});
+  const AppDetailAppBar({
+    super.key,
+    required this.title,
+    this.onBack,
+    this.action,
+  });
 
   final String title;
 
   /// Defaults to [Get.back].
   final VoidCallback? onBack;
+
+  /// Shown at the end of the bar, after the title.
+  final Widget? action;
 
   static const double _radius = 28;
 
@@ -37,7 +45,11 @@ class AppDetailAppBar extends StatelessWidget {
               bottom: false,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: AppBackHeader(title: title, onBack: onBack),
+                child: AppBackHeader(
+                  title: title,
+                  onBack: onBack,
+                  action: action,
+                ),
               ),
             ),
           ),

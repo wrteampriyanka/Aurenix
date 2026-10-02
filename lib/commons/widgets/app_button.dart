@@ -167,9 +167,16 @@ class _AnimatedIconCircle extends StatelessWidget {
 
     if (!animate) return circle;
 
-    return CustomPaint(
-      painter: _RipplePainter(time: time, color: context.color.primaryShade50),
-      child: circle,
+    // Keeps the per-frame ripple from repainting the rest of the screen
+    // (e.g. a full-screen background shader) on every tick.
+    return RepaintBoundary(
+      child: CustomPaint(
+        painter: _RipplePainter(
+          time: time,
+          color: context.color.primaryShade50,
+        ),
+        child: circle,
+      ),
     );
   }
 }

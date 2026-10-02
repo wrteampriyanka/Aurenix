@@ -35,9 +35,30 @@ class AppSidebar extends GetView<SidebarController> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
               children: [
-                _MenuCard(items: SidebarController.actions),
+                _MenuCard(
+                  children: [
+                    for (final item in SidebarController.actions)
+                      _itemRow(item),
+                  ],
+                ),
                 const SizedBox(height: 12),
-                _MenuCard(items: SidebarController.projects),
+                Obx(
+                  () => _MenuCard(
+                    children: [
+                      _itemRow(SidebarController.newProjectItem),
+                      for (final project in controller.projects.take(
+                        SidebarController.sidebarProjectCount,
+                      ))
+                        _MenuRow(
+                          label: project.name,
+                          icon: project.icon,
+                          iconColor: project.iconColor,
+                          onTap: () => controller.onProject(project),
+                        ),
+                      _itemRow(SidebarController.viewAllItem),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.only(left: 6, bottom: 8),
@@ -59,6 +80,14 @@ class AppSidebar extends GetView<SidebarController> {
       ),
     );
   }
+
+  _MenuRow _itemRow(SidebarItem item) => _MenuRow(
+    label: item.labelKey.tr,
+    icon: item.icon,
+    iconColor: item.iconColor,
+    showArrow: item.showArrow,
+    onTap: () => controller.onItem(item),
+  );
 }
 
 /// Rounded outlined box shared by the sidebar cards.
@@ -266,10 +295,10 @@ class _ClearButton extends StatelessWidget {
   }
 }
 
-class _MenuCard extends GetView<SidebarController> {
-  const _MenuCard({required this.items});
+class _MenuCard extends StatelessWidget {
+  const _MenuCard({required this.children});
 
-  final List<SidebarItem> items;
+  final List<_MenuRow> children;
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +309,7 @@ class _MenuCard extends GetView<SidebarController> {
         type: MaterialType.transparency,
         child: Column(
           children: [
-            for (var i = 0; i < items.length; i++) ...[
+            for (var i = 0; i < children.length; i++) ...[
               if (i > 0)
                 Divider(
                   height: 1,
@@ -289,10 +318,7 @@ class _MenuCard extends GetView<SidebarController> {
                   endIndent: 12,
                   color: context.color.tileBorder,
                 ),
-              _MenuRow(
-                item: items[i],
-                onTap: () => controller.onItem(items[i]),
-              ),
+              children[i],
             ],
           ],
         ),
@@ -302,9 +328,20 @@ class _MenuCard extends GetView<SidebarController> {
 }
 
 class _MenuRow extends StatelessWidget {
-  const _MenuRow({required this.item, required this.onTap});
+  const _MenuRow({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.iconColor,
+    this.showArrow = false,
+  });
 
-  final SidebarItem item;
+  final String label;
+  final IconData icon;
+
+  /// Defaults to the regular text colour.
+  final Color? iconColor;
+  final bool showArrow;
   final VoidCallback onTap;
 
   @override
@@ -315,21 +352,17 @@ class _MenuRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
         child: Row(
           children: [
-            Icon(
-              item.icon,
-              size: 20,
-              color: item.iconColor ?? context.color.textNatural,
-            ),
+            Icon(icon, size: 20, color: iconColor ?? context.color.textNatural),
             const SizedBox(width: 12),
             Expanded(
               child: CustomText(
-                item.labelKey.tr,
+                label,
                 maxLines: 1,
                 fontSize: 14,
                 color: context.color.textNatural,
               ),
             ),
-            if (item.showArrow)
+            if (showArrow)
               Icon(
                 PhosphorIconsRegular.caretRight,
                 size: 16,

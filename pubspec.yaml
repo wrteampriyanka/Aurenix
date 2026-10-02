@@ -73,6 +73,7 @@ flutter:
     - assets/images/log_in_icon/
     - assets/images/
     - assets/images/home_screen_icon/
+    - assets/images/pyment/
     - assets/translations/
 
   # Register your custom fonts here

@@ -31,4 +31,12 @@ class AppAssets {
   static const String gitlabLogo = 'assets/images/gitlab.svg';
   static const String slackLogo = 'assets/images/slack.svg';
   static const String teamsLogo = 'assets/images/teams.svg';
+
+  // PhonePe and Play Purchase are PNGs: their SVGs wrap a bitmap in a
+  // pattern fill, which flutter_svg cannot draw.
+  static const String playPurchaseLogo =
+      'assets/images/pyment/play_purchase.png';
+  static const String razorpayLogo = 'assets/images/pyment/razorpay.svg';
+  static const String phonepeLogo = 'assets/images/pyment/phonepe.png';
+  static const String paytmLogo = 'assets/images/pyment/paytm.svg';
 }
