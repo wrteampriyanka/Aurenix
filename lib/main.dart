@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,16 +26,26 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  /// True while the translation files are being reloaded after a hot reload.
+  bool _reloadingTranslations = false;
+
   /// Hot reload doesn't rerun [main], so reload the translation files here;
   /// otherwise newly added keys show up as raw keys until a full restart.
+  ///
+  /// [Get.forceAppUpdate] (used by [Get.updateLocale] when the language
+  /// changes) also runs this, and the reload below ends with another
+  /// [Get.forceAppUpdate], so it is guarded against re-entering itself.
+  /// Without the guard every language change reassembled the app forever.
   @override
   void reassemble() {
     super.reassemble();
-    AppTranslations.load().then((translations) {
+    if (!kDebugMode || _reloadingTranslations) return;
+    _reloadingTranslations = true;
+    AppTranslations.load().then((translations) async {
       Get.clearTranslations();
       Get.addTranslations(translations.keys);
-      Get.forceAppUpdate();
-    });
+      await Get.forceAppUpdate();
+    }).whenComplete(() => _reloadingTranslations = false);
   }
 
   @override

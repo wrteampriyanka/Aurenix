@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../core/routes/app_routes.dart';
-import '../../../core/services/language_service.dart';
 import '../../edit_profile/controllers/edit_profile_controller.dart';
 import '../widgets/language_sheet.dart';
 
@@ -100,13 +99,9 @@ class ProfileController extends GetxController {
 
   void onUpgrade() => Get.toNamed(AppRoutes.upgrade);
 
-  /// Lets them pick English, Hindi or Arabic; the app switches at once.
-  Future<void> onLanguage() async {
-    final picked = await LanguageSheet.show(
-      selected: LanguageService.instance.selected.value,
-    );
-    if (picked != null) await LanguageService.instance.select(picked);
-  }
+  /// Lets them pick English, Hindi or Arabic; the sheet switches the app
+  /// at once.
+  Future<void> onLanguage() => LanguageSheet.show();
 
   // TODO: wire these up once the screens exist.
   void onModelTap() {}

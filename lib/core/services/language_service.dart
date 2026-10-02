@@ -66,14 +66,24 @@ class LanguageService {
     return languages.firstWhereOrNull((l) => l.code == code) ?? fallback;
   }
 
-  /// Switches every screen to [language] and remembers it.
+  /// True while the app is being rebuilt for a new language.
+  final switching = false.obs;
+
+  /// Switches every screen to [language] and remembers it. Completes once
+  /// the app has been rebuilt in the new language.
   Future<void> select(AppLanguage language) async {
-    if (language == selected.value) return;
+    if (language == selected.value || switching.value) return;
     selected.value = language;
-    Get.updateLocale(language.locale);
-    await StorageService.instance.setString(
-      StorageService.languageKey,
-      language.code,
-    );
+    switching.value = true;
+    try {
+      // Rebuilds every widget so each `.tr` string is re-resolved.
+      await Get.updateLocale(language.locale);
+      await StorageService.instance.setString(
+        StorageService.languageKey,
+        language.code,
+      );
+    } finally {
+      switching.value = false;
+    }
   }
 }

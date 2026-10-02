@@ -6,15 +6,14 @@ import '../../../commons/widgets/custom_text.dart';
 import '../../../core/services/language_service.dart';
 import '../../../core/theme/app_colors.dart';
 
-/// Floating sheet listing the app languages. Resolves with the one tapped,
-/// or null when dismissed.
+/// Floating sheet listing the app languages. Tapping one switches the app
+/// to it (the highlight moves at once) and then closes the sheet.
 class LanguageSheet extends StatelessWidget {
-  const LanguageSheet({super.key, required this.selected});
+  const LanguageSheet({super.key});
 
-  final AppLanguage selected;
-
-  static Future<AppLanguage?> show({required AppLanguage selected}) {
-    return showModalBottomSheet<AppLanguage>(
+  /// Resolves once the sheet is closed.
+  static Future<void> show() {
+    return showModalBottomSheet<void>(
       context: Get.context!,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
@@ -26,13 +25,23 @@ class LanguageSheet extends StatelessWidget {
         curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic,
       ),
-      builder: (_) => LanguageSheet(selected: selected),
+      builder: (_) => const LanguageSheet(),
     );
+  }
+
+  Future<void> _pick(BuildContext context, AppLanguage language) async {
+    final service = LanguageService.instance;
+    if (service.switching.value) return;
+    if (language != service.selected.value) {
+      await service.select(language);
+    }
+    if (context.mounted) Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     final color = context.color;
+    final service = LanguageService.instance;
     return SafeArea(
       top: false,
       child: Container(
@@ -70,15 +79,19 @@ class LanguageSheet extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-              child: Column(
-                children: [
-                  for (final language in LanguageService.languages)
-                    _LanguageRow(
-                      language: language,
-                      selected: language == selected,
-                      onTap: () => Navigator.of(context).pop(language),
-                    ),
-                ],
+              // Rebuilds as soon as a language is picked, so the check mark
+              // moves to the tapped row before the sheet closes.
+              child: Obx(
+                () => Column(
+                  children: [
+                    for (final language in LanguageService.languages)
+                      _LanguageRow(
+                        language: language,
+                        selected: language == service.selected.value,
+                        onTap: () => _pick(context, language),
+                      ),
+                  ],
+                ),
               ),
             ),
           ],
