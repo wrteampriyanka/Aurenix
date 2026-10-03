@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../../../../core/constants/app_assets.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
 
 /// An app card on the integration screen.
 class IntegrationApp {

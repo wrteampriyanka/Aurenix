@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../home/controllers/sidebar_controller.dart';
+import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
 
 /// Actions offered from an archived chat's more menu.
 enum ArchivedChatAction { unarchive, delete }

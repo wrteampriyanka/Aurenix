@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../app_button.dart';
-import '../app_text_field.dart';
-import '../custom_text.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_text_field.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
 
 /// The sheet behind "Edit Project" and "Add Instructions": one multi-line
 /// field holding what the assistant should keep in mind for this project.

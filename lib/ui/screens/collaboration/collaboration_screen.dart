@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../widgets/app_button.dart';
-import '../widgets/app_plain_background.dart';
-import '../widgets/custom_text.dart';
-import 'controllers/collaboration_controller.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/ui/screens/collaboration/controllers/collaboration_controller.dart';
 
 /// Who a project is shared with: its access setting, an invite field and
 /// the list of members with their roles.

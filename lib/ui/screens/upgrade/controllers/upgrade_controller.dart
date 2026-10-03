@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
-import '../../../../core/routes/app_routes.dart';
-import '../models/upgrade_plan.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/ui/screens/upgrade/models/upgrade_plan.dart';
 
 class UpgradeController extends GetxController {
   List<UpgradePlan> get plans => UpgradePlan.all;

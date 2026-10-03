@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../home/controllers/sidebar_controller.dart';
-import '../widgets/app_detail_app_bar.dart';
-import '../widgets/app_search_field.dart';
-import '../widgets/custom_text.dart';
-import 'controllers/project_detail_controller.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/ui/screens/widgets/app_detail_app_bar.dart';
+import 'package:aurenix/ui/screens/widgets/app_search_field.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/ui/screens/project_detail/controllers/project_detail_controller.dart';
 
 /// A single project: its chats, with a composer for starting a new one.
 class ProjectDetailScreen extends GetView<ProjectDetailController> {

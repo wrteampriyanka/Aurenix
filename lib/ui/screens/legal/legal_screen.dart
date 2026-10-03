@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:get/get.dart';
 
-import '../widgets/app_plain_background.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
 
 /// A static text document reached from the profile menu. Its body is
 /// markdown kept in the translations.

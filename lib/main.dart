@@ -2,12 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'core/constants/app_constants.dart';
-import 'core/localization/app_translations.dart';
-import 'core/routes/app_pages.dart';
-import 'core/services/language_service.dart';
-import 'core/storage/storage_service.dart';
-import 'core/theme/app_theme.dart';
+import 'package:aurenix/core/constants/app_constants.dart';
+import 'package:aurenix/core/localization/app_translations.dart';
+import 'package:aurenix/core/routes/app_pages.dart';
+import 'package:aurenix/core/services/language_service.dart';
+import 'package:aurenix/core/storage/storage_service.dart';
+import 'package:aurenix/core/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

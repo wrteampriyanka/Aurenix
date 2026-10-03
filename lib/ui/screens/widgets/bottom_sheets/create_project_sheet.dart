@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../app_button.dart';
-import '../app_text_field.dart';
-import '../custom_text.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_text_field.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
 
 /// Which chats a project's assistant may remember.
 enum ProjectMemory { all, projectOnly }

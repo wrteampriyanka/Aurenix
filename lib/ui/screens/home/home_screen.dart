@@ -3,18 +3,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../widgets/app_background.dart';
-import '../widgets/app_top_bar.dart';
-import '../widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import '../onboarding/widgets/wave_orb.dart';
-import '../presets/controllers/presets_controller.dart';
-import '../presets/widgets/preset_widgets.dart';
-import 'controllers/home_controller.dart';
-import 'controllers/sidebar_controller.dart';
-import 'widgets/app_sidebar.dart';
-import 'widgets/chat_messages.dart';
-import 'widgets/sidebar_drawer.dart';
+import 'package:aurenix/ui/screens/widgets/app_background.dart';
+import 'package:aurenix/ui/screens/widgets/app_top_bar.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/onboarding/widgets/wave_orb.dart';
+import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
+import 'package:aurenix/ui/screens/presets/widgets/preset_widgets.dart';
+import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
+import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/ui/screens/home/widgets/app_sidebar.dart';
+import 'package:aurenix/ui/screens/home/widgets/chat_messages.dart';
+import 'package:aurenix/ui/screens/home/widgets/sidebar_drawer.dart';
 
 class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});

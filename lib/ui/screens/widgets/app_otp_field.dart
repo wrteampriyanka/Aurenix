@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/app_colors.dart';
-import 'custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
 
 /// Row of [length] boxes for entering a numeric verification code.
 ///

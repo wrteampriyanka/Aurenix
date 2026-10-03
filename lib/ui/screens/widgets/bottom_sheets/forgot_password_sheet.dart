@@ -3,13 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../app_button.dart';
-import '../app_text_field.dart';
-import '../custom_text.dart';
-import '../../../../core/constants/app_assets.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../utils/validators.dart';
-import '../../login/controllers/login_controller.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_text_field.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/utils/validators.dart';
+import 'package:aurenix/ui/screens/login/controllers/login_controller.dart';
 
 /// Bottom sheet asking for the account email before starting verification.
 /// Plain dark background, as in the design.

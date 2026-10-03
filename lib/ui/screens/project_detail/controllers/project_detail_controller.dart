@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../core/routes/app_routes.dart';
-import '../../home/controllers/home_controller.dart';
-import '../../home/controllers/sidebar_controller.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
+import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
 
 /// One project's chats, opened by tapping a project card or sidebar row.
 /// The project itself lives in [SidebarController], so renaming or deleting

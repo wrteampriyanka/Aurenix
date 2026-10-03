@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../widgets/app_background.dart';
-import '../widgets/app_button.dart';
-import '../widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import 'controllers/onboarding_controller.dart';
-import 'widgets/integration_hub.dart';
-import 'widgets/wave_orb.dart';
+import 'package:aurenix/ui/screens/widgets/app_background.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/onboarding/controllers/onboarding_controller.dart';
+import 'package:aurenix/ui/screens/onboarding/widgets/integration_hub.dart';
+import 'package:aurenix/ui/screens/onboarding/widgets/wave_orb.dart';
 
 class OnboardingScreen extends GetView<OnboardingController> {
   const OnboardingScreen({super.key});

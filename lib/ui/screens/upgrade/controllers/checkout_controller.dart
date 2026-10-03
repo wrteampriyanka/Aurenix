@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../widgets/bottom_sheets/app_picker_sheet.dart';
-import '../models/country.dart';
-import '../models/upgrade_plan.dart';
-import '../../widgets/app_snackbar.dart';
+import 'package:aurenix/ui/screens/widgets/bottom_sheets/app_picker_sheet.dart';
+import 'package:aurenix/ui/screens/upgrade/models/country.dart';
+import 'package:aurenix/ui/screens/upgrade/models/upgrade_plan.dart';
+import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
 
 class CheckoutController extends GetxController {
   final formKey = GlobalKey<FormState>();

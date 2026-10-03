@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:get/get.dart';
 
-import '../storage/storage_service.dart';
+import 'package:aurenix/core/storage/storage_service.dart';
 
 /// One of the languages the app can be shown in, picked from Profile.
 class AppLanguage {

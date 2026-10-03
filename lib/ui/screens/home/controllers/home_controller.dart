@@ -13,14 +13,14 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/constants/app_assets.dart';
-import '../../../../core/routes/app_routes.dart';
-import '../../../../core/services/demo_chat_service.dart';
-import '../../../../core/services/voice_service.dart';
-import '../../presets/controllers/presets_controller.dart';
-import '../../widgets/bottom_sheets/services_sheet.dart';
-import 'sidebar_controller.dart';
-import '../../widgets/app_snackbar.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/core/services/demo_chat_service.dart';
+import 'package:aurenix/core/services/voice_service.dart';
+import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
+import 'package:aurenix/ui/screens/widgets/bottom_sheets/services_sheet.dart';
+import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
 
 /// A quick action chip under the orb.
 class HomeAction {

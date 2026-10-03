@@ -3,8 +3,8 @@ import 'dart:ui' show PointMode;
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../utils/elapsed_time_mixin.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/utils/elapsed_time_mixin.dart';
 
 /// Bright blue orb inside a thin outer ring, with three translucent waves
 /// braided together whose crests stay in place and rise and settle one

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../widgets/app_background.dart';
-import '../widgets/app_button.dart';
-import '../widgets/app_composite_icon.dart';
-import '../widgets/app_fading_card.dart';
-import '../widgets/app_top_bar.dart';
-import '../widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import 'controllers/profile_controller.dart';
+import 'package:aurenix/ui/screens/widgets/app_background.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_composite_icon.dart';
+import 'package:aurenix/ui/screens/widgets/app_fading_card.dart';
+import 'package:aurenix/ui/screens/widgets/app_top_bar.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/profile/controllers/profile_controller.dart';
 
 class ProfileScreen extends GetView<ProfileController> {
   const ProfileScreen({super.key});

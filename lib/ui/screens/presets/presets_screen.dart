@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../widgets/app_plain_background.dart';
-import '../widgets/app_search_field.dart';
-import '../widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import 'controllers/presets_controller.dart';
-import 'widgets/preset_widgets.dart';
+import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
+import 'package:aurenix/ui/screens/widgets/app_search_field.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
+import 'package:aurenix/ui/screens/presets/widgets/preset_widgets.dart';
 
 /// Called with the tapped preset and the hero tag of its card.
 typedef PresetTap = void Function(Preset preset, String heroTag);

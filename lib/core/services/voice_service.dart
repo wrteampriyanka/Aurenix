@@ -1,7 +1,7 @@
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
-import '../storage/storage_service.dart';
+import 'package:aurenix/core/storage/storage_service.dart';
 
 /// One of the voices the assistant can speak with, picked in Voice
 /// Preferences. The device's text to speech voices differ per phone, so a

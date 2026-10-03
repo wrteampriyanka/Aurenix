@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../../core/routes/app_routes.dart';
-import '../../widgets/bottom_sheets/create_project_sheet.dart';
-import '../../widgets/bottom_sheets/project_instructions_sheet.dart';
-import '../../widgets/bottom_sheets/project_menu_sheet.dart';
-import 'home_controller.dart';
-import '../../widgets/app_snackbar.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/ui/screens/widgets/bottom_sheets/create_project_sheet.dart';
+import 'package:aurenix/ui/screens/widgets/bottom_sheets/project_instructions_sheet.dart';
+import 'package:aurenix/ui/screens/widgets/bottom_sheets/project_menu_sheet.dart';
+import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
+import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
 
 /// What a sidebar menu row does when tapped.
 enum SidebarAction { newChat, temporaryChat, presets, newProject, viewAll }

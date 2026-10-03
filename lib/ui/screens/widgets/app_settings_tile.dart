@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/app_colors.dart';
-import 'app_switch.dart';
-import 'custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/app_switch.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
 
 /// Title, subtitle and an on/off switch on a rounded card.
 class AppToggleCard extends StatelessWidget {

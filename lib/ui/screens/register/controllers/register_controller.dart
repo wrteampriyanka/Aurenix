@@ -2,8 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../../../core/routes/app_routes.dart';
-import '../../otp/controllers/otp_controller.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/ui/screens/otp/controllers/otp_controller.dart';
 
 class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();

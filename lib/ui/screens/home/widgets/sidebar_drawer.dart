@@ -4,7 +4,7 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
 
 /// Slides [sidebar] in from the left over [child], which stays in place and
 /// is dimmed behind it.

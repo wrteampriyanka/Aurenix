@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../widgets/app_button.dart';
-import '../widgets/app_plain_background.dart';
-import '../widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import 'controllers/preset_detail_controller.dart';
-import 'controllers/presets_controller.dart';
-import 'widgets/preset_widgets.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/presets/controllers/preset_detail_controller.dart';
+import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
+import 'package:aurenix/ui/screens/presets/widgets/preset_widgets.dart';
 
 /// Everything about one preset: its card, ratings, capabilities and quick
 /// starter prompts, with "Start Chat" pinned to the bottom.

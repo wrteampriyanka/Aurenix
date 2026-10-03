@@ -2,9 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../../core/routes/app_routes.dart';
-import '../../edit_profile/controllers/edit_profile_controller.dart';
-import '../../widgets/bottom_sheets/language_sheet.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/ui/screens/edit_profile/controllers/edit_profile_controller.dart';
+import 'package:aurenix/ui/screens/widgets/bottom_sheets/language_sheet.dart';
 
 /// A row in one of the profile menu cards.
 ///

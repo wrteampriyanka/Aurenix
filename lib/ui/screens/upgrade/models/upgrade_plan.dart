@@ -1,4 +1,4 @@
-import '../../../../core/constants/app_assets.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
 
 /// A paid plan offered on the upgrade screen. All texts are translation keys.
 class UpgradePlan {

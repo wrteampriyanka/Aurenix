@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
 
 /// Dark filled input with an optional leading icon, used on the form screens.
 class AppTextField extends StatelessWidget {

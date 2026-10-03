@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/app_colors.dart';
-import 'custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
 
 /// The app's one snackbar: a dark rounded card floating above the bottom
 /// edge, in the same colours as the sheets and cards around it.

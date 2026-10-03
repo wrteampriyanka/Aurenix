@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../../../core/routes/app_routes.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
 
 /// Why the code is being verified, which decides where Continue leads.
 enum OtpPurpose { register, resetPassword }

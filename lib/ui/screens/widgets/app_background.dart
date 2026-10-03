@@ -5,9 +5,9 @@ import 'dart:ui' show PointMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/app_colors.dart';
-import '../../../utils/elapsed_time_mixin.dart';
-import 'k_glowing_blurs.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/utils/elapsed_time_mixin.dart';
+import 'package:aurenix/ui/screens/widgets/k_glowing_blurs.dart';
 
 /// Shared dark screen background: gradient + twinkling dot matrix + glows.
 ///

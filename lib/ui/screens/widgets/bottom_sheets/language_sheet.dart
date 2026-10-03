@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../custom_text.dart';
-import '../../../../core/services/language_service.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/services/language_service.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
 
 /// Floating sheet listing the app languages. Tapping one switches the app
 /// to it (the highlight moves at once) and then closes the sheet.

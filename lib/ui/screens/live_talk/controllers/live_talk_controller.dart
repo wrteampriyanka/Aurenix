@@ -10,12 +10,12 @@ import 'package:get/get.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
-import '../../../../core/routes/app_routes.dart';
-import '../../../../core/services/demo_chat_service.dart';
-import '../../../../core/services/screen_share_service.dart';
-import '../../../../core/services/voice_service.dart';
-import '../../widgets/bottom_sheets/audio_output_sheet.dart';
-import '../../widgets/app_snackbar.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/core/services/demo_chat_service.dart';
+import 'package:aurenix/core/services/screen_share_service.dart';
+import 'package:aurenix/core/services/voice_service.dart';
+import 'package:aurenix/ui/screens/widgets/bottom_sheets/audio_output_sheet.dart';
+import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
 
 enum LiveStatus { idle, listening, thinking, speaking }
 

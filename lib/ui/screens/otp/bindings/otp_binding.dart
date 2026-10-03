@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/otp_controller.dart';
+import 'package:aurenix/ui/screens/otp/controllers/otp_controller.dart';
 
 class OtpBinding extends Bindings {
   @override

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../widgets/app_background.dart';
-import '../widgets/app_button.dart';
-import '../widgets/app_social_button.dart';
-import '../widgets/app_terms_footer.dart';
-import '../widgets/app_text_field.dart';
-import '../widgets/custom_text.dart';
-import '../widgets/or_divider.dart';
-import '../../../core/constants/app_assets.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../utils/validators.dart';
-import 'controllers/register_controller.dart';
+import 'package:aurenix/ui/screens/widgets/app_background.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_social_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_terms_footer.dart';
+import 'package:aurenix/ui/screens/widgets/app_text_field.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/ui/screens/widgets/or_divider.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/utils/validators.dart';
+import 'package:aurenix/ui/screens/register/controllers/register_controller.dart';
 
 class RegisterScreen extends GetView<RegisterController> {
   const RegisterScreen({super.key});

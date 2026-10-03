@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../../core/theme/app_colors.dart';
-import 'app_detail_app_bar.dart';
-import 'custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/widgets/app_detail_app_bar.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
 
 /// Plain dark screen with a soft glow behind the status bar, used by the
 /// form screens (reset password, edit profile). The glow is teal unless

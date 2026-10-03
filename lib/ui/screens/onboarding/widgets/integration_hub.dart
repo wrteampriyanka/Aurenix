@@ -3,9 +3,9 @@ import 'dart:ui' show PathMetric;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../../core/constants/app_assets.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../utils/elapsed_time_mixin.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/utils/elapsed_time_mixin.dart';
 
 /// App icon in the centre, connected to four platform tiles (two per side)
 /// by bracket-shaped lines, with a stem going up to the orb above.

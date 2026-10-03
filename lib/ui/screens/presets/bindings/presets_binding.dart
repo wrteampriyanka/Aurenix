@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/presets_controller.dart';
+import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
 
 class PresetsBinding extends Bindings {
   @override

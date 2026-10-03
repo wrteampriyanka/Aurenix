@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import '../widgets/custom_text.dart';
-import '../../../core/constants/app_assets.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../core/theme/app_colors.dart';
-import 'controllers/splash_controller.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/constants/app_constants.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/splash/controllers/splash_controller.dart';
 
 class SplashScreen extends GetView<SplashController> {
   const SplashScreen({super.key});

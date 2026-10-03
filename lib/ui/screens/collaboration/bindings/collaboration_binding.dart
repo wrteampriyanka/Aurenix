@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
-import '../../home/controllers/sidebar_controller.dart';
-import '../controllers/collaboration_controller.dart';
+import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/ui/screens/collaboration/controllers/collaboration_controller.dart';
 
 class CollaborationBinding extends Bindings {
   @override

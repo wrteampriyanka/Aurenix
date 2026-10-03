@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/live_talk_controller.dart';
+import 'package:aurenix/ui/screens/live_talk/controllers/live_talk_controller.dart';
 
 class LiveTalkBinding extends Bindings {
   @override

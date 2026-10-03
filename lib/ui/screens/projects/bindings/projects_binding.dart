@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/projects_controller.dart';
+import 'package:aurenix/ui/screens/projects/controllers/projects_controller.dart';
 
 class ProjectsBinding extends Bindings {
   @override

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/budget_controller.dart';
+import 'package:aurenix/ui/screens/budget/controllers/budget_controller.dart';
 
 class BudgetBinding extends Bindings {
   @override

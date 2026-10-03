@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/constants/app_assets.dart';
-import '../../../../core/routes/app_routes.dart';
-import '../../widgets/app_snackbar.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
 
 /// The filter chips under the search field.
 enum PresetFilter {

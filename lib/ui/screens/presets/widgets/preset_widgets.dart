@@ -3,9 +3,9 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../../widgets/custom_text.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../controllers/presets_controller.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
 
 /// Flies a preset card between the list and the detail screen: the card
 /// grows from its small size to the big header card, the avatar glides

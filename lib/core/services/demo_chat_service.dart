@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart' show rootBundle;
 
-import '../constants/app_assets.dart';
+import 'package:aurenix/core/constants/app_assets.dart';
 
 /// Who wrote a chat turn.
 enum ChatRole { user, model }

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import '../widgets/app_background.dart';
-import '../widgets/app_button.dart';
-import '../widgets/app_fading_card.dart';
-import '../widgets/custom_text.dart';
-import '../../../core/theme/app_colors.dart';
-import 'controllers/upgrade_controller.dart';
-import 'models/upgrade_plan.dart';
-import 'widgets/upgrade_widgets.dart';
+import 'package:aurenix/ui/screens/widgets/app_background.dart';
+import 'package:aurenix/ui/screens/widgets/app_button.dart';
+import 'package:aurenix/ui/screens/widgets/app_fading_card.dart';
+import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/ui/screens/upgrade/controllers/upgrade_controller.dart';
+import 'package:aurenix/ui/screens/upgrade/models/upgrade_plan.dart';
+import 'package:aurenix/ui/screens/upgrade/widgets/upgrade_widgets.dart';
 
 class UpgradeScreen extends GetView<UpgradeController> {
   const UpgradeScreen({super.key});
