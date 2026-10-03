@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_button.dart';
-import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
-import 'package:aurenix/ui/screens/widgets/app_text_field.dart';
+import 'package:aurenix/features/widgets/app_button.dart';
+import 'package:aurenix/features/widgets/app_plain_background.dart';
+import 'package:aurenix/features/widgets/app_text_field.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/validators.dart';
-import 'package:aurenix/ui/screens/reset_password/controllers/reset_password_controller.dart';
+import 'package:aurenix/features/reset_password/controllers/reset_password_controller.dart';
 
 class ResetPasswordScreen extends GetView<ResetPasswordController> {
   const ResetPasswordScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/data_control/controllers/data_control_controller.dart';
+import 'package:aurenix/features/data_control/controllers/data_control_controller.dart';
 
 class DataControlBinding extends Bindings {
   @override

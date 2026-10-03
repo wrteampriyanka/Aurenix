@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/services/language_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 

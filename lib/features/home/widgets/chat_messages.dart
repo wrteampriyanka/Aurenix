@@ -3,10 +3,12 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
+import 'package:aurenix/features/home/controllers/home_controller.dart';
+import 'package:aurenix/features/home/widgets/chat_upgrade_card.dart';
+import 'package:aurenix/features/home/widgets/message_menu.dart';
 
 /// The conversation: user bubbles on the right, AI replies full width.
 class ChatMessages extends StatelessWidget {
@@ -29,16 +31,20 @@ class ChatMessages extends StatelessWidget {
         Expanded(
           child: Obx(() {
             final messages = controller.messages;
+            // One past the messages: the free-limit upgrade card closes the
+            // conversation off, until the plan is paid for and it drops out.
+            final showUpgrade = !ChatUpgradeCard.isPlanActive.value;
             return ListView.builder(
               controller: controller.scrollController,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-              itemCount: messages.length,
+              itemCount: messages.length + (showUpgrade ? 1 : 0),
               itemBuilder: (context, i) {
+                if (i == messages.length) return const ChatUpgradeCard();
                 final message = messages[i];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: message.isUser
-                      ? _UserBubble(message: message)
+                      ? _UserBubble(message: message, controller: controller)
                       : _AiMessage(message: message, controller: controller),
                 );
               },
@@ -94,9 +100,45 @@ class ChatNotice extends StatelessWidget {
 }
 
 class _UserBubble extends StatelessWidget {
-  const _UserBubble({required this.message});
+  const _UserBubble({required this.message, required this.controller});
 
   final ChatMessage message;
+  final HomeController controller;
+
+  /// Opens the Copy / Select / Edit / Share card over the bubble.
+  void _onLongPress(BuildContext context) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return;
+    final anchor = box.localToGlobal(Offset.zero) & box.size;
+    showMessageMenu(
+      context: context,
+      anchor: anchor,
+      items: [
+        if (message.text.isNotEmpty) ...[
+          MessageMenuItem(
+            icon: PhosphorIconsRegular.copy,
+            label: 'chat_copy_text'.tr,
+            onTap: () => controller.onCopy(message),
+          ),
+          MessageMenuItem(
+            icon: PhosphorIconsRegular.textAlignLeft,
+            label: 'chat_select_text'.tr,
+            onTap: () => controller.onSelectText(message),
+          ),
+        ],
+        MessageMenuItem(
+          icon: PhosphorIconsRegular.pencilSimple,
+          label: 'chat_edit_message'.tr,
+          onTap: () => controller.onEditMessage(message),
+        ),
+        MessageMenuItem(
+          icon: PhosphorIconsRegular.shareNetwork,
+          label: 'chat_share'.tr,
+          onTap: () => controller.onShare(message),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,36 +148,65 @@ class _UserBubble extends StatelessWidget {
         constraints: BoxConstraints(
           maxWidth: MediaQuery.sizeOf(context).width * 0.75,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (message.attachment case final file?) ...[
-              _SentAttachment(attachment: file),
-              if (message.text.isNotEmpty) const SizedBox(height: 6),
-            ],
-            if (message.text.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: context.color.sidebarSelected,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: SelectableText(
-                  message.text.value,
-                  style: TextStyle(
-                    color: context.color.textNatural,
-                    fontSize: 15,
-                    height: 1.3,
+        child: Builder(
+          // Its own context, so the long press measures the bubble
+          // rather than the whole list.
+          builder: (context) => GestureDetector(
+            onLongPress: () => _onLongPress(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (message.attachment case final file?) ...[
+                  _SentAttachment(attachment: file),
+                  if (message.text.isNotEmpty) const SizedBox(height: 6),
+                ],
+                if (message.text.isNotEmpty)
+                  Obx(
+                    () => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: context.color.sidebarSelected,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: _BubbleText(
+                        text: message.text.value,
+                        // Plain until "Select Texts" is picked: otherwise
+                        // a long press would start a selection instead of
+                        // opening the menu.
+                        selectable: message.selectable.value,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );
+  }
+}
+
+/// The words in a sent bubble, with the selection handles only once the
+/// menu has asked for them.
+class _BubbleText extends StatelessWidget {
+  const _BubbleText({required this.text, required this.selectable});
+
+  final String text;
+  final bool selectable;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(
+      color: context.color.textNatural,
+      fontSize: 15,
+      height: 1.3,
+    );
+    return selectable
+        ? SelectableText(text, style: style, autofocus: true)
+        : Text(text, style: style);
   }
 }
 
@@ -529,7 +600,7 @@ class _ActionIconState extends State<_ActionIcon> {
   Widget build(BuildContext context) {
     final color = widget.active
         ? context.color.buttonHighlight
-        : context.color.textBody;
+        : context.color.textNatural;
     return Material(
       color: Colors.transparent,
       shape: const CircleBorder(),

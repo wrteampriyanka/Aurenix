@@ -3,12 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
+import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/routes/app_routes.dart';
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/create_project_sheet.dart';
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/project_instructions_sheet.dart';
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/project_menu_sheet.dart';
-import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
-import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
+import 'package:aurenix/features/home/widgets/message_menu.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/app_picker_sheet.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/create_project_sheet.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/project_instructions_sheet.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/project_menu_sheet.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/rename_chat_sheet.dart';
+import 'package:aurenix/features/home/controllers/home_controller.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
 
 /// What a sidebar menu row does when tapped.
 enum SidebarAction { newChat, temporaryChat, presets, newProject, viewAll }
@@ -18,16 +22,22 @@ class SidebarItem {
   const SidebarItem({
     required this.action,
     required this.labelKey,
-    required this.icon,
+    this.icon,
+    this.iconAsset,
     this.iconColor,
     this.showArrow = false,
-  });
+  }) : assert(icon != null || iconAsset != null, 'give an icon or an asset');
 
   final SidebarAction action;
 
   /// Translation key of the label.
   final String labelKey;
-  final IconData icon;
+
+  /// A font icon, or null when [iconAsset] is used instead.
+  final IconData? icon;
+
+  /// An SVG from `assets/images`, tinted like a font icon.
+  final String? iconAsset;
 
   /// Tint of the icon; defaults to the regular text colour.
   final Color? iconColor;
@@ -50,6 +60,13 @@ class ChatSummary {
   /// null for chats that are not in a shared project.
   final String? authorInitials;
   final Color? authorColor;
+
+  ChatSummary copyWith({String? title}) => ChatSummary(
+    id: id,
+    title: title ?? this.title,
+    authorInitials: authorInitials,
+    authorColor: authorColor,
+  );
 }
 
 /// A folder of chats, listed in the sidebar and on the projects screen.
@@ -76,13 +93,19 @@ class Project {
   /// What the assistant should keep in mind inside this project.
   final String instructions;
 
-  Project copyWith({String? name, String? instructions}) => Project(
+  Project copyWith({
+    String? name,
+    String? instructions,
+    IconData? icon,
+    Color? iconColor,
+    int? chatCount,
+  }) => Project(
     id: id,
     name: name ?? this.name,
-    icon: icon,
-    iconColor: iconColor,
+    icon: icon ?? this.icon,
+    iconColor: iconColor ?? this.iconColor,
     memory: memory,
-    chatCount: chatCount,
+    chatCount: chatCount ?? this.chatCount,
     instructions: instructions ?? this.instructions,
   );
 }
@@ -105,7 +128,7 @@ class SidebarController extends GetxController
     SidebarItem(
       action: SidebarAction.newChat,
       labelKey: 'sidebar_new_chat',
-      icon: PhosphorIconsRegular.plusCircle,
+      iconAsset: AppAssets.addChatIcon,
       showArrow: true,
     ),
     SidebarItem(
@@ -279,9 +302,10 @@ class SidebarController extends GetxController
     final action = await ProjectMenuSheet.show();
     if (action == null) return;
     switch (action) {
-      // Both of these open the instructions sheet; editing a project is
-      // editing what it tells the assistant.
+      // Edit reopens the create sheet over the project: its name, colour
+      // and icon. Instructions is the separate text sheet.
       case ProjectMenuAction.edit:
+        await editProject(project);
       case ProjectMenuAction.instructions:
         await editInstructions(project);
       // TODO: wire this up once chats can be moved into a project.
@@ -290,6 +314,27 @@ class SidebarController extends GetxController
       case ProjectMenuAction.delete:
         deleteProject(project);
     }
+  }
+
+  /// Reopens the create sheet on the project's look, and keeps whatever
+  /// comes back.
+  Future<void> editProject(Project project) async {
+    final draft = await CreateProjectSheet.edit(
+      ProjectDraft(
+        name: project.name,
+        icon: project.icon,
+        iconColor: project.iconColor,
+        memory: project.memory,
+      ),
+    );
+    if (draft == null) return;
+    final index = projects.indexWhere((p) => p.id == project.id);
+    if (index == -1) return;
+    projects[index] = projects[index].copyWith(
+      name: draft.name,
+      icon: draft.icon,
+      iconColor: draft.iconColor,
+    );
   }
 
   Future<void> editInstructions(Project project) async {
@@ -310,8 +355,95 @@ class SidebarController extends GetxController
     );
   }
 
-  // TODO: wire this up once chats can be renamed, archived or deleted.
-  void onChatMore(ChatSummary chat) {}
+  /// The chat the top bar's "..." acts on: whichever one is open.
+  ChatSummary? get selectedChat {
+    final id = selectedChatId.value;
+    if (id == null) return null;
+    final index = chats.indexWhere((c) => c.id == id);
+    return index == -1 ? null : chats[index];
+  }
+
+  /// The Rename / Archive / Move / Delete card, grown out of [anchor].
+  Future<void> showChatMenu({
+    required BuildContext context,
+    required Rect anchor,
+    required ChatSummary chat,
+  }) => showMessageMenu(
+    context: context,
+    anchor: anchor,
+    items: [
+      MessageMenuItem(
+        icon: PhosphorIconsRegular.pencilSimple,
+        label: 'chat_menu_rename'.tr,
+        onTap: () => renameChat(chat),
+      ),
+      MessageMenuItem(
+        icon: PhosphorIconsRegular.arrowCircleDown,
+        label: 'chat_menu_archive'.tr,
+        onTap: () => archiveChat(chat),
+      ),
+      MessageMenuItem(
+        icon: PhosphorIconsRegular.folderSimplePlus,
+        label: 'chat_menu_move'.tr,
+        onTap: () => moveChatToProject(chat),
+      ),
+      MessageMenuItem(
+        icon: PhosphorIconsRegular.trash,
+        label: 'chat_menu_delete'.tr,
+        onTap: () => deleteChat(chat),
+      ),
+    ],
+  );
+
+  /// Opens the title in a sheet and keeps whatever comes back.
+  Future<void> renameChat(ChatSummary chat) async {
+    final title = await RenameChatSheet.show(initialTitle: chat.title);
+    if (title == null) return;
+    final index = chats.indexWhere((c) => c.id == chat.id);
+    if (index == -1) return;
+    chats[index] = chats[index].copyWith(title: title);
+  }
+
+  // TODO: sync these three with the API; for now they only move the chat
+  // out of the drawer's list.
+  void archiveChat(ChatSummary chat) {
+    _removeChat(chat);
+    AppSnackbar.show('chat_menu_archived'.trParams({'name': chat.title}));
+  }
+
+  /// Files the chat under one of the user's projects, picked from a sheet.
+  Future<void> moveChatToProject(ChatSummary chat) async {
+    if (projects.isEmpty) {
+      AppSnackbar.show('chat_menu_no_projects'.tr);
+      return;
+    }
+    final project = await AppPickerSheet.show<Project>(
+      title: 'chat_menu_move'.tr,
+      items: projects,
+      labelOf: (p) => p.name,
+    );
+    if (project == null) return;
+    final index = projects.indexWhere((p) => p.id == project.id);
+    if (index != -1) {
+      projects[index] = projects[index].copyWith(
+        chatCount: projects[index].chatCount + 1,
+      );
+    }
+    _removeChat(chat);
+    AppSnackbar.show('chat_menu_moved'.trParams({'name': project.name}));
+  }
+
+  void deleteChat(ChatSummary chat) {
+    _removeChat(chat);
+    AppSnackbar.show('chat_menu_deleted'.trParams({'name': chat.title}));
+  }
+
+  /// Drops the chat from the drawer, starting a fresh one when it was the
+  /// conversation on screen.
+  void _removeChat(ChatSummary chat) {
+    chats.removeWhere((c) => c.id == chat.id);
+    if (selectedChatId.value == chat.id) _startChat();
+  }
 
   @override
   void onClose() {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
-import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
+import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
 
 /// Who can open the project.
 enum ProjectAccess { onlyInvited, anyoneWithLink }

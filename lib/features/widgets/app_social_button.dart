@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 
 /// Light pill button with a leading brand logo (e.g. Google, GitHub).
 class AppSocialButton extends StatelessWidget {

@@ -3,8 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
-import 'package:aurenix/ui/screens/otp/controllers/otp_controller.dart';
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/forgot_password_sheet.dart';
+import 'package:aurenix/core/services/session_service.dart';
+import 'package:aurenix/features/otp/controllers/otp_controller.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/forgot_password_sheet.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -34,8 +35,12 @@ class LoginController extends GetxController {
   void onGoogleLogin() => _goHome();
   void onGithubLogin() => _goHome();
 
-  /// Clears the auth screens so back can't return to them.
-  void _goHome() => Get.offAllNamed(AppRoutes.home);
+  /// Remembers the session, then clears the auth screens so back can't
+  /// return to them and the next app launch opens straight into the chat.
+  Future<void> _goHome() async {
+    await SessionService.instance.signIn();
+    Get.offAllNamed(AppRoutes.home);
+  }
 
   /// Opens the forgot password sheet, prefilled with the login email.
   void onForgotPassword() {

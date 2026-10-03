@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/widgets/app_svg_icon.dart';
+import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
 
 /// Menu, chats and profile shown in the home drawer.
 ///
@@ -85,6 +86,7 @@ class AppSidebar extends GetView<SidebarController> {
   _MenuRow _itemRow(SidebarItem item) => _MenuRow(
     label: item.labelKey.tr,
     icon: item.icon,
+    iconAsset: item.iconAsset,
     iconColor: item.iconColor,
     showArrow: item.showArrow,
     onTap: () => controller.onItem(item),
@@ -331,7 +333,8 @@ class _MenuCard extends StatelessWidget {
 class _MenuRow extends StatelessWidget {
   const _MenuRow({
     required this.label,
-    required this.icon,
+    this.icon,
+    this.iconAsset,
     required this.onTap,
     this.onLongPress,
     this.iconColor,
@@ -339,7 +342,12 @@ class _MenuRow extends StatelessWidget {
   });
 
   final String label;
-  final IconData icon;
+
+  /// A font icon, or null when [iconAsset] is used instead.
+  final IconData? icon;
+
+  /// An SVG from `assets/images`, tinted like a font icon.
+  final String? iconAsset;
 
   /// Defaults to the regular text colour.
   final Color? iconColor;
@@ -358,7 +366,18 @@ class _MenuRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: iconColor ?? context.color.textNatural),
+            if (iconAsset case final asset?)
+              AppSvgIcon(
+                asset,
+                size: 20,
+                color: iconColor ?? context.color.textNatural,
+              )
+            else
+              Icon(
+                icon,
+                size: 20,
+                color: iconColor ?? context.color.textNatural,
+              ),
             const SizedBox(width: 12),
             Expanded(
               child: CustomText(
@@ -434,7 +453,11 @@ class _ChatsCard extends GetView<SidebarController> {
                           chat: chat,
                           selected: chat.id == selectedId,
                           onTap: () => controller.onChat(chat),
-                          onMore: () => controller.onChatMore(chat),
+                          onMore: (anchor) => controller.showChatMenu(
+                            context: context,
+                            anchor: anchor,
+                            chat: chat,
+                          ),
                         ),
                     ],
                   ),
@@ -456,7 +479,9 @@ class _ChatRow extends StatelessWidget {
   final ChatSummary chat;
   final bool selected;
   final VoidCallback onTap;
-  final VoidCallback onMore;
+
+  /// Takes the "..." button's place on screen, so the menu lines up.
+  final ValueChanged<Rect> onMore;
 
   @override
   Widget build(BuildContext context) {
@@ -478,16 +503,22 @@ class _ChatRow extends StatelessWidget {
                   color: context.color.textNatural,
                 ),
               ),
-              InkResponse(
-                onTap: onMore,
-                radius: 18,
-                child: SizedBox(
-                  width: 36,
-                  height: 38,
-                  child: Icon(
-                    PhosphorIconsRegular.dotsThreeVertical,
-                    size: 16,
-                    color: context.color.textBody,
+              Builder(
+                builder: (context) => InkResponse(
+                  onTap: () {
+                    final box = context.findRenderObject() as RenderBox?;
+                    if (box == null || !box.hasSize) return;
+                    onMore(box.localToGlobal(Offset.zero) & box.size);
+                  },
+                  radius: 18,
+                  child: SizedBox(
+                    width: 36,
+                    height: 38,
+                    child: Icon(
+                      PhosphorIconsRegular.dotsThreeVertical,
+                      size: 16,
+                      color: context.color.textBody,
+                    ),
                   ),
                 ),
               ),

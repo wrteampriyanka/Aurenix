@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/widgets/app_search_field.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_search_field.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 
 /// Floating sheet with a search field over a list of options. Opens scrolled
 /// to the current [selected] option and resolves with the one tapped, or

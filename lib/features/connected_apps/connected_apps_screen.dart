@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
-import 'package:aurenix/ui/screens/widgets/app_search_field.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_plain_background.dart';
+import 'package:aurenix/features/widgets/app_search_field.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/connected_apps/controllers/connected_apps_controller.dart';
-import 'package:aurenix/ui/screens/connected_apps/widgets/integration_app_logo.dart';
+import 'package:aurenix/features/connected_apps/controllers/connected_apps_controller.dart';
+import 'package:aurenix/features/connected_apps/widgets/integration_app_logo.dart';
 
 class ConnectedAppsScreen extends GetView<ConnectedAppsController> {
   const ConnectedAppsScreen({super.key});

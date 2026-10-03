@@ -14,8 +14,8 @@ import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/services/screen_share_service.dart';
 import 'package:aurenix/core/services/voice_service.dart';
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/audio_output_sheet.dart';
-import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/audio_output_sheet.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
 
 enum LiveStatus { idle, listening, thinking, speaking }
 

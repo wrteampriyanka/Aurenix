@@ -17,10 +17,11 @@ import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/services/voice_service.dart';
-import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/services_sheet.dart';
-import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
-import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
+import 'package:aurenix/features/presets/controllers/presets_controller.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/services_sheet.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/upgrade_prompt_sheet.dart';
+import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
 
 /// A quick action chip under the orb.
 class HomeAction {
@@ -79,11 +80,16 @@ class ChatMessage {
 
   /// Web pages the reply was grounded on (Research only).
   final sources = <ChatSource>[].obs;
+
+  /// Set by "Select Texts" in the long press menu: the bubble then hands
+  /// its words to the system selection handles.
+  final selectable = false.obs;
 }
 
 class HomeController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final messageController = TextEditingController();
+  final messageFocus = FocusNode();
   final scrollController = ScrollController();
 
   final messages = <ChatMessage>[].obs;
@@ -181,6 +187,41 @@ class HomeController extends GetxController
     ServicesSheet.precache();
   }
 
+  /// How long the user chats before the upgrade nudge comes up.
+  static const upgradePromptDelay = Duration(minutes: 3);
+
+  /// How long to wait before trying again when the moment is wrong — the
+  /// user is on another screen, or a sheet of their own is open.
+  static const _upgradePromptRetry = Duration(seconds: 30);
+
+  Timer? _upgradePrompt;
+
+  /// Starts the countdown on the first message of the run. Later messages
+  /// leave it alone, so a busy conversation does not push the nudge back
+  /// past the point of ever arriving.
+  void _armUpgradePrompt([Duration delay = upgradePromptDelay]) {
+    if (_upgradePrompt != null || !UpgradePromptSheet.isPending) return;
+    _upgradePrompt = Timer(delay, _showUpgradePrompt);
+  }
+
+  /// Interrupting the user mid-task would be rude, so the nudge waits for a
+  /// quiet moment on the chat screen: nothing else open, no reply running
+  /// and not a temporary chat, which is deliberately throwaway.
+  void _showUpgradePrompt() {
+    final busy =
+        Get.currentRoute != AppRoutes.home ||
+        (Get.isBottomSheetOpen ?? false) ||
+        (Get.isDialogOpen ?? false) ||
+        isDrawerOpen.value ||
+        isTemporary.value ||
+        (messages.lastOrNull?.isStreaming.value ?? false);
+    if (busy) {
+      _upgradePrompt = Timer(_upgradePromptRetry, _showUpgradePrompt);
+      return;
+    }
+    UpgradePromptSheet.show();
+  }
+
   void onMenu() => drawer.isDismissed ? drawer.forward() : closeDrawer();
 
   void closeDrawer() => drawer.reverse();
@@ -214,6 +255,10 @@ class HomeController extends GetxController
     // Sending a new message replaces the reply still streaming in.
     if (isGenerating.value) onStop();
     _acceptSpeech = false;
+    // Back to plain bubbles: a selection left open from the menu.
+    for (final message in messages) {
+      message.selectable.value = false;
+    }
     messageController.clear();
     attachment.value = null;
     messages.add(ChatMessage.user(text, attachment: file));
@@ -238,6 +283,30 @@ class HomeController extends GetxController
   void onCopy(ChatMessage message) {
     Clipboard.setData(ClipboardData(text: message.text.value));
     AppSnackbar.show('chat_copied'.tr);
+  }
+
+  /// Turns the system selection handles on for one sent message, so its
+  /// words can be picked apart; any other message goes back to plain.
+  void onSelectText(ChatMessage message) {
+    for (final other in messages) {
+      other.selectable.value = other == message;
+    }
+  }
+
+  /// Puts a sent message back in the input to be rewritten. The message
+  /// and everything after it leave the chat, so sending asks again from
+  /// that point.
+  void onEditMessage(ChatMessage message) {
+    final index = messages.indexOf(message);
+    if (index < 0) return;
+    if (isGenerating.value) onStop();
+    messages.removeRange(index, messages.length);
+    attachment.value = message.attachment;
+    messageController.text = message.text.value;
+    messageController.selection = TextSelection.collapsed(
+      offset: messageController.text.length,
+    );
+    messageFocus.requestFocus();
   }
 
   void onLike(ChatMessage message, bool liked) =>
@@ -308,10 +377,19 @@ class HomeController extends GetxController
 
   void onShare(ChatMessage message) {
     final text = message.text.value;
+    final sent = message.attachment;
     SharePlus.instance.share(
       ShareParams(
         text: text.isEmpty ? null : text,
-        files: message.images.isEmpty
+        files: sent != null
+            ? [
+                XFile.fromData(
+                  sent.bytes,
+                  mimeType: sent.mimeType,
+                  name: sent.name,
+                ),
+              ]
+            : message.images.isEmpty
             ? null
             : [
                 for (final (i, image) in message.images.indexed)
@@ -447,6 +525,7 @@ class HomeController extends GetxController
 
   /// Streams the AI reply to the conversation so far into a new message.
   void _generate() {
+    _armUpgradePrompt();
     final history = [
       for (final m in messages)
         if (m.error.value == null &&
@@ -710,16 +789,30 @@ class HomeController extends GetxController
 
   void onRemoveAttachment() => attachment.value = null;
 
-  // TODO: wire these up once the menus exist.
+  // TODO: wire this up once the model picker exists.
   void onModelTap() {}
-  void onMore() {}
+
+  /// The top bar's "..." — the Rename / Archive / Move / Delete card for
+  /// the chat on screen. A conversation that has not been saved yet has
+  /// nothing to act on.
+  void onMore(Rect anchor) {
+    final sidebar = Get.find<SidebarController>();
+    final chat = sidebar.selectedChat;
+    if (chat == null) {
+      AppSnackbar.show('chat_menu_unsaved'.tr);
+      return;
+    }
+    sidebar.showChatMenu(context: Get.context!, anchor: anchor, chat: chat);
+  }
 
   @override
   void onClose() {
     _reply?.cancel();
+    _upgradePrompt?.cancel();
     _speech.cancel();
     _tts.stop();
     messageController.dispose();
+    messageFocus.dispose();
     scrollController.dispose();
     drawer.dispose();
     super.onClose();

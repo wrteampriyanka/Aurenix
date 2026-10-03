@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_button.dart';
-import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
-import 'package:aurenix/ui/screens/widgets/app_search_field.dart';
-import 'package:aurenix/ui/screens/widgets/app_settings_tile.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_button.dart';
+import 'package:aurenix/features/widgets/app_plain_background.dart';
+import 'package:aurenix/features/widgets/app_search_field.dart';
+import 'package:aurenix/features/widgets/app_settings_tile.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/memories/controllers/memories_controller.dart';
+import 'package:aurenix/features/memories/controllers/memories_controller.dart';
 
 class MemoriesScreen extends GetView<MemoriesController> {
   const MemoriesScreen({super.key});

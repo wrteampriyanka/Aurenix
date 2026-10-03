@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/upgrade/models/upgrade_plan.dart';
+import 'package:aurenix/features/upgrade/models/upgrade_plan.dart';
 
 /// Round frosted button at the top left of the upgrade screens (close/back).
 class UpgradeTopButton extends StatelessWidget {

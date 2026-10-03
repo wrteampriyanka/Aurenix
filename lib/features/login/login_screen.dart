@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_background.dart';
-import 'package:aurenix/ui/screens/widgets/app_button.dart';
-import 'package:aurenix/ui/screens/widgets/app_social_button.dart';
-import 'package:aurenix/ui/screens/widgets/app_terms_footer.dart';
-import 'package:aurenix/ui/screens/widgets/app_text_field.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
-import 'package:aurenix/ui/screens/widgets/or_divider.dart';
+import 'package:aurenix/features/widgets/app_background.dart';
+import 'package:aurenix/features/widgets/app_button.dart';
+import 'package:aurenix/features/widgets/app_social_button.dart';
+import 'package:aurenix/features/widgets/app_terms_footer.dart';
+import 'package:aurenix/features/widgets/app_text_field.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/or_divider.dart';
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/validators.dart';
-import 'package:aurenix/ui/screens/login/controllers/login_controller.dart';
+import 'package:aurenix/features/login/controllers/login_controller.dart';
 
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});

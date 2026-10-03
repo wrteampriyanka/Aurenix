@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/routes/app_routes.dart';
-import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
 
 /// The filter chips under the search field.
 enum PresetFilter {

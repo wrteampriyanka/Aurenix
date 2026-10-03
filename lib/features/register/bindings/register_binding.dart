@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/register/controllers/register_controller.dart';
+import 'package:aurenix/features/register/controllers/register_controller.dart';
 
 class RegisterBinding extends Bindings {
   @override

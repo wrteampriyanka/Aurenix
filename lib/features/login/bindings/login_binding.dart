@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/login/controllers/login_controller.dart';
+import 'package:aurenix/features/login/controllers/login_controller.dart';
 
 class LoginBinding extends Bindings {
   @override

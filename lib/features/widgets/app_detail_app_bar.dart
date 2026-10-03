@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
+import 'package:aurenix/features/widgets/app_plain_background.dart';
 
 /// Top bar of the profile detail screens: reaches up behind the status bar,
 /// carries the teal glow, and rounds off its bottom-left and bottom-right

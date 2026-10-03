@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/app_picker_sheet.dart';
-import 'package:aurenix/ui/screens/upgrade/models/country.dart';
-import 'package:aurenix/ui/screens/upgrade/models/upgrade_plan.dart';
-import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
+import 'package:aurenix/features/home/widgets/chat_upgrade_card.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/app_picker_sheet.dart';
+import 'package:aurenix/features/upgrade/models/country.dart';
+import 'package:aurenix/features/upgrade/models/upgrade_plan.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
 
 class CheckoutController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -89,6 +90,8 @@ class CheckoutController extends GetxController {
     try {
       // TODO: start the purchase with [paymentMethod] for [plan].
       await Future<void>.delayed(const Duration(milliseconds: 600));
+      // The plan is theirs: the free-limit card leaves the chat.
+      ChatUpgradeCard.markActivated();
       AppSnackbar.show(
         'upgrade_payment_pending'.trParams({
           'method': paymentMethod.value.labelKey.tr,

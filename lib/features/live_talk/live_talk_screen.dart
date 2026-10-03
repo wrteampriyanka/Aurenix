@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_plain_background.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/onboarding/widgets/wave_orb.dart';
-import 'package:aurenix/ui/screens/live_talk/controllers/live_talk_controller.dart';
+import 'package:aurenix/features/onboarding/widgets/wave_orb.dart';
+import 'package:aurenix/features/live_talk/controllers/live_talk_controller.dart';
 
 class LiveTalkScreen extends GetView<LiveTalkController> {
   const LiveTalkScreen({super.key});

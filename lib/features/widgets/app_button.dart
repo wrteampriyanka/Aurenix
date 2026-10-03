@@ -5,7 +5,7 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/elapsed_time_mixin.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 
 /// Primary pill button with a leading animated circular icon.
 /// Uses the primary blue by default; pass [color], [highlightColor] and

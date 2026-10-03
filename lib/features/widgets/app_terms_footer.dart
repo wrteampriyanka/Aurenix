@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 
 /// "By clicking continue you agree to our Terms & Conditions and Privacy
 /// Policy." footer shown at the bottom of the auth screens.

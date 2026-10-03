@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
+import 'package:aurenix/features/widgets/app_plain_background.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 
 /// A static text document reached from the profile menu. Its body is

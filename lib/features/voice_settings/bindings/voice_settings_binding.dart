@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/voice_settings/controllers/voice_settings_controller.dart';
+import 'package:aurenix/features/voice_settings/controllers/voice_settings_controller.dart';
 
 class VoiceSettingsBinding extends Bindings {
   @override

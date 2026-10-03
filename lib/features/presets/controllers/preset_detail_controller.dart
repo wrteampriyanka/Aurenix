@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
-import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
-import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
+import 'package:aurenix/features/home/controllers/home_controller.dart';
+import 'package:aurenix/features/presets/controllers/presets_controller.dart';
 
 /// The preset opened from the Presets list, passed as the route argument.
 class PresetDetailController extends GetxController {

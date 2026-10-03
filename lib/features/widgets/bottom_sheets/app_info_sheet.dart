@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/widgets/app_button.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_button.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 
 /// Floating sheet describing a third-party app: its logo, name and handle,
 /// a Connect or Disconnect button, and the permissions it grants.

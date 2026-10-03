@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_button.dart';
-import 'package:aurenix/ui/screens/widgets/app_text_field.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_button.dart';
+import 'package:aurenix/features/widgets/app_text_field.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 
 /// Which chats a project's assistant may remember.
@@ -31,9 +31,16 @@ class ProjectDraft {
 /// Create button — and the icon tile, name field and card outline stay put
 /// across all three so it reads as one sheet growing.
 ///
+/// Opened again with an [initial] draft it becomes the Edit Project sheet:
+/// the same card, minus the memory step, straight on the name, colour and
+/// icon with a Save button.
+///
 /// Resolves with the finished [ProjectDraft], or null when dismissed.
 class CreateProjectSheet extends StatefulWidget {
-  const CreateProjectSheet({super.key});
+  const CreateProjectSheet({super.key, this.initial});
+
+  /// The project being edited, or null when one is being created.
+  final ProjectDraft? initial;
 
   /// Swatches offered on the last sheet.
   static const colors = [
@@ -46,7 +53,7 @@ class CreateProjectSheet extends StatefulWidget {
     Color(0xFF2DD4BF),
   ];
 
-  /// Icons offered on the last sheet, laid out eight to a row.
+  /// Icons offered on the last sheet, laid out nine to a row over three rows.
   static const icons = [
     PhosphorIconsRegular.envelopeSimple,
     PhosphorIconsRegular.lock,
@@ -72,14 +79,9 @@ class CreateProjectSheet extends StatefulWidget {
     PhosphorIconsRegular.pencilSimple,
     PhosphorIconsRegular.gear,
     PhosphorIconsRegular.code,
-    PhosphorIconsRegular.shareNetwork,
-    PhosphorIconsRegular.presentationChart,
-    PhosphorIconsRegular.imageSquare,
-    PhosphorIconsRegular.folder,
     PhosphorIconsRegular.star,
     PhosphorIconsRegular.heart,
     PhosphorIconsRegular.rocket,
-    PhosphorIconsRegular.compass,
   ];
 
   static Future<ProjectDraft?> show() {
@@ -99,6 +101,26 @@ class CreateProjectSheet extends StatefulWidget {
     );
   }
 
+  /// The same sheet over an existing project: its name, colour and icon
+  /// ready to be changed. Resolves with the edited draft, or null.
+  static Future<ProjectDraft?> edit(ProjectDraft initial) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    return showModalBottomSheet<ProjectDraft>(
+      context: Get.context!,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black54,
+      elevation: 0,
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 450),
+        reverseDuration: Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      ),
+      builder: (_) => CreateProjectSheet(initial: initial),
+    );
+  }
+
   @override
   State<CreateProjectSheet> createState() => _CreateProjectSheetState();
 }
@@ -113,14 +135,18 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
   static const _settle = Duration(milliseconds: 260);
 
   final _formKey = GlobalKey<FormState>();
-  final _name = TextEditingController();
+  late final _name = TextEditingController(text: widget.initial?.name ?? '');
   final _nameFocus = FocusNode();
 
-  _Step _step = _Step.memory;
+  /// Editing skips straight to the look: the memory choice was made when
+  /// the project was created.
+  late _Step _step = _isEditing ? _Step.look : _Step.memory;
 
-  ProjectMemory? _memory;
-  Color _color = CreateProjectSheet.colors[1];
-  IconData _icon = PhosphorIconsRegular.lightbulb;
+  late ProjectMemory? _memory = widget.initial?.memory;
+  late Color _color = widget.initial?.iconColor ?? CreateProjectSheet.colors[1];
+  late IconData _icon = widget.initial?.icon ?? PhosphorIconsRegular.lightbulb;
+
+  bool get _isEditing => widget.initial != null;
 
   /// Unfocuses the name field when the user presses done on the keyboard.
   void _onNameSubmitted() {
@@ -185,6 +211,9 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
           onColor: (v) => setState(() => _color = v),
           onIcon: (v) => setState(() => _icon = v),
           onCreate: _create,
+          actionLabel: _isEditing
+              ? 'projects_instructions_save'.tr
+              : 'continue'.tr,
         );
     }
   }
@@ -226,7 +255,9 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         CustomText(
-                          'sidebar_new_project'.tr,
+                          _isEditing
+                              ? 'projects_menu_edit'.tr
+                              : 'sidebar_new_project'.tr,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: color.textNatural,
@@ -373,6 +404,7 @@ class _LookStep extends StatelessWidget {
     required this.onColor,
     required this.onIcon,
     required this.onCreate,
+    required this.actionLabel,
   });
 
   final Color color;
@@ -380,6 +412,9 @@ class _LookStep extends StatelessWidget {
   final ValueChanged<Color> onColor;
   final ValueChanged<IconData> onIcon;
   final VoidCallback onCreate;
+
+  /// "Continue" when creating, "Save Changes" when editing.
+  final String actionLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -402,9 +437,9 @@ class _LookStep extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 8,
-            mainAxisSpacing: 6,
-            crossAxisSpacing: 6,
+            crossAxisCount: 9,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
           ),
           itemCount: CreateProjectSheet.icons.length,
           itemBuilder: (_, i) {
@@ -419,7 +454,7 @@ class _LookStep extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         AppButton(
-          label: 'continue'.tr,
+          label: actionLabel,
           icon: null,
           height: 50,
           fontSize: 16,
@@ -595,7 +630,11 @@ class _IconCell extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: selected ? color : Colors.transparent),
         ),
-        child: Icon(icon, size: 18, color: selected ? color : theme.textBody),
+        child: Icon(
+          icon,
+          size: 17,
+          color: selected ? color : theme.textNatural,
+        ),
       ),
     );
   }

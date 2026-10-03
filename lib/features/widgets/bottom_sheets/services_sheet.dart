@@ -3,12 +3,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/connected_apps/services/connected_apps_service.dart';
-import 'package:aurenix/ui/screens/connected_apps/widgets/integration_app_logo.dart';
-import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
+import 'package:aurenix/features/connected_apps/services/connected_apps_service.dart';
+import 'package:aurenix/features/connected_apps/widgets/integration_app_logo.dart';
+import 'package:aurenix/features/home/controllers/home_controller.dart';
 
 /// A coloured tile at the top of the services sheet.
 class _Service {

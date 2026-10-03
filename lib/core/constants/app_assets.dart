@@ -24,6 +24,12 @@ class AppAssets {
       'assets/images/home_screen_icon/integration.svg';
   static const String attachIcon = 'assets/images/home_screen_icon/attach.svg';
 
+  /// Drawer button in the top bars.
+  static const String menuIcon = 'assets/images/menu_Icon.svg';
+
+  /// "New chat" everywhere it is offered: the top bar pill and the drawer.
+  static const String addChatIcon = 'assets/images/addchat_icon.svg';
+
   static const String figmaColorLogo = 'assets/images/figma.svg';
   static const String zyncLogo = 'assets/images/zync.png';
   static const String googleDriveLogo = 'assets/images/googledrive.svg';

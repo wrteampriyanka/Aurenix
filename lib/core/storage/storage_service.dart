@@ -23,4 +23,11 @@ class StorageService {
 
   Future<void> setString(String key, String value) async =>
       _prefs?.setString(key, value);
+
+  bool getBool(String key) => _prefs?.getBool(key) ?? false;
+
+  Future<void> setBool(String key, {required bool value}) async =>
+      _prefs?.setBool(key, value);
+
+  Future<void> remove(String key) async => _prefs?.remove(key);
 }

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/core/services/session_service.dart';
 
 /// Why the code is being verified, which decides where Continue leads.
 enum OtpPurpose { register, resetPassword }
@@ -61,7 +62,7 @@ class OtpController extends GetxController {
     });
   }
 
-  void onContinue() {
+  Future<void> onContinue() async {
     if (codeController.text.length < codeLength) {
       codeFocusNode.requestFocus();
       return;
@@ -71,7 +72,9 @@ class OtpController extends GetxController {
       case OtpPurpose.resetPassword:
         Get.toNamed(AppRoutes.resetPassword, arguments: email);
       case OtpPurpose.register || null:
-        // Account is verified: clear the auth screens so back can't return.
+        // Account is verified: remember the session, then clear the auth
+        // screens so back can't return.
+        await SessionService.instance.signIn();
         Get.offAllNamed(AppRoutes.home);
     }
   }

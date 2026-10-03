@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
-import 'package:aurenix/ui/screens/savings/controllers/savings_controller.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/features/savings/controllers/savings_controller.dart';
 
 class SavingsScreen extends GetView<SavingsController> {
   const SavingsScreen({super.key});

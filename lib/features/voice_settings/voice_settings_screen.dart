@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_button.dart';
-import 'package:aurenix/ui/screens/widgets/app_plain_background.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_button.dart';
+import 'package:aurenix/features/widgets/app_plain_background.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/services/voice_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/onboarding/widgets/wave_orb.dart';
-import 'package:aurenix/ui/screens/voice_settings/controllers/voice_settings_controller.dart';
+import 'package:aurenix/features/onboarding/widgets/wave_orb.dart';
+import 'package:aurenix/features/voice_settings/controllers/voice_settings_controller.dart';
 
 class VoiceSettingsScreen extends GetView<VoiceSettingsController> {
   const VoiceSettingsScreen({super.key});

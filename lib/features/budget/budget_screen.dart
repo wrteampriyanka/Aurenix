@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
-import 'package:aurenix/ui/screens/budget/controllers/budget_controller.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/features/budget/controllers/budget_controller.dart';
 
 class BudgetScreen extends GetView<BudgetController> {
   const BudgetScreen({super.key});

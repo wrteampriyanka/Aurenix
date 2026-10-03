@@ -3,7 +3,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/services/voice_service.dart';
-import 'package:aurenix/ui/screens/widgets/app_snackbar.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
 
 /// Voice Preferences: swipe through the voices, each one introduces itself
 /// as it comes into view, and Save keeps the one on screen.

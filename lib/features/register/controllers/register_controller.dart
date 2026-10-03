@@ -3,7 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
-import 'package:aurenix/ui/screens/otp/controllers/otp_controller.dart';
+import 'package:aurenix/core/services/session_service.dart';
+import 'package:aurenix/features/otp/controllers/otp_controller.dart';
 
 class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -41,8 +42,14 @@ class RegisterController extends GetxController {
   }
 
   // TODO: sign up with the provider before going home.
-  void onGoogleSignUp() => Get.offAllNamed(AppRoutes.home);
-  void onGithubSignUp() => Get.offAllNamed(AppRoutes.home);
+  Future<void> onGoogleSignUp() => _goHome();
+  Future<void> onGithubSignUp() => _goHome();
+
+  /// Remembers the session so the next launch opens straight into the chat.
+  Future<void> _goHome() async {
+    await SessionService.instance.signIn();
+    Get.offAllNamed(AppRoutes.home);
+  }
 
   // TODO: wire up the remaining actions once auth exists.
   void onTermsTap() {}

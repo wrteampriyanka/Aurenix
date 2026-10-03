@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/elapsed_time_mixin.dart';
-import 'package:aurenix/ui/screens/widgets/k_glowing_blurs.dart';
+import 'package:aurenix/features/widgets/k_glowing_blurs.dart';
 
 /// Shared dark screen background: gradient + twinkling dot matrix + glows.
 ///

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
-import 'package:aurenix/ui/screens/categories/controllers/categories_controller.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/features/categories/controllers/categories_controller.dart';
 
 class CategoriesScreen extends GetView<CategoriesController> {
   const CategoriesScreen({super.key});

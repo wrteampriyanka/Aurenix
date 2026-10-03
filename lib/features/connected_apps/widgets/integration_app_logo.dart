@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/connected_apps/services/connected_apps_service.dart';
+import 'package:aurenix/features/connected_apps/services/connected_apps_service.dart';
 
 /// Draws an [IntegrationApp]'s SVG or PNG logo at [size].
 class IntegrationAppLogo extends StatelessWidget {

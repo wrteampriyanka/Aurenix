@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
-import 'package:aurenix/ui/screens/edit_profile/controllers/edit_profile_controller.dart';
-import 'package:aurenix/ui/screens/widgets/bottom_sheets/language_sheet.dart';
+import 'package:aurenix/core/services/session_service.dart';
+import 'package:aurenix/features/edit_profile/controllers/edit_profile_controller.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/language_sheet.dart';
 
 /// A row in one of the profile menu cards.
 ///
@@ -110,10 +111,16 @@ class ProfileController extends GetxController {
 
   // TODO: wire these up once the screens exist.
   void onModelTap() {}
-  void onMore() {}
+  void onMore(Rect anchor) {}
+
+  /// Drops the saved session, so the next launch starts at sign in.
+  Future<void> _logout() async {
+    await SessionService.instance.signOut();
+    Get.offAllNamed(AppRoutes.login);
+  }
 
   void onItem(ProfileMenuItem item) {
-    if (item == logout) Get.offAllNamed(AppRoutes.login);
+    if (item == logout) _logout();
     if (item == customizeAi) Get.toNamed(AppRoutes.customizeAi);
     if (item == archiveChats) Get.toNamed(AppRoutes.archiveChats);
     if (item == connectedApps) Get.toNamed(AppRoutes.connectedApps);

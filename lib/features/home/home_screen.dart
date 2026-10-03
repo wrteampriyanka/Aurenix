@@ -3,18 +3,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/ui/screens/widgets/app_background.dart';
-import 'package:aurenix/ui/screens/widgets/app_top_bar.dart';
-import 'package:aurenix/ui/screens/widgets/custom_text.dart';
+import 'package:aurenix/features/widgets/app_background.dart';
+import 'package:aurenix/features/widgets/app_top_bar.dart';
+import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/ui/screens/onboarding/widgets/wave_orb.dart';
-import 'package:aurenix/ui/screens/presets/controllers/presets_controller.dart';
-import 'package:aurenix/ui/screens/presets/widgets/preset_widgets.dart';
-import 'package:aurenix/ui/screens/home/controllers/home_controller.dart';
-import 'package:aurenix/ui/screens/home/controllers/sidebar_controller.dart';
-import 'package:aurenix/ui/screens/home/widgets/app_sidebar.dart';
-import 'package:aurenix/ui/screens/home/widgets/chat_messages.dart';
-import 'package:aurenix/ui/screens/home/widgets/sidebar_drawer.dart';
+import 'package:aurenix/features/onboarding/widgets/wave_orb.dart';
+import 'package:aurenix/features/presets/controllers/presets_controller.dart';
+import 'package:aurenix/features/presets/widgets/preset_widgets.dart';
+import 'package:aurenix/features/home/controllers/home_controller.dart';
+import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/home/widgets/app_sidebar.dart';
+import 'package:aurenix/features/home/widgets/chat_messages.dart';
+import 'package:aurenix/features/home/widgets/sidebar_drawer.dart';
 
 class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});
@@ -330,6 +330,7 @@ class _InputBar extends StatelessWidget {
                     child: Obx(
                       () => TextField(
                         controller: controller.messageController,
+                        focusNode: controller.messageFocus,
                         cursorColor: context.color.primary,
                         minLines: 1,
                         maxLines: 5,

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import 'package:aurenix/ui/screens/categories/controllers/categories_controller.dart';
+import 'package:aurenix/features/categories/controllers/categories_controller.dart';
 
 class CategoriesBinding extends Bindings {
   @override
