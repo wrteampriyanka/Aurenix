@@ -8,6 +8,7 @@ import '../../widgets/bottom_sheets/create_project_sheet.dart';
 import '../../widgets/bottom_sheets/project_instructions_sheet.dart';
 import '../../widgets/bottom_sheets/project_menu_sheet.dart';
 import 'home_controller.dart';
+import '../../widgets/app_snackbar.dart';
 
 /// What a sidebar menu row does when tapped.
 enum SidebarAction { newChat, temporaryChat, presets, newProject, viewAll }
@@ -226,10 +227,7 @@ class SidebarController extends GetxController
         _startChat();
       case SidebarAction.temporaryChat:
         _startChat(temporary: true);
-        Get.rawSnackbar(
-          message: 'sidebar_temporary_chat_on'.tr,
-          duration: const Duration(seconds: 2),
-        );
+        AppSnackbar.show('sidebar_temporary_chat_on'.tr);
       case SidebarAction.presets:
         Get.toNamed(AppRoutes.presets);
       case SidebarAction.newProject:
@@ -288,10 +286,7 @@ class SidebarController extends GetxController
         await editInstructions(project);
       // TODO: wire this up once chats can be moved into a project.
       case ProjectMenuAction.importChats:
-        Get.rawSnackbar(
-          message: 'projects_import_coming_soon'.tr,
-          duration: const Duration(seconds: 2),
-        );
+        AppSnackbar.show('projects_import_coming_soon'.tr);
       case ProjectMenuAction.delete:
         deleteProject(project);
     }
@@ -309,8 +304,8 @@ class SidebarController extends GetxController
 
   void deleteProject(Project project) {
     projects.removeWhere((p) => p.id == project.id);
-    Get.rawSnackbar(
-      message: 'projects_deleted'.trParams({'name': project.name}),
+    AppSnackbar.show(
+      'projects_deleted'.trParams({'name': project.name}),
       duration: const Duration(seconds: 2),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/services/voice_service.dart';
+import '../../widgets/app_snackbar.dart';
 
 /// Voice Preferences: swipe through the voices, each one introduces itself
 /// as it comes into view, and Save keeps the one on screen.
@@ -81,8 +82,8 @@ class VoiceSettingsController extends GetxController {
     await _stop();
     await VoiceService.instance.select(current);
     Get.back(result: current);
-    Get.rawSnackbar(
-      message: 'voice_saved'.trParams({'name': current.name}),
+    AppSnackbar.show(
+      'voice_saved'.trParams({'name': current.name}),
       duration: const Duration(seconds: 2),
     );
   }

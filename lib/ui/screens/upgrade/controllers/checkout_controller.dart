@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../widgets/bottom_sheets/app_picker_sheet.dart';
 import '../models/country.dart';
 import '../models/upgrade_plan.dart';
+import '../../widgets/app_snackbar.dart';
 
 class CheckoutController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -88,12 +89,10 @@ class CheckoutController extends GetxController {
     try {
       // TODO: start the purchase with [paymentMethod] for [plan].
       await Future<void>.delayed(const Duration(milliseconds: 600));
-      Get.snackbar(
-        'upgrade_payment_title'.tr,
+      AppSnackbar.show(
         'upgrade_payment_pending'.trParams({
           'method': paymentMethod.value.labelKey.tr,
         }),
-        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       isPaying.value = false;

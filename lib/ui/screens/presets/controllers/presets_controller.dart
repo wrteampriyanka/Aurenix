@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../widgets/app_snackbar.dart';
 
 /// The filter chips under the search field.
 enum PresetFilter {
@@ -101,7 +102,7 @@ Future<void> openPresetSite(Preset preset) async {
     Uri.parse(preset.siteUrl),
     mode: LaunchMode.externalApplication,
   );
-  if (!opened) Get.rawSnackbar(message: 'chat_open_failed'.tr);
+  if (!opened) AppSnackbar.error('chat_open_failed'.tr);
 }
 
 /// What the detail screen is opened with: the preset and the tag of the

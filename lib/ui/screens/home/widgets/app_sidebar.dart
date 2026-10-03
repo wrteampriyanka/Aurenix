@@ -54,8 +54,7 @@ class AppSidebar extends GetView<SidebarController> {
                           icon: project.icon,
                           iconColor: project.iconColor,
                           onTap: () => controller.onProject(project),
-                          onLongPress: () =>
-                              controller.onProjectMenu(project),
+                          onLongPress: () => controller.onProjectMenu(project),
                         ),
                       _itemRow(SidebarController.viewAllItem),
                     ],

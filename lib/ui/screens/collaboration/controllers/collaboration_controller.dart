@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../home/controllers/sidebar_controller.dart';
+import '../../widgets/app_snackbar.dart';
 
 /// Who can open the project.
 enum ProjectAccess { onlyInvited, anyoneWithLink }
@@ -100,17 +101,11 @@ class CollaborationController extends GetxController {
   void onInvite() {
     final email = emailController.text.trim();
     if (!_emailPattern.hasMatch(email)) {
-      Get.rawSnackbar(
-        message: 'collaboration_invalid_email'.tr,
-        duration: const Duration(seconds: 2),
-      );
+      AppSnackbar.error('collaboration_invalid_email'.tr);
       return;
     }
     if (members.any((m) => m.email.toLowerCase() == email.toLowerCase())) {
-      Get.rawSnackbar(
-        message: 'collaboration_already_member'.tr,
-        duration: const Duration(seconds: 2),
-      );
+      AppSnackbar.error('collaboration_already_member'.tr);
       return;
     }
     final name = email.split('@').first;
@@ -126,8 +121,8 @@ class CollaborationController extends GetxController {
     );
     emailController.clear();
     FocusManager.instance.primaryFocus?.unfocus();
-    Get.rawSnackbar(
-      message: 'collaboration_invited'.trParams({'email': email}),
+    AppSnackbar.show(
+      'collaboration_invited'.trParams({'email': email}),
       duration: const Duration(seconds: 2),
     );
   }
@@ -140,8 +135,8 @@ class CollaborationController extends GetxController {
 
   void onRemove(Collaborator member) {
     members.removeWhere((m) => m.id == member.id);
-    Get.rawSnackbar(
-      message: 'collaboration_removed'.trParams({'name': member.name}),
+    AppSnackbar.show(
+      'collaboration_removed'.trParams({'name': member.name}),
       duration: const Duration(seconds: 2),
     );
   }
@@ -151,10 +146,7 @@ class CollaborationController extends GetxController {
     await Clipboard.setData(
       ClipboardData(text: 'https://aurenix.app/p/$projectId'),
     );
-    Get.rawSnackbar(
-      message: 'collaboration_link_copied'.tr,
-      duration: const Duration(seconds: 2),
-    );
+    AppSnackbar.show('collaboration_link_copied'.tr);
   }
 
   static const _colors = [

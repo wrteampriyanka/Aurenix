@@ -434,7 +434,12 @@ class _MessageActions extends StatelessWidget {
   final HomeController controller;
 
   @override
-  Widget build(BuildContext context) {
+  // The vote and the read-aloud mark are read here, in a build of their
+  // own: the Obx around the message does not reach into a child widget,
+  // so without this one the icons never changed when tapped.
+  Widget build(BuildContext context) => Obx(() => _row(context));
+
+  Widget _row(BuildContext context) {
     final liked = message.liked.value;
     final hasText = message.text.isNotEmpty;
     final speaking = controller.speakingMessage.value == message;

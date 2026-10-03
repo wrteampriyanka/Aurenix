@@ -20,6 +20,7 @@ import '../../../../core/services/voice_service.dart';
 import '../../presets/controllers/presets_controller.dart';
 import '../../widgets/bottom_sheets/services_sheet.dart';
 import 'sidebar_controller.dart';
+import '../../widgets/app_snackbar.dart';
 
 /// A quick action chip under the orb.
 class HomeAction {
@@ -236,10 +237,7 @@ class HomeController extends GetxController
 
   void onCopy(ChatMessage message) {
     Clipboard.setData(ClipboardData(text: message.text.value));
-    Get.rawSnackbar(
-      message: 'chat_copied'.tr,
-      duration: const Duration(seconds: 2),
-    );
+    AppSnackbar.show('chat_copied'.tr);
   }
 
   void onLike(ChatMessage message, bool liked) =>
@@ -261,7 +259,7 @@ class HomeController extends GetxController
         if (await _tts.speak(part) != 1) throw Exception('speak failed');
       }
     } catch (_) {
-      if (run == _speakRun) Get.rawSnackbar(message: 'chat_speak_failed'.tr);
+      if (run == _speakRun) AppSnackbar.error('chat_speak_failed'.tr);
     }
     if (run == _speakRun) speakingMessage.value = null;
   }
@@ -332,7 +330,7 @@ class HomeController extends GetxController
       Uri.parse(source.uri),
       mode: LaunchMode.externalApplication,
     );
-    if (!opened) Get.rawSnackbar(message: 'chat_open_failed'.tr);
+    if (!opened) AppSnackbar.error('chat_open_failed'.tr);
   }
 
   /// Markdown without the symbols, so they are not read out.
@@ -357,7 +355,7 @@ class HomeController extends GetxController
       available = false;
     }
     if (!available) {
-      Get.rawSnackbar(message: 'chat_mic_unavailable'.tr);
+      AppSnackbar.error('chat_mic_unavailable'.tr);
       return;
     }
     await _stopSpeaking();
@@ -387,13 +385,11 @@ class HomeController extends GetxController
   void _onSpeechError(SpeechRecognitionError error) {
     if (!isListening.value) return;
     isListening.value = false;
-    Get.rawSnackbar(
-      message: switch (error.errorMsg) {
-        'error_no_match' || 'error_speech_timeout' => 'chat_voice_empty'.tr,
-        'error_permission' => 'chat_mic_unavailable'.tr,
-        final msg => msg,
-      },
-    );
+    AppSnackbar.error(switch (error.errorMsg) {
+      'error_no_match' || 'error_speech_timeout' => 'chat_voice_empty'.tr,
+      'error_permission' => 'chat_mic_unavailable'.tr,
+      final msg => msg,
+    });
   }
 
   /// Stops dictation and sends what was said.
@@ -409,7 +405,7 @@ class HomeController extends GetxController
     }
     _acceptSpeech = false;
     if (messageController.text.trim().isEmpty) {
-      Get.rawSnackbar(message: 'chat_voice_empty'.tr);
+      AppSnackbar.error('chat_voice_empty'.tr);
       return;
     }
     onSend();
@@ -674,12 +670,12 @@ class HomeController extends GetxController
       if (file == null) return;
       final mimeType = _documentTypes[file.extension?.toLowerCase()];
       if (mimeType == null) {
-        Get.rawSnackbar(message: 'chat_file_unsupported'.tr);
+        AppSnackbar.error('chat_file_unsupported'.tr);
         return;
       }
       _setAttachment(file.name, await file.readAsBytes(), mimeType);
     } catch (_) {
-      Get.rawSnackbar(message: 'chat_file_failed'.tr);
+      AppSnackbar.error('chat_file_failed'.tr);
     }
   }
 
@@ -696,13 +692,13 @@ class HomeController extends GetxController
       if (photo == null) return;
       _setAttachment(photo.name, await photo.readAsBytes(), 'image/jpeg');
     } catch (_) {
-      Get.rawSnackbar(message: 'chat_camera_unavailable'.tr);
+      AppSnackbar.error('chat_camera_unavailable'.tr);
     }
   }
 
   void _setAttachment(String name, Uint8List bytes, String mimeType) {
     if (bytes.length > _maxAttachmentBytes) {
-      Get.rawSnackbar(message: 'chat_file_too_large'.tr);
+      AppSnackbar.error('chat_file_too_large'.tr);
       return;
     }
     attachment.value = ChatAttachment(

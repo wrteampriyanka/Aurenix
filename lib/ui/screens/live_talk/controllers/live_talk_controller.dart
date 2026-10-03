@@ -15,6 +15,7 @@ import '../../../../core/services/demo_chat_service.dart';
 import '../../../../core/services/screen_share_service.dart';
 import '../../../../core/services/voice_service.dart';
 import '../../widgets/bottom_sheets/audio_output_sheet.dart';
+import '../../widgets/app_snackbar.dart';
 
 enum LiveStatus { idle, listening, thinking, speaking }
 
@@ -101,13 +102,13 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
           }
           isMuted.value = true;
           status.value = LiveStatus.idle;
-          Get.rawSnackbar(message: 'chat_mic_unavailable'.tr);
+          AppSnackbar.error('chat_mic_unavailable'.tr);
         };
     } catch (_) {
       available = false;
     }
     if (!available) {
-      Get.rawSnackbar(message: 'chat_mic_unavailable'.tr);
+      AppSnackbar.error('chat_mic_unavailable'.tr);
       return;
     }
     if (_closed || isMuted.value) return;
@@ -360,8 +361,8 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
       debugPrint('Live talk camera failed: $e');
       controller?.dispose();
       final denied = e is CameraException && e.code.startsWith('CameraAccess');
-      Get.rawSnackbar(
-        message: (denied ? 'live_camera_denied' : 'live_camera_unavailable').tr,
+      AppSnackbar.error(
+        (denied ? 'live_camera_denied' : 'live_camera_unavailable').tr,
       );
     } finally {
       _cameraStarting = false;
@@ -408,7 +409,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
       );
       if (_closed) return await ScreenShareService.instance.stop();
       if (started == null) {
-        Get.rawSnackbar(message: 'live_share_unavailable'.tr);
+        AppSnackbar.error('live_share_unavailable'.tr);
       }
       // False means the user declined, which needs no message.
       if (started != true) return;
