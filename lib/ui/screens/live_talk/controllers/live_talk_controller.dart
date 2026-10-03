@@ -11,7 +11,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/services/api_service.dart';
+import '../../../../core/services/demo_chat_service.dart';
 import '../../../../core/services/screen_share_service.dart';
 import '../../../../core/services/voice_service.dart';
 import '../../widgets/bottom_sheets/audio_output_sheet.dart';
@@ -154,7 +154,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     _history.add(ChatTurn(role: ChatRole.user, text: text, file: image));
 
     final buffer = StringBuffer();
-    _reply = ApiService.instance
+    _reply = DemoChatService.instance
         .streamChat(_history)
         .listen(
           (chunk) => buffer.write(chunk.text),

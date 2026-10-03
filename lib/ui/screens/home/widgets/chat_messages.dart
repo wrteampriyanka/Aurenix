@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../widgets/custom_text.dart';
-import '../../../../core/services/api_service.dart';
+import '../../../../core/services/demo_chat_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../controllers/home_controller.dart';
 
@@ -202,15 +202,26 @@ class _AiMessage extends StatelessWidget {
           ? controller.pendingStatus
           : null;
 
+      // A picture on the way: the status line sits above a soft box the
+      // size of the image, so nothing jumps when it lands.
+      final drawing =
+          status != null &&
+          message.isStreaming.value &&
+          controller.isGeneratingImage.value;
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (status != null) _Status(text: status),
+          if (status != null) ...[
+            _Status(text: status),
+            if (drawing) ...[
+              const SizedBox(height: 10),
+              const _ImagePlaceholder(),
+              const SizedBox(height: 12),
+            ],
+          ],
           for (final image in message.images) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.memory(image.bytes, fit: BoxFit.contain),
-            ),
+            _ReplyImage(image: image),
             const SizedBox(height: 12),
           ],
           if (text.isNotEmpty) _Markdown(text: text),
@@ -219,12 +230,96 @@ class _AiMessage extends StatelessWidget {
             CustomText(error, fontSize: 14, color: context.color.error),
           ],
           if (!message.isStreaming.value) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
             _MessageActions(message: message, controller: controller),
           ],
         ],
       );
     });
+  }
+}
+
+/// Width (and height) of a picture in a reply, and of the box standing in
+/// for it while it is drawn.
+const _imageSize = 240.0;
+
+/// Soft rounded box shown under "Generating image" until the picture
+/// lands, with a slow sheen moving across it.
+class _ImagePlaceholder extends StatefulWidget {
+  const _ImagePlaceholder();
+
+  @override
+  State<_ImagePlaceholder> createState() => _ImagePlaceholderState();
+}
+
+class _ImagePlaceholderState extends State<_ImagePlaceholder>
+    with SingleTickerProviderStateMixin {
+  late final _sheen = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _sheen.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final base = context.color.inputFill;
+    final highlight = context.color.sidebarSelected;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: SizedBox(
+        width: _imageSize,
+        height: _imageSize,
+        child: AnimatedBuilder(
+          animation: _sheen,
+          builder: (context, _) {
+            // The gradient slides from off the left edge to off the right.
+            final shift = _sheen.value * 2 - 1;
+            return DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment(shift - 1, -1),
+                  end: Alignment(shift + 1, 1),
+                  colors: [base, highlight, base],
+                  stops: const [0.35, 0.5, 0.65],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// A drawn picture in a reply: fixed square, rounded, fading in.
+class _ReplyImage extends StatelessWidget {
+  const _ReplyImage({required this.image});
+
+  final GeneratedImage image;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Image.memory(
+        image.bytes,
+        width: _imageSize,
+        height: _imageSize,
+        fit: BoxFit.cover,
+        cacheWidth: (_imageSize * 3).round(),
+        frameBuilder: (context, child, frame, wasSync) => AnimatedOpacity(
+          opacity: wasSync || frame != null ? 1 : 0,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          child: child,
+        ),
+      ),
+    );
   }
 }
 
@@ -241,8 +336,8 @@ class _Status extends StatefulWidget {
 class _StatusState extends State<_Status> with SingleTickerProviderStateMixin {
   late final _pulse = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..repeat(reverse: true);
+    duration: const Duration(milliseconds: 1600),
+  )..repeat();
 
   @override
   void dispose() {
@@ -252,13 +347,26 @@ class _StatusState extends State<_Status> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: Tween(begin: 0.35, end: 1.0).animate(_pulse),
-      child: CustomText(
-        widget.text,
-        fontSize: 15,
-        color: context.color.textBody,
-      ),
+    final dim = context.color.textBody;
+    final bright = context.color.textNatural;
+    final text = CustomText(widget.text, fontSize: 15, color: bright);
+    return AnimatedBuilder(
+      animation: _pulse,
+      builder: (context, child) {
+        // A bright band travels along the words, left to right.
+        final shift = _pulse.value * 2 - 1;
+        return ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (bounds) => LinearGradient(
+            begin: Alignment(shift - 1, 0),
+            end: Alignment(shift + 1, 0),
+            colors: [dim, bright, dim],
+            stops: const [0.35, 0.5, 0.65],
+          ).createShader(bounds),
+          child: child,
+        );
+      },
+      child: text,
     );
   }
 }
@@ -331,57 +439,66 @@ class _MessageActions extends StatelessWidget {
     final hasText = message.text.isNotEmpty;
     final speaking = controller.speakingMessage.value == message;
     final sources = message.sources;
-    return Row(
-      children: [
-        if (hasText) ...[
+    // The 36pt tap boxes pad the glyphs, so the row is pulled back to line
+    // the first icon up with the text above it.
+    return Transform.translate(
+      offset: const Offset(-8, 0),
+      child: Row(
+        spacing: 2,
+        children: [
+          if (hasText) ...[
+            _ActionIcon(
+              icon: PhosphorIconsRegular.copy,
+              onTap: () => controller.onCopy(message),
+            ),
+            _ActionIcon(
+              icon: speaking
+                  ? PhosphorIconsFill.speakerHigh
+                  : PhosphorIconsRegular.speakerHigh,
+              active: speaking,
+              onTap: () => controller.onSpeak(message),
+            ),
+          ],
           _ActionIcon(
-            icon: PhosphorIconsRegular.copy,
-            onTap: () => controller.onCopy(message),
+            icon: PhosphorIconsRegular.arrowsClockwise,
+            onTap: () => controller.onRegenerate(message),
           ),
-          _ActionIcon(
-            icon: speaking
-                ? PhosphorIconsFill.speakerHigh
-                : PhosphorIconsRegular.speakerHigh,
-            active: speaking,
-            onTap: () => controller.onSpeak(message),
-          ),
+          if (message.error.value == null) ...[
+            _ActionIcon(
+              icon: PhosphorIconsRegular.shareNetwork,
+              onTap: () => controller.onShare(message),
+            ),
+            _ActionIcon(
+              icon: liked == true
+                  ? PhosphorIconsFill.thumbsUp
+                  : PhosphorIconsRegular.thumbsUp,
+              onTap: () => controller.onLike(message, true),
+            ),
+            _ActionIcon(
+              icon: liked == false
+                  ? PhosphorIconsFill.thumbsDown
+                  : PhosphorIconsRegular.thumbsDown,
+              onTap: () => controller.onLike(message, false),
+            ),
+          ],
+          if (sources.isNotEmpty) ...[
+            const Spacer(),
+            SizedBox(
+              height: 20,
+              child: VerticalDivider(width: 1, color: context.color.divider),
+            ),
+            _SourcesButton(sources: sources, onOpen: controller.onOpenSource),
+          ],
         ],
-        _ActionIcon(
-          icon: PhosphorIconsRegular.arrowsClockwise,
-          onTap: () => controller.onRegenerate(message),
-        ),
-        if (message.error.value == null) ...[
-          _ActionIcon(
-            icon: PhosphorIconsRegular.shareNetwork,
-            onTap: () => controller.onShare(message),
-          ),
-          _ActionIcon(
-            icon: liked == true
-                ? PhosphorIconsFill.thumbsUp
-                : PhosphorIconsRegular.thumbsUp,
-            onTap: () => controller.onLike(message, true),
-          ),
-          _ActionIcon(
-            icon: liked == false
-                ? PhosphorIconsFill.thumbsDown
-                : PhosphorIconsRegular.thumbsDown,
-            onTap: () => controller.onLike(message, false),
-          ),
-        ],
-        if (sources.isNotEmpty) ...[
-          const Spacer(),
-          SizedBox(
-            height: 20,
-            child: VerticalDivider(width: 1, color: context.color.divider),
-          ),
-          _SourcesButton(sources: sources, onOpen: controller.onOpenSource),
-        ],
-      ],
+      ),
     );
   }
 }
 
-class _ActionIcon extends StatelessWidget {
+/// One round icon button under a reply. The whole 36pt square takes the
+/// tap, so the small glyphs are still easy to hit, and the icon dips and
+/// recolours as it is pressed.
+class _ActionIcon extends StatefulWidget {
   const _ActionIcon({
     required this.icon,
     required this.onTap,
@@ -393,18 +510,54 @@ class _ActionIcon extends StatelessWidget {
   final bool active;
 
   @override
+  State<_ActionIcon> createState() => _ActionIconState();
+}
+
+class _ActionIconState extends State<_ActionIcon> {
+  bool _down = false;
+
+  void _setDown(bool down) {
+    if (_down != down) setState(() => _down = down);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return InkResponse(
-      onTap: onTap,
-      radius: 18,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 14),
-        child: Icon(
-          icon,
-          size: 20,
-          color: active
-              ? context.color.buttonHighlight
-              : context.color.textBody,
+    final color = widget.active
+        ? context.color.buttonHighlight
+        : context.color.textBody;
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: widget.onTap,
+        onTapDown: (_) => _setDown(true),
+        onTapUp: (_) => _setDown(false),
+        onTapCancel: () => _setDown(false),
+        customBorder: const CircleBorder(),
+        splashColor: color.withValues(alpha: 0.12),
+        highlightColor: Colors.transparent,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: AnimatedScale(
+            scale: _down ? 0.86 : 1,
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOut,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: Tween(begin: 0.7, end: 1.0).animate(animation),
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: Icon(
+                widget.icon,
+                key: ValueKey((widget.icon, widget.active)),
+                size: 20,
+                color: color,
+              ),
+            ),
+          ),
         ),
       ),
     );

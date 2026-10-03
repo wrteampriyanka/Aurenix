@@ -419,8 +419,8 @@ class _LookStep extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         AppButton(
-          label: 'projects_create'.tr,
-          icon: PhosphorIconsRegular.folderPlus,
+          label: 'continue'.tr,
+          icon: null,
           height: 50,
           fontSize: 16,
           onPressed: onCreate,

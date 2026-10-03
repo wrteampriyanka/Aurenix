@@ -12,4 +12,6 @@ class ProjectsController extends GetxController {
   void onCreate() => _sidebar.onCreateProject();
 
   void onProject(Project project) => _sidebar.onProject(project);
+
+  void onProjectMenu(Project project) => _sidebar.onProjectMenu(project);
 }

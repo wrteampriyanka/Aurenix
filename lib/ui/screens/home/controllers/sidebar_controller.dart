@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import '../../../../core/routes/app_routes.dart';
 import '../../widgets/bottom_sheets/create_project_sheet.dart';
+import '../../widgets/bottom_sheets/project_instructions_sheet.dart';
+import '../../widgets/bottom_sheets/project_menu_sheet.dart';
 import 'home_controller.dart';
 
 /// What a sidebar menu row does when tapped.
@@ -32,10 +35,20 @@ class SidebarItem {
 
 /// A past conversation listed under "Chats".
 class ChatSummary {
-  const ChatSummary({required this.id, required this.title});
+  const ChatSummary({
+    required this.id,
+    required this.title,
+    this.authorInitials,
+    this.authorColor,
+  });
 
   final String id;
   final String title;
+
+  /// Initials of whoever started the chat, shown on the project screen;
+  /// null for chats that are not in a shared project.
+  final String? authorInitials;
+  final Color? authorColor;
 }
 
 /// A folder of chats, listed in the sidebar and on the projects screen.
@@ -47,6 +60,7 @@ class Project {
     required this.iconColor,
     this.memory = ProjectMemory.all,
     this.chatCount = 0,
+    this.instructions = '',
   });
 
   final String id;
@@ -57,6 +71,19 @@ class Project {
   /// How much of the user's history the project may draw on.
   final ProjectMemory memory;
   final int chatCount;
+
+  /// What the assistant should keep in mind inside this project.
+  final String instructions;
+
+  Project copyWith({String? name, String? instructions}) => Project(
+    id: id,
+    name: name ?? this.name,
+    icon: icon,
+    iconColor: iconColor,
+    memory: memory,
+    chatCount: chatCount,
+    instructions: instructions ?? this.instructions,
+  );
 }
 
 /// State of the home drawer, including its in-place search.
@@ -242,13 +269,48 @@ class SidebarController extends GetxController
     );
   }
 
-  // TODO: open the project's chats once chats can be stored by project.
-  /// Starts a new chat for [project] back on the home screen.
+  /// Opens [project]'s own screen, with its chats and composer.
   void onProject(Project project) {
-    Get.until((route) => route.settings.name == AppRoutes.home);
-    _startChat();
+    _home.closeDrawer();
+    Get.toNamed(AppRoutes.projectDetail, arguments: project);
+  }
+
+  /// The long-press menu on a project card or sidebar row.
+  Future<void> onProjectMenu(Project project) async {
+    HapticFeedback.mediumImpact();
+    final action = await ProjectMenuSheet.show();
+    if (action == null) return;
+    switch (action) {
+      // Both of these open the instructions sheet; editing a project is
+      // editing what it tells the assistant.
+      case ProjectMenuAction.edit:
+      case ProjectMenuAction.instructions:
+        await editInstructions(project);
+      // TODO: wire this up once chats can be moved into a project.
+      case ProjectMenuAction.importChats:
+        Get.rawSnackbar(
+          message: 'projects_import_coming_soon'.tr,
+          duration: const Duration(seconds: 2),
+        );
+      case ProjectMenuAction.delete:
+        deleteProject(project);
+    }
+  }
+
+  Future<void> editInstructions(Project project) async {
+    final text = await ProjectInstructionsSheet.show(
+      initialText: project.instructions,
+    );
+    if (text == null) return;
+    final index = projects.indexWhere((p) => p.id == project.id);
+    if (index == -1) return;
+    projects[index] = projects[index].copyWith(instructions: text);
+  }
+
+  void deleteProject(Project project) {
+    projects.removeWhere((p) => p.id == project.id);
     Get.rawSnackbar(
-      message: 'projects_new_chat_in'.trParams({'name': project.name}),
+      message: 'projects_deleted'.trParams({'name': project.name}),
       duration: const Duration(seconds: 2),
     );
   }

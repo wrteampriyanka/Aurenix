@@ -7,6 +7,8 @@ import '../../ui/screens/budget/bindings/budget_binding.dart';
 import '../../ui/screens/budget/budget_screen.dart';
 import '../../ui/screens/categories/bindings/categories_binding.dart';
 import '../../ui/screens/categories/categories_screen.dart';
+import '../../ui/screens/collaboration/bindings/collaboration_binding.dart';
+import '../../ui/screens/collaboration/collaboration_screen.dart';
 import '../../ui/screens/connected_apps/bindings/connected_apps_binding.dart';
 import '../../ui/screens/connected_apps/connected_apps_screen.dart';
 import '../../ui/screens/customize_ai/bindings/customize_ai_binding.dart';
@@ -34,6 +36,8 @@ import '../../ui/screens/presets/preset_detail_screen.dart';
 import '../../ui/screens/presets/presets_screen.dart';
 import '../../ui/screens/profile/bindings/profile_binding.dart';
 import '../../ui/screens/profile/profile_screen.dart';
+import '../../ui/screens/project_detail/bindings/project_detail_binding.dart';
+import '../../ui/screens/project_detail/project_detail_screen.dart';
 import '../../ui/screens/projects/bindings/projects_binding.dart';
 import '../../ui/screens/projects/projects_screen.dart';
 import '../../ui/screens/register/bindings/register_binding.dart';
@@ -134,6 +138,11 @@ class AppPages {
       CheckoutBinding(),
     ),
     _screen(
+      AppRoutes.collaboration,
+      () => const CollaborationScreen(),
+      CollaborationBinding(),
+    ),
+    _screen(
       AppRoutes.connectedApps,
       () => const ConnectedAppsScreen(),
       ConnectedAppsBinding(),
@@ -208,6 +217,11 @@ class AppPages {
       () => const LegalScreen(page: LegalPage.privacyPolicy),
     ),
     _screen(AppRoutes.profile, () => const ProfileScreen(), ProfileBinding()),
+    _screen(
+      AppRoutes.projectDetail,
+      () => const ProjectDetailScreen(),
+      ProjectDetailBinding(),
+    ),
     _screen(
       AppRoutes.projects,
       () => const ProjectsScreen(),

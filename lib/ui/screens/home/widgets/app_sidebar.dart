@@ -54,6 +54,8 @@ class AppSidebar extends GetView<SidebarController> {
                           icon: project.icon,
                           iconColor: project.iconColor,
                           onTap: () => controller.onProject(project),
+                          onLongPress: () =>
+                              controller.onProjectMenu(project),
                         ),
                       _itemRow(SidebarController.viewAllItem),
                     ],
@@ -332,6 +334,7 @@ class _MenuRow extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.onTap,
+    this.onLongPress,
     this.iconColor,
     this.showArrow = false,
   });
@@ -344,10 +347,14 @@ class _MenuRow extends StatelessWidget {
   final bool showArrow;
   final VoidCallback onTap;
 
+  /// Opens the project menu on the project rows; null elsewhere.
+  final VoidCallback? onLongPress;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
         child: Row(

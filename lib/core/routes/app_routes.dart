@@ -6,6 +6,7 @@ abstract class AppRoutes {
   static const budget = '/budget';
   static const categories = '/categories';
   static const checkout = '/checkout';
+  static const collaboration = '/collaboration';
   static const connectedApps = '/connected-apps';
   static const customizeAi = '/customize-ai';
   static const dataControl = '/data-control';
@@ -20,6 +21,7 @@ abstract class AppRoutes {
   static const presets = '/presets';
   static const privacyPolicy = '/privacy-policy';
   static const profile = '/profile';
+  static const projectDetail = '/project-detail';
   static const projects = '/projects';
   static const register = '/register';
   static const resetPassword = '/reset-password';

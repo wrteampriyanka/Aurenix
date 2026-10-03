@@ -43,6 +43,7 @@ class ProjectsScreen extends GetView<ProjectsController> {
           itemBuilder: (_, i) => _ProjectCard(
             project: projects[i],
             onTap: () => controller.onProject(projects[i]),
+            onLongPress: () => controller.onProjectMenu(projects[i]),
           ),
         );
       }),
@@ -90,10 +91,15 @@ class _CreateButton extends StatelessWidget {
 }
 
 class _ProjectCard extends StatelessWidget {
-  const _ProjectCard({required this.project, required this.onTap});
+  const _ProjectCard({
+    required this.project,
+    required this.onTap,
+    required this.onLongPress,
+  });
 
   final Project project;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +113,7 @@ class _ProjectCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Column(

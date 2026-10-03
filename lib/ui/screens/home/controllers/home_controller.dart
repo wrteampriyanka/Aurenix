@@ -15,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/services/api_service.dart';
+import '../../../../core/services/demo_chat_service.dart';
 import '../../../../core/services/voice_service.dart';
 import '../../presets/controllers/presets_controller.dart';
 import '../../widgets/bottom_sheets/services_sheet.dart';
@@ -194,11 +194,13 @@ class HomeController extends GetxController
       return null;
     }
     if (last.images.isNotEmpty) return null;
-    if (_generatingImage) return 'chat_generating_image'.tr;
+    if (isGeneratingImage.value) return 'chat_generating_image'.tr;
     return _searchWeb ? 'chat_searching_web'.tr : 'chat_thinking'.tr;
   }
 
-  bool _generatingImage = false;
+  /// Whether the reply coming in is a picture, so the chat shows the
+  /// image placeholder instead of the plain status line.
+  final isGeneratingImage = false.obs;
 
   void onSend() {
     if (isListening.value) {
@@ -463,13 +465,22 @@ class HomeController extends GetxController
     final reply = ChatMessage.ai();
     messages.add(reply);
     isGenerating.value = true;
-    _generatingImage = selectedAction.value == generateImagesAction;
+    // A picture comes back when the chip is on, or when the message asks
+    // for one, or when a photo was sent to be changed.
+    isGeneratingImage.value =
+        selectedAction.value == generateImagesAction ||
+        (messages.length > 1 &&
+            DemoChatService.wantsImage(
+              messages[messages.length - 2].text.value,
+              hasImage:
+                  messages[messages.length - 2].attachment?.isImage ?? false,
+            ));
     _scrollToBottom();
 
-    if (_generatingImage) {
+    if (isGeneratingImage.value) {
       // Only the latest message: older photos would be redrawn otherwise.
-      _reply = ApiService.instance
-          .generateImage([history.last])
+      _reply = DemoChatService.instance
+          .generateImage(history.isEmpty ? const [] : [history.last])
           .asStream()
           .listen(
             (result) {
@@ -489,7 +500,7 @@ class HomeController extends GetxController
       return;
     }
 
-    _reply = ApiService.instance
+    _reply = DemoChatService.instance
         .streamChat(
           history,
           searchWeb: _searchWeb,
@@ -530,8 +541,17 @@ class HomeController extends GetxController
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!scrollController.hasClients) return;
+      final end = scrollController.position.maxScrollExtent;
+      final gap = end - scrollController.position.pixels;
+      if (gap <= 0) return;
+      // Words arrive a few times a second: starting a new animation each
+      // time fights the one before it, so small steps just jump.
+      if (gap < 120) {
+        scrollController.jumpTo(end);
+        return;
+      }
       scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
+        end,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
       );
