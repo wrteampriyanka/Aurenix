@@ -32,8 +32,9 @@ class ChatMessages extends StatelessWidget {
           child: Obx(() {
             final messages = controller.messages;
             // One past the messages: the free-limit upgrade card closes the
-            // conversation off, until the plan is paid for and it drops out.
-            final showUpgrade = !ChatUpgradeCard.isPlanActive.value;
+            // conversation off once the allowance is used up, until it resets
+            // or the plan is paid for and it drops out.
+            final showUpgrade = controller.isChatLimited;
             return ListView.builder(
               controller: controller.scrollController,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),

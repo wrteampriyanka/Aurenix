@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:aurenix/core/constants/app_constants.dart';
 import 'package:aurenix/core/localization/app_translations.dart';
 import 'package:aurenix/core/routes/app_pages.dart';
+import 'package:aurenix/core/services/chat_quota_service.dart';
 import 'package:aurenix/core/services/language_service.dart';
 import 'package:aurenix/core/storage/storage_service.dart';
 import 'package:aurenix/core/theme/app_theme.dart';
@@ -12,6 +13,7 @@ import 'package:aurenix/core/theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.instance.init();
+  ChatQuotaService.instance.init();
   final translations = await AppTranslations.load();
   runApp(MyApp(translations: translations));
 }

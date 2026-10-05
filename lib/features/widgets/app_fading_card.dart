@@ -12,6 +12,14 @@ enum CardFade {
   /// The whole left edge stays solid; the outline fades out towards the
   /// right, so nothing is missing down the left of the card.
   rightward,
+
+  /// The top edge stays solid; the outline fades out towards the bottom, so
+  /// both bottom corners go at once and nothing is missing on one side only.
+  downward,
+
+  /// No fade: the whole outline is drawn at full strength, so the card reads
+  /// as a closed box with its bottom edge intact.
+  none,
 }
 
 /// Frosted card whose fill and outline fade out towards the bottom right,
@@ -50,10 +58,14 @@ class AppFadingCard extends StatelessWidget {
         padding: padding,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(radius),
+          // A closed card keeps an even fill; a fading one lets the page
+          // show through towards the bottom.
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [fill, fill.withValues(alpha: 0)],
+            colors: fade == CardFade.none
+                ? [fill, fill]
+                : [fill, fill.withValues(alpha: 0)],
             stops: const [0.0, 0.85],
           ),
         ),
@@ -101,6 +113,21 @@ class _FadingBorderPainter extends CustomPainter {
           Offset(w, 0),
           [color, color, color.withValues(alpha: 0)],
           const [0.0, 0.45, 1.0],
+        ),
+        // Straight down, so both top corners sit at 0 and the outline is
+        // gone by the bottom on the left and the right alike.
+        CardFade.downward => ui.Gradient.linear(
+          Offset.zero,
+          Offset(0, h),
+          [color, color, color.withValues(alpha: 0)],
+          const [0.0, 0.35, 0.95],
+        ),
+        // Every edge at full strength: a closed outline, no fade.
+        CardFade.none => ui.Gradient.linear(
+          Offset.zero,
+          Offset(0, h),
+          [color, color],
+          const [0.0, 1.0],
         ),
       };
     canvas.drawRRect(

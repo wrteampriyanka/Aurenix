@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/core/services/chat_quota_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/upgrade/models/upgrade_plan.dart';
 import 'package:aurenix/features/upgrade/widgets/upgrade_widgets.dart';
@@ -13,22 +14,17 @@ import 'package:aurenix/features/widgets/custom_text.dart';
 /// what the paid plan is called, why the chat stopped, and its price with a
 /// way through to the upgrade screen.
 ///
-/// Carries no fill of its own, only the fading outline, so it reads as part
-/// of the conversation rather than a panel over it.
+/// Carries no fill of its own, only the outline, so it reads as part of the
+/// conversation rather than a panel over it. The outline is closed on every
+/// side, so the bottom edge stays visible.
 class ChatUpgradeCard extends StatelessWidget {
   const ChatUpgradeCard({super.key, this.plan = UpgradePlan.lite});
 
   final UpgradePlan plan;
 
-  /// Set once the user has paid, which takes the card back out of the chat.
-  /// Held for this app run only, until the purchase is a real one.
-  static final isPlanActive = false.obs;
-
-  static void markActivated() => isPlanActive.value = true;
-
-  /// Lets a fresh run (or a sign-out) see the card again.
-  @visibleForTesting
-  static void reset() => isPlanActive.value = false;
+  /// Called once the user has paid: the allowance is lifted, which takes
+  /// the card back out of the chat.
+  static void markActivated() => ChatQuotaService.instance.activatePlan();
 
   void _activate() => Get.toNamed(AppRoutes.upgrade);
 
@@ -39,7 +35,7 @@ class ChatUpgradeCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
       // No fill: the chat background shows through, leaving just the outline.
       fill: Colors.transparent,
-      fade: CardFade.rightward,
+      fade: CardFade.none,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -51,12 +47,19 @@ class ChatUpgradeCard extends StatelessWidget {
             color: color.textNatural,
           ),
           const SizedBox(height: 8),
-          CustomText(
-            'chat_upgrade_limit'.tr,
-            maxLines: 3,
-            fontSize: 13,
-            color: color.textBody,
-          ),
+          Obx(() {
+            final resetsAt = ChatQuotaService.instance.resetsAt.value;
+            return CustomText(
+              resetsAt == null
+                  ? 'chat_upgrade_limit'.tr
+                  : 'chat_upgrade_limit_until'.trParams({
+                      'time': TimeOfDay.fromDateTime(resetsAt).format(context),
+                    }),
+              maxLines: 3,
+              fontSize: 13,
+              color: color.textBody,
+            );
+          }),
           const SizedBox(height: 16),
           Divider(height: 1, thickness: 1, color: color.profileCardDivider),
           const SizedBox(height: 16),

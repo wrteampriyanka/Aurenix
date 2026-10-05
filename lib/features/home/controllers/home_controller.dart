@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/routes/app_routes.dart';
+import 'package:aurenix/core/services/chat_quota_service.dart';
 import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/services/voice_service.dart';
 import 'package:aurenix/features/presets/controllers/presets_controller.dart';
@@ -62,6 +63,13 @@ class ChatMessage {
       text = ''.obs,
       isStreaming = true.obs;
 
+  /// A message read back from the chat history: it is already complete, so
+  /// it is not waiting on anything.
+  ChatMessage.history({required this.isUser, required String text})
+    : attachment = null,
+      text = text.obs,
+      isStreaming = false.obs;
+
   final bool isUser;
 
   /// Photo or document the user sent with the message.
@@ -87,7 +95,7 @@ class ChatMessage {
 }
 
 class HomeController extends GetxController
-    with GetSingleTickerProviderStateMixin {
+    with GetSingleTickerProviderStateMixin, WidgetsBindingObserver {
   final messageController = TextEditingController();
   final messageFocus = FocusNode();
   final scrollController = ScrollController();
@@ -185,10 +193,40 @@ class HomeController extends GetxController
     ever(Get.find<SidebarController>().selectedChatId, (_) => closeDrawer());
     _tts.setErrorHandler((_) => _stopSpeaking());
     ServicesSheet.precache();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  /// The reset timer does not run while the app is paused, so the clock is
+  /// checked again on the way back.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _quota.refresh();
   }
 
   /// How long the user chats before the upgrade nudge comes up.
   static const upgradePromptDelay = Duration(minutes: 3);
+
+  ChatQuotaService get _quota => ChatQuotaService.instance;
+
+  /// Whether the free allowance is used up: the chat is shut and the
+  /// upgrade card closes it off until the window resets.
+  bool get isChatLimited => _quota.isLimited;
+
+  /// Turns a message away once the allowance is used up, pointing at when
+  /// it comes back. Returns whether the chat is shut.
+  bool _blockedByLimit() {
+    if (!isChatLimited) return false;
+    _scrollToBottom();
+    final resetsAt = _quota.resetsAt.value;
+    AppSnackbar.error(
+      resetsAt == null
+          ? 'chat_limit_reached'.tr
+          : 'chat_limit_reached_until'.trParams({
+              'time': TimeOfDay.fromDateTime(resetsAt).format(Get.context!),
+            }),
+    );
+    return true;
+  }
 
   /// How long to wait before trying again when the moment is wrong — the
   /// user is on another screen, or a sheet of their own is open.
@@ -252,6 +290,7 @@ class HomeController extends GetxController
     final text = messageController.text.trim();
     final file = attachment.value;
     if (text.isEmpty && file == null) return;
+    if (_blockedByLimit()) return;
     // Sending a new message replaces the reply still streaming in.
     if (isGenerating.value) onStop();
     _acceptSpeech = false;
@@ -262,7 +301,24 @@ class HomeController extends GetxController
     messageController.clear();
     attachment.value = null;
     messages.add(ChatMessage.user(text, attachment: file));
+    _rememberChat();
     _generate();
+  }
+
+  /// Keeps the conversation in the drawer's chat list. A temporary chat is
+  /// deliberately throwaway, so it is left out.
+  void _rememberChat() {
+    if (isTemporary.value) return;
+    final first = messages.firstWhereOrNull((m) => m.isUser);
+    if (first == null) return;
+    Get.find<SidebarController>().recordChat(messages, first.text.value);
+  }
+
+  /// Puts a conversation from the history back on screen.
+  void openChat(List<ChatMessage> saved) {
+    onNewChat();
+    messages.addAll(saved);
+    _scrollToBottom();
   }
 
   /// Stops the reply that is streaming in.
@@ -273,7 +329,7 @@ class HomeController extends GetxController
 
   /// Asks again for [message], replacing it with a new reply.
   void onRegenerate(ChatMessage message) {
-    if (isGenerating.value) return;
+    if (isGenerating.value || _blockedByLimit()) return;
     final index = messages.indexOf(message);
     if (index < 0) return;
     messages.removeRange(index, messages.length);
@@ -526,6 +582,7 @@ class HomeController extends GetxController
   /// Streams the AI reply to the conversation so far into a new message.
   void _generate() {
     _armUpgradePrompt();
+    _quota.recordMessage();
     final history = [
       for (final m in messages)
         if (m.error.value == null &&
@@ -539,6 +596,7 @@ class HomeController extends GetxController
     ];
     final reply = ChatMessage.ai();
     messages.add(reply);
+    _rememberChat();
     isGenerating.value = true;
     // A picture comes back when the chip is on, or when the message asks
     // for one, or when a photo was sent to be changed.
@@ -667,6 +725,11 @@ class HomeController extends GetxController
     isTemporary.value = temporary;
     preset.value = null;
     _reply?.cancel();
+    // A reply still coming in belongs to the chat we are leaving; mark it
+    // done so its stored copy does not stay stuck mid-stream.
+    if (messages.lastOrNull case final last? when !last.isUser) {
+      last.isStreaming.value = false;
+    }
     _stopSpeaking();
     if (isListening.value) onCancelVoice();
     _reply = null;
@@ -809,6 +872,7 @@ class HomeController extends GetxController
   void onClose() {
     _reply?.cancel();
     _upgradePrompt?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     _speech.cancel();
     _tts.stop();
     messageController.dispose();

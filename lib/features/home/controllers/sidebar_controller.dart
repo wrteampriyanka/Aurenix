@@ -199,7 +199,110 @@ class SidebarController extends GetxController
     const ChatSummary(id: '2', title: 'Incursion of tow universes'),
     const ChatSummary(id: '3', title: 'Astral travel & Subconscious'),
   ].obs;
-  final selectedChatId = RxnString('1');
+
+  /// The chat on screen, or null when the conversation is a fresh one that
+  /// has not earned a history entry yet.
+  final selectedChatId = RxnString();
+
+  /// What each chat in the list is made of, by id. Held for this app run
+  /// only, until the API can store conversations.
+  final _transcripts = <String, List<ChatMessage>>{};
+
+  // TODO: drop these along with the seeded chats above once the API can
+  // hand back real conversations.
+  static const _demoTranscripts = {
+    '1': [
+      'Could several universes really hold different laws of physics?',
+      'They could. In the inflationary picture each bubble universe cools '
+          'into its own vacuum state, so constants we treat as fixed — the '
+          'strength of gravity, the mass of an electron — settle at '
+          'different values in each one. Most of those settings would never '
+          'form stars or chemistry, which is why ours looks finely tuned '
+          'from the inside.',
+      'So where would the cosmic power in those stories come from?',
+      'In fiction it is usually borrowed from the vacuum itself: the energy '
+          'of empty space, which really is what drives the expansion we '
+          'measure. The leap is the idea that a being could tap it locally '
+          'and keep the result stable.',
+    ],
+    '2': [
+      'What would actually happen if two universes touched?',
+      'If two bubbles with different vacuum states met, the wall between '
+          'them would not stay put — the lower-energy vacuum would eat into '
+          'the higher one at close to the speed of light, rewriting the '
+          'physics inside as it went. Nothing built out of the old constants '
+          'would survive the crossing.',
+      'That is grimmer than the comics make it look.',
+      'Much grimmer. The comic version keeps both sets of matter intact so '
+          'the characters can meet, which needs the walls to be stable — the '
+          'one thing the physics does not give you.',
+    ],
+    '3': [
+      'Is there any evidence for astral travel, or is it all subconscious?',
+      'The experiences are real and well documented; the travel is not. '
+          'Out-of-body episodes can be brought on in a lab by stimulating '
+          'the temporoparietal junction, which is where the brain stitches '
+          'touch, balance and vision into one sense of where you are. '
+          'Disturb that and the self seems to sit outside the body.',
+      'Why do the reports agree with each other so often?',
+      'Because they come from the same machinery: the ceiling view, the '
+          'floating, the tunnel all follow from how that region fails. '
+          'Shared anatomy gives shared imagery without a shared destination.',
+    ],
+  };
+
+  /// The project screen lists the same three conversations under its own
+  /// ids, so they open to the same words.
+  static const _demoAliases = {'pc1': '1', 'pc2': '2', 'pc3': '3'};
+
+  /// Fills the seeded chats in, so opening one from the history shows its
+  /// own conversation rather than an empty screen.
+  void _seedTranscripts() {
+    for (final entry in _demoTranscripts.entries) {
+      _transcripts[entry.key] = [
+        for (final (i, text) in entry.value.indexed)
+          ChatMessage.history(isUser: i.isEven, text: text),
+      ];
+    }
+    for (final entry in _demoAliases.entries) {
+      _transcripts[entry.key] = _transcripts[entry.value]!;
+    }
+  }
+
+  /// Longest a title taken from a first message runs before it is cut.
+  static const _titleLength = 38;
+
+  /// Files the conversation under the open chat, the way a chat app does:
+  /// the first message of a new conversation opens an entry at the top of
+  /// the list named after it, and every message after that updates it.
+  void recordChat(List<ChatMessage> messages, String firstMessage) {
+    if (messages.isEmpty) return;
+    final title = _titleFrom(firstMessage);
+    var id = selectedChatId.value;
+    final index = id == null ? -1 : chats.indexWhere((c) => c.id == id);
+    if (index == -1) {
+      id = DateTime.now().microsecondsSinceEpoch.toString();
+      chats.insert(0, ChatSummary(id: id, title: title));
+      selectedChatId.value = id;
+    } else if (!_transcripts.containsKey(id)) {
+      // An entry that has no words of its own yet is named by this message.
+      chats[index] = chats[index].copyWith(title: title);
+    }
+    // The messages themselves are shared, so a reply still streaming in
+    // keeps filling out the stored copy.
+    _transcripts[id!] = List.of(messages);
+  }
+
+  /// The messages of the chat with [id]; empty for one with nothing stored.
+  List<ChatMessage> transcriptOf(String id) => _transcripts[id] ?? const [];
+
+  /// A chat's name taken from its first message: one line, cut short.
+  String _titleFrom(String text) {
+    final line = text.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (line.isEmpty) return 'sidebar_new_chat'.tr;
+    if (line.length <= _titleLength) return line;
+    return '${line.substring(0, _titleLength).trimRight()}…';
+  }
 
   final userName = 'Mikel Strome';
   final userEmail = 'designer@gmail.com';
@@ -215,6 +318,7 @@ class SidebarController extends GetxController
   void onInit() {
     super.onInit();
     searchController.addListener(() => query.value = searchController.text);
+    _seedTranscripts();
   }
 
   /// Expands the drawer into search, opening the keyboard once it settles
@@ -234,10 +338,15 @@ class SidebarController extends GetxController
     search.reverse();
   }
 
-  /// Selects [chat]; the home screen closes the drawer to show it.
+  /// Selects [chat] and puts its messages back on screen; the home screen
+  /// closes the drawer to show it.
   void onChat(ChatSummary chat) {
     selectedChatId.value = chat.id;
+    _home.openChat(transcriptOf(chat.id));
     if (isSearching.value) onSearchBack();
+    // Tapping the chat already on screen leaves the id alone, so the
+    // drawer is closed here rather than off the back of a change to it.
+    _home.closeDrawer();
   }
 
   void onProfile() => Get.toNamed(AppRoutes.profile);
@@ -442,6 +551,7 @@ class SidebarController extends GetxController
   /// conversation on screen.
   void _removeChat(ChatSummary chat) {
     chats.removeWhere((c) => c.id == chat.id);
+    _transcripts.remove(chat.id);
     if (selectedChatId.value == chat.id) _startChat();
   }
 

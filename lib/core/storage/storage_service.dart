@@ -24,6 +24,11 @@ class StorageService {
   Future<void> setString(String key, String value) async =>
       _prefs?.setString(key, value);
 
+  int? getInt(String key) => _prefs?.getInt(key);
+
+  Future<void> setInt(String key, int value) async =>
+      _prefs?.setInt(key, value);
+
   bool getBool(String key) => _prefs?.getBool(key) ?? false;
 
   Future<void> setBool(String key, {required bool value}) async =>

@@ -27,20 +27,26 @@ Future<void> showMessageMenu({
   required BuildContext context,
   required Rect anchor,
   required List<MessageMenuItem> items,
-}) {
+}) async {
   HapticFeedback.mediumImpact();
-  return Navigator.of(context, rootNavigator: true).push(
-    PageRouteBuilder<void>(
-      opaque: false,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black.withValues(alpha: 0.4),
-      transitionDuration: const Duration(milliseconds: 180),
-      reverseTransitionDuration: const Duration(milliseconds: 140),
-      pageBuilder: (context, animation, _) =>
-          _MessageMenu(anchor: anchor, items: items, animation: animation),
-    ),
-  );
+  // The card resolves with the row that was tapped rather than running it
+  // itself: an action that opens a sheet off `Get.context` would otherwise
+  // build it against this route while the route is still being torn down.
+  final picked = await Navigator.of(context, rootNavigator: true)
+      .push<MessageMenuItem>(
+        PageRouteBuilder<MessageMenuItem>(
+          opaque: false,
+          barrierDismissible: true,
+          barrierLabel: MaterialLocalizations.of(context)
+              .modalBarrierDismissLabel,
+          barrierColor: Colors.black.withValues(alpha: 0.4),
+          transitionDuration: const Duration(milliseconds: 180),
+          reverseTransitionDuration: const Duration(milliseconds: 140),
+          pageBuilder: (context, animation, _) =>
+              _MessageMenu(anchor: anchor, items: items, animation: animation),
+        ),
+      );
+  picked?.onTap();
 }
 
 class _MessageMenu extends StatelessWidget {
@@ -125,10 +131,7 @@ class _Card extends StatelessWidget {
           children: [
             for (final item in items)
               InkWell(
-                onTap: () {
-                  Navigator.of(context).pop();
-                  item.onTap();
-                },
+                onTap: () => Navigator.of(context).pop(item),
                 child: SizedBox(
                   height: 52,
                   child: Row(

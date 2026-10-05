@@ -88,7 +88,10 @@ class _HomeBody extends StatelessWidget {
               }),
               Expanded(
                 child: Obx(() {
-                  if (controller.messages.isNotEmpty) {
+                  // A fresh chat with the allowance used up still shows the
+                  // upgrade card, so it is clear why nothing can be sent.
+                  if (controller.messages.isNotEmpty ||
+                      controller.isChatLimited) {
                     return ChatMessages(controller: controller);
                   }
                   return switch (controller.preset.value) {
@@ -345,6 +348,8 @@ class _InputBar extends StatelessWidget {
                           border: InputBorder.none,
                           hintText: controller.isListening.value
                               ? 'chat_listening_hint'.tr
+                              : controller.isChatLimited
+                              ? 'chat_limit_hint'.tr
                               : 'home_input_hint'.tr,
                           hintStyle: TextStyle(
                             color: context.color.textBody,
