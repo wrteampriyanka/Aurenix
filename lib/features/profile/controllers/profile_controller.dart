@@ -8,15 +8,11 @@ import 'package:aurenix/features/edit_profile/controllers/edit_profile_controlle
 import 'package:aurenix/features/widgets/bottom_sheets/language_sheet.dart';
 
 /// A row in one of the profile menu cards.
-///
-/// [overlay], when set, is drawn small over the centre of [icon] so two
-/// Phosphor glyphs can be combined (a chat bubble with an arrow inside).
 class ProfileMenuItem {
-  const ProfileMenuItem(this.labelKey, this.icon, {this.overlay});
+  const ProfileMenuItem(this.labelKey, this.icon);
 
   final String labelKey;
   final IconData icon;
-  final IconData? overlay;
 }
 
 class ProfileController extends GetxController {
@@ -33,8 +29,7 @@ class ProfileController extends GetxController {
 
   static const archiveChats = ProfileMenuItem(
     'profile_archive_chats',
-    PhosphorIconsRegular.chatCircle,
-    overlay: PhosphorIconsRegular.arrowDown,
+    PhosphorIconsRegular.arrowCircleDown,
   );
 
   static const customizeAi = ProfileMenuItem(

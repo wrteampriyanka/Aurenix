@@ -33,7 +33,7 @@ class ProjectDetailScreen extends GetView<ProjectDetailController> {
                 children: [
                   _IconButton(
                     icon: PhosphorIconsRegular.fileText,
-                    onTap: controller.onInstructions,
+                    onTap: controller.onFiles,
                   ),
                   const SizedBox(width: 8),
                   _IconButton(

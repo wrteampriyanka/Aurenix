@@ -7,7 +7,6 @@ import 'package:aurenix/features/widgets/custom_text.dart';
 import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/home/controllers/home_controller.dart';
-import 'package:aurenix/features/home/widgets/chat_upgrade_card.dart';
 import 'package:aurenix/features/home/widgets/message_menu.dart';
 
 /// The conversation: user bubbles on the right, AI replies full width.
@@ -31,16 +30,11 @@ class ChatMessages extends StatelessWidget {
         Expanded(
           child: Obx(() {
             final messages = controller.messages;
-            // One past the messages: the free-limit upgrade card closes the
-            // conversation off once the allowance is used up, until it resets
-            // or the plan is paid for and it drops out.
-            final showUpgrade = controller.isChatLimited;
             return ListView.builder(
               controller: controller.scrollController,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-              itemCount: messages.length + (showUpgrade ? 1 : 0),
+              itemCount: messages.length,
               itemBuilder: (context, i) {
-                if (i == messages.length) return const ChatUpgradeCard();
                 final message = messages[i];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 20),

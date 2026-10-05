@@ -4,7 +4,6 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/features/widgets/app_background.dart';
 import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_composite_icon.dart';
 import 'package:aurenix/features/widgets/app_fading_card.dart';
 import 'package:aurenix/features/widgets/app_top_bar.dart';
 import 'package:aurenix/features/widgets/custom_text.dart';
@@ -205,7 +204,11 @@ class _MenuCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      _MenuIcon(item: items[i]),
+                      Icon(
+                        items[i].icon,
+                        size: 22,
+                        color: context.color.textNatural,
+                      ),
                       const SizedBox(width: 22),
                       Expanded(
                         child: CustomText(
@@ -229,21 +232,5 @@ class _MenuCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// The row's glyph, with the item's overlay glyph drawn small over its
-/// centre when it has one.
-class _MenuIcon extends StatelessWidget {
-  const _MenuIcon({required this.item});
-
-  final ProfileMenuItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = context.color.textNatural;
-    final overlay = item.overlay;
-    if (overlay == null) return Icon(item.icon, size: 22, color: color);
-    return AppCompositeIcon(icon: item.icon, overlay: overlay, color: color);
   }
 }

@@ -1,9 +1,12 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/features/home/controllers/home_controller.dart';
 import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/widgets/app_snackbar.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/project_files_sheet.dart';
 
 /// One project's chats, opened by tapping a project card or sidebar row.
 /// The project itself lives in [SidebarController], so renaming or deleting
@@ -52,6 +55,26 @@ class ProjectDetailController extends GetxController {
     return chats.where((c) => c.title.toLowerCase().contains(q)).toList();
   }
 
+  // TODO: load and upload the project's files once the backend stores them.
+  final files = <ProjectFile>[
+    const ProjectFile(id: 'pf1', name: 'Universe Study Doc 3', bytes: 23 << 20),
+    const ProjectFile(
+      id: 'pf2',
+      name: 'Warm Hole - Research Paper',
+      bytes: 103 << 20,
+    ),
+    const ProjectFile(
+      id: 'pf3',
+      name: 'Paper Universe Theory',
+      bytes: 11 << 20,
+    ),
+    const ProjectFile(
+      id: 'pf4',
+      name: 'Project Question Entanglement',
+      bytes: 493 << 20,
+    ),
+  ].obs;
+
   final messageController = TextEditingController();
   final hasText = false.obs;
 
@@ -81,6 +104,33 @@ class ProjectDetailController extends GetxController {
 
   Future<void> onInstructions() async {
     if (project case final p?) await _sidebar.editInstructions(p);
+  }
+
+  /// Shows the project's files, with a button to upload more.
+  void onFiles() {
+    ProjectFilesSheet.show(
+      files: files,
+      onUpload: onUploadFiles,
+      onRemove: files.remove,
+    );
+  }
+
+  /// Adds whatever files the user picks to the project.
+  Future<void> onUploadFiles() async {
+    try {
+      final picked = await FilePicker.pickFiles();
+      for (final file in picked) {
+        files.add(
+          ProjectFile(
+            id: '${DateTime.now().microsecondsSinceEpoch}-${file.name}',
+            name: file.name,
+            bytes: file.lengthSync() ?? await file.length() ?? 0,
+          ),
+        );
+      }
+    } catch (_) {
+      AppSnackbar.error('project_files_failed'.tr);
+    }
   }
 
   /// Opens the project's sharing settings.

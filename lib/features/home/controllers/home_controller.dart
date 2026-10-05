@@ -20,7 +20,7 @@ import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/services/voice_service.dart';
 import 'package:aurenix/features/presets/controllers/presets_controller.dart';
 import 'package:aurenix/features/widgets/bottom_sheets/services_sheet.dart';
-import 'package:aurenix/features/widgets/bottom_sheets/upgrade_prompt_sheet.dart';
+import 'package:aurenix/features/widgets/bottom_sheets/chat_limit_sheet.dart';
 import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
 import 'package:aurenix/features/widgets/app_snackbar.dart';
 
@@ -203,61 +203,19 @@ class HomeController extends GetxController
     if (state == AppLifecycleState.resumed) _quota.refresh();
   }
 
-  /// How long the user chats before the upgrade nudge comes up.
-  static const upgradePromptDelay = Duration(minutes: 3);
-
   ChatQuotaService get _quota => ChatQuotaService.instance;
 
   /// Whether the free allowance is used up: the chat is shut and the
   /// upgrade card closes it off until the window resets.
   bool get isChatLimited => _quota.isLimited;
 
-  /// Turns a message away once the allowance is used up, pointing at when
-  /// it comes back. Returns whether the chat is shut.
+  /// Turns a message away once the allowance is used up, bringing up the
+  /// upgrade sheet instead. Returns whether the chat is shut.
   bool _blockedByLimit() {
     if (!isChatLimited) return false;
     _scrollToBottom();
-    final resetsAt = _quota.resetsAt.value;
-    AppSnackbar.error(
-      resetsAt == null
-          ? 'chat_limit_reached'.tr
-          : 'chat_limit_reached_until'.trParams({
-              'time': TimeOfDay.fromDateTime(resetsAt).format(Get.context!),
-            }),
-    );
+    ChatLimitSheet.show();
     return true;
-  }
-
-  /// How long to wait before trying again when the moment is wrong — the
-  /// user is on another screen, or a sheet of their own is open.
-  static const _upgradePromptRetry = Duration(seconds: 30);
-
-  Timer? _upgradePrompt;
-
-  /// Starts the countdown on the first message of the run. Later messages
-  /// leave it alone, so a busy conversation does not push the nudge back
-  /// past the point of ever arriving.
-  void _armUpgradePrompt([Duration delay = upgradePromptDelay]) {
-    if (_upgradePrompt != null || !UpgradePromptSheet.isPending) return;
-    _upgradePrompt = Timer(delay, _showUpgradePrompt);
-  }
-
-  /// Interrupting the user mid-task would be rude, so the nudge waits for a
-  /// quiet moment on the chat screen: nothing else open, no reply running
-  /// and not a temporary chat, which is deliberately throwaway.
-  void _showUpgradePrompt() {
-    final busy =
-        Get.currentRoute != AppRoutes.home ||
-        (Get.isBottomSheetOpen ?? false) ||
-        (Get.isDialogOpen ?? false) ||
-        isDrawerOpen.value ||
-        isTemporary.value ||
-        (messages.lastOrNull?.isStreaming.value ?? false);
-    if (busy) {
-      _upgradePrompt = Timer(_upgradePromptRetry, _showUpgradePrompt);
-      return;
-    }
-    UpgradePromptSheet.show();
   }
 
   void onMenu() => drawer.isDismissed ? drawer.forward() : closeDrawer();
@@ -581,7 +539,6 @@ class HomeController extends GetxController
 
   /// Streams the AI reply to the conversation so far into a new message.
   void _generate() {
-    _armUpgradePrompt();
     _quota.recordMessage();
     final history = [
       for (final m in messages)
@@ -669,6 +626,11 @@ class HomeController extends GetxController
     _reply = null;
     reply.isStreaming.value = false;
     isGenerating.value = false;
+    // The reply that used up the allowance has landed: say so now rather
+    // than on the next send.
+    if (isChatLimited && Get.currentRoute == AppRoutes.home) {
+      ChatLimitSheet.show();
+    }
   }
 
   void _scrollToBottom() {
@@ -871,7 +833,6 @@ class HomeController extends GetxController
   @override
   void onClose() {
     _reply?.cancel();
-    _upgradePrompt?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _speech.cancel();
     _tts.stop();
