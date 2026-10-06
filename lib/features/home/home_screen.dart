@@ -303,110 +303,12 @@ class _InputBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
-              decoration: BoxDecoration(
-                color: context.color.inputFill,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: context.color.inputBorder),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Obx(() {
-                    final file = controller.attachment.value;
-                    if (file == null) return const SizedBox.shrink();
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-                      child: _AttachmentChip(
-                        attachment: file,
-                        onRemove: controller.onRemoveAttachment,
-                      ),
-                    );
-                  }),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Obx(
-                      () => TextField(
-                        controller: controller.messageController,
-                        focusNode: controller.messageFocus,
-                        cursorColor: context.color.primary,
-                        minLines: 1,
-                        maxLines: 5,
-                        textInputAction: TextInputAction.send,
-                        onSubmitted: (_) => controller.onSend(),
-                        style: TextStyle(
-                          color: context.color.textNatural,
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          isCollapsed: true,
-                          border: InputBorder.none,
-                          hintText: controller.isListening.value
-                              ? 'chat_listening_hint'.tr
-                              : controller.isChatLimited
-                              ? 'chat_limit_hint'.tr
-                              : 'home_input_hint'.tr,
-                          hintStyle: TextStyle(
-                            color: context.color.textBody,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: controller.onAttach,
-                        icon: Icon(
-                          PhosphorIconsRegular.plus,
-                          size: 22,
-                          color: context.color.textNatural,
-                        ),
-                      ),
-                      Expanded(
-                        child: Obx(() {
-                          if (controller.isListening.value) {
-                            return _VoiceWaveform(
-                              levels: controller.soundLevels.toList(),
-                            );
-                          }
-                          final action = controller.selectedAction.value;
-                          return Align(
-                            alignment: Alignment.centerLeft,
-                            child: action == null
-                                ? const SizedBox.shrink()
-                                : _ActionTag(
-                                    action: action,
-                                    onClear: controller.onClearAction,
-                                  ),
-                          );
-                        }),
-                      ),
-                      Obx(
-                        () => controller.isListening.value
-                            ? IconButton(
-                                onPressed: controller.onCancelVoice,
-                                icon: Icon(
-                                  PhosphorIconsRegular.x,
-                                  size: 20,
-                                  color: context.color.textBody,
-                                ),
-                              )
-                            : IconButton(
-                                onPressed: controller.onMic,
-                                icon: Icon(
-                                  PhosphorIconsRegular.microphone,
-                                  size: 22,
-                                  color: context.color.textNatural,
-                                ),
-                              ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            // Empty state gets the roomy stacked field; once the chat is
+            // running the controls move up beside the text on one line.
+            child: Obx(
+              () => controller.messages.isEmpty
+                  ? _stacked(context)
+                  : _inline(context),
             ),
           ),
           const SizedBox(width: 12),
@@ -434,6 +336,165 @@ class _InputBar extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Text on top, plus and mic on a row of their own underneath.
+  Widget _stacked(BuildContext context) {
+    return _shell(
+      context: context,
+      padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
+      children: [
+        _attachment(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: _field(context),
+        ),
+        Row(
+          children: [
+            _attachButton(context),
+            Expanded(child: _waveformOrTag(context)),
+            _micButton(context),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Plus, text and mic all on one line, so the bar stays short while
+  /// messages fill the screen.
+  Widget _inline(BuildContext context) {
+    return _shell(
+      context: context,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      children: [
+        _attachment(),
+        Obx(() {
+          if (!controller.isListening.value &&
+              controller.selectedAction.value == null) {
+            return const SizedBox.shrink();
+          }
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+            child: _waveformOrTag(context),
+          );
+        }),
+        Row(
+          children: [
+            _attachButton(context),
+            Expanded(child: _field(context)),
+            _micButton(context),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// The rounded, bordered box both layouts live in.
+  Widget _shell({
+    required BuildContext context,
+    required EdgeInsets padding,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: context.color.inputFill,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: context.color.inputBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
+    );
+  }
+
+  Widget _attachment() {
+    return Obx(() {
+      final file = controller.attachment.value;
+      if (file == null) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+        child: _AttachmentChip(
+          attachment: file,
+          onRemove: controller.onRemoveAttachment,
+        ),
+      );
+    });
+  }
+
+  Widget _field(BuildContext context) {
+    return Obx(
+      () => TextField(
+        controller: controller.messageController,
+        focusNode: controller.messageFocus,
+        cursorColor: context.color.primary,
+        minLines: 1,
+        maxLines: 5,
+        textInputAction: TextInputAction.send,
+        onSubmitted: (_) => controller.onSend(),
+        style: TextStyle(color: context.color.textNatural, fontSize: 15),
+        decoration: InputDecoration(
+          isCollapsed: true,
+          border: InputBorder.none,
+          hintText: controller.isListening.value
+              ? 'chat_listening_hint'.tr
+              : controller.isChatLimited
+              ? 'chat_limit_hint'.tr
+              : 'home_input_hint'.tr,
+          hintStyle: TextStyle(color: context.color.textBody, fontSize: 15),
+        ),
+      ),
+    );
+  }
+
+  Widget _attachButton(BuildContext context) {
+    return IconButton(
+      onPressed: controller.onAttach,
+      icon: Icon(
+        PhosphorIconsRegular.plus,
+        size: 22,
+        color: context.color.textNatural,
+      ),
+    );
+  }
+
+  Widget _micButton(BuildContext context) {
+    return Obx(
+      () => controller.isListening.value
+          ? IconButton(
+              onPressed: controller.onCancelVoice,
+              icon: Icon(
+                PhosphorIconsRegular.x,
+                size: 20,
+                color: context.color.textBody,
+              ),
+            )
+          : IconButton(
+              onPressed: controller.onMic,
+              icon: Icon(
+                PhosphorIconsRegular.microphone,
+                size: 22,
+                color: context.color.textNatural,
+              ),
+            ),
+    );
+  }
+
+  /// Live mic bars while listening, otherwise the picked action's tag.
+  Widget _waveformOrTag(BuildContext context) {
+    return Obx(() {
+      if (controller.isListening.value) {
+        return _VoiceWaveform(levels: controller.soundLevels.toList());
+      }
+      final action = controller.selectedAction.value;
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: action == null
+            ? const SizedBox.shrink()
+            : _ActionTag(action: action, onClear: controller.onClearAction),
+      );
+    });
   }
 }
 
