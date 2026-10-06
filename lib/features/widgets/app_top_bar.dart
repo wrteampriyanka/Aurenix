@@ -71,28 +71,30 @@ class AppTopBar extends StatelessWidget {
               children: [
                 // The drawn icon already carries its plus, so no overlay.
                 _PillIcon(asset: AppAssets.addChatIcon, onTap: onNewChat),
-                SizedBox(
-                  height: 24,
-                  child: VerticalDivider(
-                    width: 1,
-                    color: context.color.tileBorder,
-                  ),
-                ),
-                if (trailing case final trailing?)
+                // Nothing follows the new chat button when the bar has no
+                // trailing widget and no menu, so the divider goes too.
+                if (trailing != null || onMore != null) ...[
                   SizedBox(
-                    width: 44,
-                    height: 46,
-                    child: Center(child: trailing),
-                  )
-                else
-                  Builder(
-                    builder: (context) => _PillIcon(
-                      icon: PhosphorIconsRegular.dotsThree,
-                      onTap: onMore == null
-                          ? null
-                          : () => _reportMore(context, onMore!),
+                    height: 24,
+                    child: VerticalDivider(
+                      width: 1,
+                      color: context.color.tileBorder,
                     ),
                   ),
+                  if (trailing case final trailing?)
+                    SizedBox(
+                      width: 44,
+                      height: 46,
+                      child: Center(child: trailing),
+                    )
+                  else
+                    Builder(
+                      builder: (context) => _PillIcon(
+                        icon: PhosphorIconsRegular.dotsThree,
+                        onTap: () => _reportMore(context, onMore!),
+                      ),
+                    ),
+                ],
               ],
             ),
           ),

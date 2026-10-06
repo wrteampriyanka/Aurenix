@@ -66,7 +66,6 @@ class _HomeBody extends StatelessWidget {
                   onMenu: controller.onMenu,
                   onModelTap: controller.onModelTap,
                   onNewChat: controller.onNewChat,
-                  onMore: controller.onMore,
                   trailing: switch (controller.preset.value) {
                     final preset? => PresetAvatar(
                       image: preset.image,
