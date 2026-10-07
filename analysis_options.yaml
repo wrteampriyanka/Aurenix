@@ -17,6 +17,10 @@ analyzer:
     - web/**
     - windows/**
     - macos/**
+  errors:
+    # Keep TODO comments in the code without listing them in the IDE's
+    # Problems panel; they track backend work, not code defects.
+    todo: ignore
 
 linter:
   # The lint rules applied to this project can be customized in the
