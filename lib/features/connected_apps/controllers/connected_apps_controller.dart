@@ -1,11 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/bottom_sheets/app_info_sheet.dart';
+import 'package:aurenix/commons/widgets/bottom_sheets/app_info_sheet.dart';
 import 'package:aurenix/features/connected_apps/services/connected_apps_service.dart';
 import 'package:aurenix/features/connected_apps/widgets/integration_app_logo.dart';
 
-export 'package:aurenix/features/connected_apps/services/connected_apps_service.dart' show IntegrationApp;
+export 'package:aurenix/features/connected_apps/services/connected_apps_service.dart'
+    show IntegrationApp;
 
 class ConnectedAppsController extends GetxController {
   final searchController = TextEditingController();

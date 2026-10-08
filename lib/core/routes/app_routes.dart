@@ -3,8 +3,6 @@ abstract class AppRoutes {
 
   static const aboutUs = '/about-us';
   static const archiveChats = '/archive-chats';
-  static const budget = '/budget';
-  static const categories = '/categories';
   static const checkout = '/checkout';
   static const collaboration = '/collaboration';
   static const connectedApps = '/connected-apps';
@@ -25,9 +23,7 @@ abstract class AppRoutes {
   static const projects = '/projects';
   static const register = '/register';
   static const resetPassword = '/reset-password';
-  static const savings = '/savings';
   static const splash = '/splash';
-  static const transactions = '/transactions';
   static const upgrade = '/upgrade';
   static const voiceSettings = '/voice-settings';
 }

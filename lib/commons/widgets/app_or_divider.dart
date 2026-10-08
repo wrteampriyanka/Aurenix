@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Dashed horizontal line with an "OR" pill in the middle.
-class OrDivider extends StatelessWidget {
-  const OrDivider({super.key});
+class AppOrDivider extends StatelessWidget {
+  const AppOrDivider({super.key});
 
   @override
   Widget build(BuildContext context) {
     final line = Expanded(
       child: CustomPaint(
         size: const Size.fromHeight(1),
-        painter: _DashedLinePainter(color: context.color.divider),
+        painter: _DashedLinePainter(color: appColors.divider),
       ),
     );
 
@@ -23,14 +25,14 @@ class OrDivider extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
           decoration: BoxDecoration(
-            color: context.color.backgroundBase,
+            color: appColors.backgroundBase,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: context.color.divider),
+            border: Border.all(color: appColors.divider),
           ),
-          child: CustomText(
-            'or'.tr,
-            fontSize: 12,
-            color: context.color.textBody,
+          child: AppText(
+            AppStrings.or.tr,
+            fontSize: AppFontSize.overline,
+            color: appColors.textBody,
           ),
         ),
         line,

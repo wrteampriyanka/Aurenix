@@ -4,8 +4,11 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_svg_icon.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_svg_icon.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Frosted top bar shared by home and profile: sidebar button, model name
 /// with a caret, and a pill holding the new chat and more buttons.
@@ -46,19 +49,19 @@ class AppTopBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Flexible(
-                    child: CustomText(
-                      'home_model_name'.tr,
+                    child: AppText(
+                      AppStrings.homeModelName.tr,
                       maxLines: 1,
-                      fontSize: 20,
+                      fontSize: AppFontSize.h2,
                       fontWeight: FontWeight.w700,
-                      color: context.color.textNatural,
+                      color: appColors.textNatural,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Icon(
                     PhosphorIconsRegular.caretDown,
                     size: 18,
-                    color: context.color.textNatural,
+                    color: appColors.textNatural,
                   ),
                 ],
               ),
@@ -78,7 +81,7 @@ class AppTopBar extends StatelessWidget {
                     height: 24,
                     child: VerticalDivider(
                       width: 1,
-                      color: context.color.tileBorder,
+                      color: appColors.tileBorder,
                     ),
                   ),
                   if (trailing case final trailing?)
@@ -119,8 +122,8 @@ BoxDecoration glassDecoration(BuildContext context, BoxShape shape) =>
       borderRadius: shape == BoxShape.rectangle
           ? BorderRadius.circular(24)
           : null,
-      color: context.color.tileFillHighlight,
-      border: Border.all(color: context.color.tileBorder),
+      color: appColors.tileFillHighlight,
+      border: Border.all(color: appColors.tileBorder),
     );
 
 /// Round frosted icon button.
@@ -160,13 +163,9 @@ class GlassButton extends StatelessWidget {
                   ? AppSvgIcon(
                       asset!,
                       size: iconSize,
-                      color: context.color.textNatural,
+                      color: appColors.textNatural,
                     )
-                  : Icon(
-                      icon,
-                      size: iconSize,
-                      color: context.color.textNatural,
-                    ),
+                  : Icon(icon, size: iconSize, color: appColors.textNatural),
             ),
           ),
         ),
@@ -199,10 +198,10 @@ class _PillIcon extends StatelessWidget {
                 child: AppSvgIcon(
                   asset!,
                   size: 22,
-                  color: context.color.textNatural,
+                  color: appColors.textNatural,
                 ),
               )
-            : Icon(icon, size: 22, color: context.color.textNatural),
+            : Icon(icon, size: 22, color: appColors.textNatural),
       ),
     );
   }

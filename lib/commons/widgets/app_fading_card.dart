@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
 
 /// Where a card's outline fades out.
 enum CardFade {
@@ -28,7 +29,7 @@ class AppFadingCard extends StatelessWidget {
   const AppFadingCard({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.all(AppSpacing.lg),
     this.radius = 20,
     this.fill,
     this.fade = CardFade.diagonal,
@@ -47,10 +48,10 @@ class AppFadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fill = this.fill ?? context.color.profileCardFill;
+    final fill = this.fill ?? appColors.profileCardFill;
     return CustomPaint(
       foregroundPainter: _FadingBorderPainter(
-        color: context.color.profileCardBorder,
+        color: appColors.profileCardBorder,
         radius: radius,
         fade: fade,
       ),

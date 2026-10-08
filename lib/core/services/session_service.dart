@@ -26,6 +26,5 @@ class SessionService {
   Future<void> signOut() => _storage.remove(_signedInKey);
 
   /// Onboarding is only shown on the very first run.
-  Future<void> markOnboarded() =>
-      _storage.setBool(_onboardedKey, value: true);
+  Future<void> markOnboarded() => _storage.setBool(_onboardedKey, value: true);
 }

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// A file attached to a project.
 class ProjectFile {
@@ -75,7 +78,7 @@ class ProjectFilesSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     // Full width and attached to the bottom edge, with the background running
     // under the system navigation bar and only the content kept clear of it.
     return Container(
@@ -104,15 +107,15 @@ class ProjectFilesSheet extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            CustomText(
-              'project_files_title'.tr,
-              fontSize: 26,
+            const SizedBox(height: AppSpacing.xl),
+            AppText(
+              AppStrings.projectFilesTitle.tr,
+              fontSize: AppFontSize.sheetTitle,
               fontWeight: FontWeight.w700,
               textAlign: TextAlign.center,
               color: color.textNatural,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Flexible(
               child: AnimatedSize(
                 duration: const Duration(milliseconds: 260),
@@ -125,9 +128,9 @@ class ProjectFilesSheet extends StatelessWidget {
                         horizontal: 16,
                         vertical: 20,
                       ),
-                      child: CustomText(
-                        'project_files_empty'.tr,
-                        fontSize: 14,
+                      child: AppText(
+                        AppStrings.projectFilesEmpty.tr,
+                        fontSize: AppFontSize.label,
                         textAlign: TextAlign.center,
                         color: color.textBody,
                       ),
@@ -148,10 +151,10 @@ class ProjectFilesSheet extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               child: AppButton(
-                label: 'project_files_upload'.tr,
+                label: AppStrings.projectFilesUpload.tr,
                 icon: null,
                 height: 50,
-                fontSize: 16,
+                fontSize: AppFontSize.body,
                 onPressed: onUpload,
               ),
             ),
@@ -170,7 +173,7 @@ class _FileRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -189,21 +192,25 @@ class _FileRow extends StatelessWidget {
               color: color.error,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSpacing.lg),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                CustomText(
+                AppText(
                   file.name,
                   maxLines: 1,
-                  fontSize: 16,
+                  fontSize: AppFontSize.body,
                   fontWeight: FontWeight.w600,
                   color: color.textNatural,
                 ),
                 const SizedBox(height: 2),
-                CustomText(file.sizeLabel, fontSize: 12, color: color.textBody),
+                AppText(
+                  file.sizeLabel,
+                  fontSize: AppFontSize.overline,
+                  color: color.textBody,
+                ),
               ],
             ),
           ),
@@ -230,9 +237,9 @@ class _FileRow extends StatelessWidget {
                       color: color.error,
                     ),
                     const SizedBox(width: 10),
-                    CustomText(
-                      'project_files_remove'.tr,
-                      fontSize: 14,
+                    AppText(
+                      AppStrings.projectFilesRemove.tr,
+                      fontSize: AppFontSize.label,
                       color: color.error,
                     ),
                   ],

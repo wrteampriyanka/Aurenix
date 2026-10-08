@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// An app card on the integration screen.
 class IntegrationApp {
@@ -43,7 +44,7 @@ class ConnectedAppsService extends GetxService {
   static const apps = [
     IntegrationApp(
       id: 'figma',
-      nameKey: 'services_figma',
+      nameKey: AppStrings.servicesFigma,
       descriptionKey: 'services_figma_desc',
       logo: AppAssets.figmaColorLogo,
       handle: '@figma-automation-api',
@@ -55,7 +56,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'zync',
-      nameKey: 'services_zync',
+      nameKey: AppStrings.servicesZync,
       descriptionKey: 'services_zync_desc',
       logo: AppAssets.zyncLogo,
       handle: '@zync-workspace',
@@ -67,7 +68,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'google_drive',
-      nameKey: 'services_google_drive',
+      nameKey: AppStrings.servicesGoogleDrive,
       descriptionKey: 'services_google_drive_desc',
       logo: AppAssets.googleDriveLogo,
       handle: '@google-drive-api',
@@ -79,7 +80,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'notion',
-      nameKey: 'connected_apps_notion',
+      nameKey: AppStrings.connectedAppsNotion,
       descriptionKey: 'connected_apps_notion_desc',
       logo: AppAssets.notionLogo,
       handle: '@notion-ai-remote',
@@ -92,7 +93,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'firebase',
-      nameKey: 'connected_apps_firebase',
+      nameKey: AppStrings.connectedAppsFirebase,
       descriptionKey: 'connected_apps_firebase_desc',
       logo: AppAssets.firebaseLogo,
       handle: '@firebase-admin-sdk',
@@ -104,7 +105,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'slack',
-      nameKey: 'connected_apps_slack',
+      nameKey: AppStrings.connectedAppsSlack,
       descriptionKey: 'connected_apps_slack_desc',
       logo: AppAssets.slackLogo,
       handle: '@slack-bot-api',
@@ -116,7 +117,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'teams',
-      nameKey: 'connected_apps_teams',
+      nameKey: AppStrings.connectedAppsTeams,
       descriptionKey: 'connected_apps_teams_desc',
       logo: AppAssets.teamsLogo,
       handle: '@teams-graph-api',
@@ -128,7 +129,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'gitlab',
-      nameKey: 'connected_apps_gitlab',
+      nameKey: AppStrings.connectedAppsGitlab,
       descriptionKey: 'connected_apps_gitlab_desc',
       logo: AppAssets.gitlabLogo,
       handle: '@gitlab-api',
@@ -140,7 +141,7 @@ class ConnectedAppsService extends GetxService {
     ),
     IntegrationApp(
       id: 'github',
-      nameKey: 'connected_apps_github',
+      nameKey: AppStrings.connectedAppsGithub,
       descriptionKey: 'connected_apps_github_desc',
       logo: AppAssets.githubLogo,
       handle: '@github-app',

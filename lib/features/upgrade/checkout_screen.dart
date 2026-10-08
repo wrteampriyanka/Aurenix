@@ -4,15 +4,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_background.dart';
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_fading_card.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_background.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_fading_card.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/upgrade/controllers/checkout_controller.dart';
 import 'package:aurenix/features/upgrade/models/upgrade_plan.dart';
 import 'package:aurenix/features/upgrade/widgets/upgrade_widgets.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class CheckoutScreen extends GetView<CheckoutController> {
   const CheckoutScreen({super.key});
@@ -20,7 +23,7 @@ class CheckoutScreen extends GetView<CheckoutController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppBackground(
         showGrid: false,
         child: SafeArea(
@@ -38,11 +41,11 @@ class CheckoutScreen extends GetView<CheckoutController> {
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                     children: [
                       _PlanSummary(controller: controller),
-                      const SizedBox(height: 20),
-                      _SectionLabel('upgrade_payment_address'.tr),
+                      const SizedBox(height: AppSpacing.xl),
+                      _SectionLabel(AppStrings.upgradePaymentAddress.tr),
                       _AddressFields(controller: controller),
-                      const SizedBox(height: 20),
-                      _SectionLabel('upgrade_payment_method'.tr),
+                      const SizedBox(height: AppSpacing.xl),
+                      _SectionLabel(AppStrings.upgradePaymentMethod.tr),
                       for (final method in PaymentMethod.values) ...[
                         Obx(
                           () => _PaymentMethodTile(
@@ -78,38 +81,34 @@ class _PlanSummary extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CustomText(
+          AppText(
             plan.nameKey.tr,
             maxLines: 1,
-            fontSize: 20,
+            fontSize: AppFontSize.h2,
             fontWeight: FontWeight.w600,
-            color: context.color.textNatural,
+            color: appColors.textNatural,
           ),
           const SizedBox(height: 6),
-          CustomText(
+          AppText(
             plan.checkoutNoteKey.tr,
-            fontSize: 13,
-            color: context.color.textBody,
+            fontSize: AppFontSize.caption,
+            color: appColors.textBody,
           ),
-          const SizedBox(height: 16),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: context.color.profileCardDivider,
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
+          Divider(height: 1, thickness: 1, color: appColors.profileCardDivider),
+          const SizedBox(height: AppSpacing.lg),
           PlanPriceRow(
             plan: plan,
             action: AppButton(
-              label: 'upgrade_change_plan'.tr,
+              label: AppStrings.upgradeChangePlan.tr,
               icon: null,
               onPressed: controller.onChangePlan,
               height: 42,
               width: 136,
-              fontSize: 14,
-              color: context.color.upgradeButton,
-              highlightColor: context.color.upgradeButtonHighlight,
-              borderColor: context.color.upgradeButtonBorder,
+              fontSize: AppFontSize.label,
+              color: appColors.upgradeButton,
+              highlightColor: appColors.upgradeButtonHighlight,
+              borderColor: appColors.upgradeButtonBorder,
             ),
           ),
         ],
@@ -127,11 +126,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: CustomText(
+      child: AppText(
         text,
         maxLines: 1,
-        fontSize: 13,
-        color: context.color.textBody,
+        fontSize: AppFontSize.caption,
+        color: appColors.textBody,
       ),
     );
   }
@@ -153,10 +152,11 @@ class _AddressFields extends StatelessWidget {
         children: [
           _PickerField(
             value: country.name,
+            // A flag glyph, not text: sized to the row, not to the type scale.
             leading: Text(country.flag, style: const TextStyle(fontSize: 20)),
             onTap: controller.onCountryTap,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -165,7 +165,9 @@ class _AddressFields extends StatelessWidget {
                     ? AppTextField(
                         // A new field per country, so errors don't carry over.
                         key: ValueKey('state-${country.code}'),
-                        hint: 'upgrade_state'.tr,
+                        label: AppStrings.upgradeState.tr,
+                        // Shares a Row with the postal code field.
+                        reserveErrorSpace: true,
                         controller: controller.stateController,
                         textInputAction: TextInputAction.next,
                         autofillHints: const [AutofillHints.addressState],
@@ -174,17 +176,18 @@ class _AddressFields extends StatelessWidget {
                     : _PickerField(
                         key: ValueKey('state-${country.code}'),
                         value: controller.state.value,
-                        hint: 'upgrade_select_state'.tr,
+                        hint: AppStrings.upgradeSelectState.tr,
                         onTap: controller.onStateTap,
                         validator: () =>
                             controller.validateState(controller.state.value),
                       ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: AppTextField(
                   key: ValueKey('postal-${country.code}'),
-                  hint:
+                  reserveErrorSpace: true,
+                  label:
                       (controller.usesPin
                               ? 'upgrade_pin_code'
                               : 'upgrade_postal_code')
@@ -235,7 +238,7 @@ class _PickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return FormField<String>(
       validator: validator == null ? null : (_) => validator!(),
       builder: (field) => GestureDetector(
@@ -246,7 +249,6 @@ class _PickerField extends StatelessWidget {
           if (field.hasError) field.validate();
         },
         child: InputDecorator(
-          isEmpty: false,
           decoration: AppTextField.decoration(context).copyWith(
             errorText: field.errorText,
             suffixIcon: Icon(
@@ -259,13 +261,13 @@ class _PickerField extends StatelessWidget {
             children: [
               if (leading case final leading?) ...[
                 leading,
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
               ],
               Expanded(
-                child: CustomText(
+                child: AppText(
                   value ?? hint ?? '',
                   maxLines: 1,
-                  fontSize: 16,
+                  fontSize: AppFontSize.body,
                   color: value == null ? color.textBody : color.textNatural,
                 ),
               ),
@@ -290,7 +292,7 @@ class _PaymentMethodTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: color.inputFill,
       borderRadius: BorderRadius.circular(14),
@@ -311,10 +313,10 @@ class _PaymentMethodTile extends StatelessWidget {
               _PaymentLogo(asset: method.logo),
               const SizedBox(width: 14),
               Expanded(
-                child: CustomText(
+                child: AppText(
                   method.labelKey.tr,
                   maxLines: 1,
-                  fontSize: 15,
+                  fontSize: AppFontSize.chat,
                   color: color.textNatural,
                 ),
               ),
@@ -350,7 +352,7 @@ class _RadioDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       width: 20,
@@ -391,8 +393,8 @@ class _PayBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
-        color: context.color.backgroundBase,
-        border: Border(top: BorderSide(color: context.color.strokeDark)),
+        color: appColors.backgroundBase,
+        border: Border(top: BorderSide(color: appColors.strokeDark)),
       ),
       child: Row(
         children: [
@@ -400,32 +402,32 @@ class _PayBar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomText(
+                AppText(
                   plan.dueToday,
                   maxLines: 1,
-                  fontSize: 20,
+                  fontSize: AppFontSize.h2,
                   fontWeight: FontWeight.w700,
-                  color: context.color.textNatural,
+                  color: appColors.textNatural,
                 ),
                 const SizedBox(height: 2),
-                CustomText(
+                AppText(
                   plan.autoChargeKey.tr,
                   maxLines: 2,
-                  fontSize: 12,
-                  color: context.color.textBody,
+                  fontSize: AppFontSize.overline,
+                  color: appColors.textBody,
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Obx(
             () => AppButton(
-              label: 'upgrade_pay_now'.tr,
+              label: AppStrings.upgradePayNow.tr,
               icon: null,
               onPressed: controller.isPaying.value ? null : controller.onPayNow,
               height: 46,
               width: 150,
-              fontSize: 15,
+              fontSize: AppFontSize.chat,
             ),
           ),
         ],

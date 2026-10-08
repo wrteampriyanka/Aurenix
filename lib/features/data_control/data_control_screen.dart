@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_settings_tile.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_settings_tile.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/data_control/controllers/data_control_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class DataControlScreen extends GetView<DataControlController> {
   const DataControlScreen({super.key});
@@ -15,15 +18,15 @@ class DataControlScreen extends GetView<DataControlController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'data_control_title'.tr,
+      title: AppStrings.dataControlTitle.tr,
       bottom: AppButton(
-        label: 'data_control_delete_account'.tr,
+        label: AppStrings.dataControlDeleteAccount.tr,
         icon: null,
         height: 52,
-        fontSize: 16,
-        color: context.color.upgradeButton,
-        highlightColor: context.color.upgradeButtonHighlight,
-        borderColor: context.color.upgradeButtonBorder,
+        fontSize: AppFontSize.body,
+        color: appColors.upgradeButton,
+        highlightColor: appColors.upgradeButtonHighlight,
+        borderColor: appColors.upgradeButtonBorder,
         onPressed: controller.onDeleteAccount,
       ),
       child: Column(
@@ -31,50 +34,50 @@ class DataControlScreen extends GetView<DataControlController> {
         children: [
           Obx(
             () => AppToggleCard(
-              title: 'data_control_improve_title'.tr,
-              subtitle: 'data_control_improve_subtitle'.tr,
+              title: AppStrings.dataControlImproveTitle.tr,
+              subtitle: AppStrings.dataControlImproveSubtitle.tr,
               value: controller.improveModel.value,
               onChanged: controller.onImproveModel,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           AppSettingsTile(
             icon: PhosphorIconsRegular.fileText,
-            title: 'data_control_export_title'.tr,
-            subtitle: 'data_control_export_subtitle'.tr,
+            title: AppStrings.dataControlExportTitle.tr,
+            subtitle: AppStrings.dataControlExportSubtitle.tr,
             onTap: controller.onExportData,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           AppSettingsTile(
             icon: PhosphorIconsRegular.trash,
-            title: 'data_control_delete_conversations'.tr,
+            title: AppStrings.dataControlDeleteConversations.tr,
             onTap: controller.onDeleteConversationData,
           ),
-          _SectionLabel('data_control_voice_section'.tr),
+          _SectionLabel(AppStrings.dataControlVoiceSection.tr),
           Obx(
             () => AppToggleCard(
-              title: 'data_control_voice_title'.tr,
-              subtitle: 'data_control_voice_subtitle'.tr,
+              title: AppStrings.dataControlVoiceTitle.tr,
+              subtitle: AppStrings.dataControlVoiceSubtitle.tr,
               value: controller.includeVoiceData.value,
               onChanged: controller.onIncludeVoiceData,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           AppSettingsTile(
             icon: PhosphorIconsRegular.trash,
-            title: 'data_control_delete_voice'.tr,
+            title: AppStrings.dataControlDeleteVoice.tr,
             onTap: controller.onDeleteVoiceData,
           ),
-          _SectionLabel('data_control_history_section'.tr),
+          _SectionLabel(AppStrings.dataControlHistorySection.tr),
           AppSettingsTile(
             icon: PhosphorIconsRegular.arrowCircleDown,
-            title: 'data_control_archive_all'.tr,
+            title: AppStrings.dataControlArchiveAll.tr,
             onTap: controller.onArchiveAllChats,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           AppSettingsTile(
             icon: PhosphorIconsRegular.trash,
-            title: 'data_control_delete_all_chats'.tr,
+            title: AppStrings.dataControlDeleteAllChats.tr,
             onTap: controller.onDeleteAllChats,
           ),
         ],
@@ -92,11 +95,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 10),
-      child: CustomText(
+      child: AppText(
         text,
         maxLines: 1,
-        fontSize: 12,
-        color: context.color.textBody,
+        fontSize: AppFontSize.overline,
+        color: appColors.textBody,
       ),
     );
   }

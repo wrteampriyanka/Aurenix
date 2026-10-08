@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_search_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_search_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
 import 'package:aurenix/features/archive_chats/controllers/archive_chats_controller.dart';
+import 'package:aurenix/features/home/models/chat_summary.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class ArchiveChatsScreen extends GetView<ArchiveChatsController> {
   const ArchiveChatsScreen({super.key});
@@ -15,12 +18,12 @@ class ArchiveChatsScreen extends GetView<ArchiveChatsController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'archive_chats_title'.tr,
+      title: AppStrings.archiveChatsTitle.tr,
       header: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: AppSearchField(
           controller: controller.searchController,
-          hintText: 'archive_chats_search_hint'.tr,
+          hintText: AppStrings.archiveChatsSearchHint.tr,
         ),
       ),
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -41,7 +44,7 @@ class _ChatsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.color.tileBorder),
+        border: Border.all(color: appColors.tileBorder),
       ),
       child: AnimatedSize(
         duration: const Duration(milliseconds: 260),
@@ -52,13 +55,13 @@ class _ChatsCard extends StatelessWidget {
           if (chats.isEmpty) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              child: CustomText(
+              child: AppText(
                 controller.chats.isEmpty
-                    ? 'archive_chats_empty'.tr
-                    : 'sidebar_no_chats'.tr,
-                fontSize: 14,
+                    ? AppStrings.archiveChatsEmpty.tr
+                    : AppStrings.sidebarNoChats.tr,
+                fontSize: AppFontSize.label,
                 textAlign: TextAlign.center,
-                color: context.color.textBody,
+                color: appColors.textBody,
               ),
             );
           }
@@ -66,11 +69,7 @@ class _ChatsCard extends StatelessWidget {
             children: [
               for (final (i, chat) in chats.indexed) ...[
                 if (i > 0)
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: context.color.divider,
-                  ),
+                  Divider(height: 1, thickness: 1, color: appColors.divider),
                 _ChatRow(
                   chat: chat,
                   onTap: () => controller.onChat(chat),
@@ -109,11 +108,11 @@ class _ChatRow extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: CustomText(
+                child: AppText(
                   chat.title,
                   maxLines: 1,
-                  fontSize: 15,
-                  color: context.color.textNatural,
+                  fontSize: AppFontSize.chat,
+                  color: appColors.textNatural,
                 ),
               ),
               _MoreMenu(onSelected: onAction),
@@ -133,7 +132,7 @@ class _MoreMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return PopupMenuButton<ArchivedChatAction>(
       onSelected: onSelected,
       padding: EdgeInsets.zero,
@@ -146,14 +145,14 @@ class _MoreMenu extends StatelessWidget {
         _item(
           context,
           ArchivedChatAction.unarchive,
-          'archive_chats_unarchive'.tr,
+          AppStrings.archiveChatsUnarchive.tr,
           PhosphorIconsRegular.arrowCircleUp,
           color.textNatural,
         ),
         _item(
           context,
           ArchivedChatAction.delete,
-          'archive_chats_delete'.tr,
+          AppStrings.archiveChatsDelete.tr,
           PhosphorIconsRegular.trash,
           color.error,
         ),
@@ -183,8 +182,8 @@ class _MoreMenu extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 20, color: tint),
-          const SizedBox(width: 12),
-          CustomText(label, fontSize: 14, color: tint),
+          const SizedBox(width: AppSpacing.md),
+          AppText(label, fontSize: AppFontSize.label, color: tint),
         ],
       ),
     );

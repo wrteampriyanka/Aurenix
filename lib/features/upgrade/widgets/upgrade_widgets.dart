@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/upgrade/models/upgrade_plan.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
 
 /// Round frosted button at the top left of the upgrade screens (close/back).
 class UpgradeTopButton extends StatelessWidget {
@@ -15,18 +17,18 @@ class UpgradeTopButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Material(
-          color: context.color.tileFillHighlight,
+          color: appColors.tileFillHighlight,
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
             child: SizedBox.square(
               dimension: 44,
-              child: Icon(icon, size: 20, color: context.color.textNatural),
+              child: Icon(icon, size: 20, color: appColors.textNatural),
             ),
           ),
         ),
@@ -50,24 +52,24 @@ class PlanPriceRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomText(
+              AppText(
                 plan.priceKey.tr,
                 maxLines: 1,
-                fontSize: 20,
+                fontSize: AppFontSize.h2,
                 fontWeight: FontWeight.w700,
-                color: context.color.textNatural,
+                color: appColors.textNatural,
               ),
               const SizedBox(height: 2),
-              CustomText(
+              AppText(
                 plan.renewalKey.tr,
                 maxLines: 1,
-                fontSize: 13,
-                color: context.color.textBody,
+                fontSize: AppFontSize.caption,
+                color: appColors.textBody,
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         action,
       ],
     );

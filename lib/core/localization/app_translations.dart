@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
@@ -15,10 +16,12 @@ class AppTranslations extends Translations {
   static Future<AppTranslations> load() async {
     final keys = <String, Map<String, String>>{};
     for (final locale in _locales) {
-      // Uncached, so a hot reload picks up edits to the JSON files.
+      // Uncached in debug, so a hot reload picks up edits to the JSON
+      // files. In release that would re-read three files on every cold
+      // start for nothing.
       final raw = await rootBundle.loadString(
         'assets/translations/$locale.json',
-        cache: false,
+        cache: !kDebugMode,
       );
       keys[locale] = Map<String, String>.from(jsonDecode(raw) as Map);
     }

@@ -1,4 +1,4 @@
-package com.example.aurenix
+package com.wrteam.aurenix
 
 import android.app.Activity
 import android.app.Notification
@@ -37,7 +37,7 @@ import kotlin.math.max
  */
 class ScreenShareService : Service() {
     companion object {
-        const val ACTION_START = "com.example.aurenix.screen_share.START"
+        const val ACTION_START = "com.wrteam.aurenix.screen_share.START"
         const val EXTRA_RESULT_CODE = "result_code"
         const val EXTRA_RESULT_DATA = "result_data"
         const val EXTRA_CHANNEL_NAME = "channel_name"

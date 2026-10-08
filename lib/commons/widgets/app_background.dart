@@ -3,11 +3,11 @@ import 'dart:math' as math;
 import 'dart:ui' show PointMode;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/commons/widgets/app_system_ui_overlay.dart';
 import 'package:aurenix/utils/elapsed_time_mixin.dart';
-import 'package:aurenix/features/widgets/k_glowing_blurs.dart';
+import 'package:aurenix/commons/widgets/app_glowing_blurs.dart';
 
 /// Shared dark screen background: gradient + twinkling dot matrix + glows.
 ///
@@ -42,32 +42,29 @@ class AppBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+    return AppSystemUiOverlay(
       child: DecoratedBox(
         decoration: deepTop
-            ? BoxDecoration(color: context.color.backgroundBase)
+            ? BoxDecoration(color: appColors.backgroundBase)
             : BoxDecoration(
                 // Blue at the top, easing smoothly into the flat dark base.
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    context.color.backgroundTop,
+                    appColors.backgroundTop,
                     Color.lerp(
-                      context.color.backgroundTop,
-                      context.color.backgroundTopFade,
+                      appColors.backgroundTop,
+                      appColors.backgroundTopFade,
                       0.6,
                     )!,
-                    context.color.backgroundTopFade,
+                    appColors.backgroundTopFade,
                     Color.lerp(
-                      context.color.backgroundTopFade,
-                      context.color.backgroundBase,
+                      appColors.backgroundTopFade,
+                      appColors.backgroundBase,
                       0.6,
                     )!,
-                    context.color.backgroundBase,
+                    appColors.backgroundBase,
                   ],
                   stops: const [0, 0.12, 0.24, 0.36, 0.5],
                 ),
@@ -77,7 +74,7 @@ class AppBackground extends StatelessWidget {
           children: [
             if (deepTop) const _DeepTop(),
             if (glows case final glows? when glows.isNotEmpty)
-              KGlowingBlurs(glows: glows),
+              AppGlowingBlurs(glows: glows),
             if (showGrid && !gridOverContent) const _DotMatrix(),
             child,
             // Drawn over the content so the dots also show on the orb.
@@ -122,7 +119,7 @@ class _DeepTop extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: context.color.backgroundTopBand,
+              colors: appColors.backgroundTopBand,
               stops: const [0, 0.11, 0.26, 0.51, 0.72, 0.92, 1],
             ),
           ),
@@ -146,7 +143,7 @@ class _DotMatrixState extends State<_DotMatrix>
     with SingleTickerProviderStateMixin, ElapsedTimeMixin {
   @override
   Widget build(BuildContext context) {
-    final dotColor = context.color.textNatural;
+    final dotColor = appColors.textNatural;
     return IgnorePointer(
       child: Stack(
         fit: StackFit.expand,

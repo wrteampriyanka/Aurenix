@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_settings_tile.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_settings_tile.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/customize_ai/controllers/customize_ai_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class CustomizeAiScreen extends GetView<CustomizeAiController> {
   const CustomizeAiScreen({super.key});
@@ -16,12 +19,12 @@ class CustomizeAiScreen extends GetView<CustomizeAiController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'customize_ai_title'.tr,
+      title: AppStrings.customizeAiTitle.tr,
       bottom: AppButton(
-        label: 'customize_ai_save'.tr,
+        label: AppStrings.customizeAiSave.tr,
         icon: null,
         height: 52,
-        fontSize: 16,
+        fontSize: AppFontSize.body,
         onPressed: controller.onSave,
       ),
       child: Column(
@@ -29,13 +32,13 @@ class CustomizeAiScreen extends GetView<CustomizeAiController> {
         children: [
           Obx(
             () => AppToggleCard(
-              title: 'customize_ai_toggle_title'.tr,
-              subtitle: 'customize_ai_toggle_subtitle'.tr,
+              title: AppStrings.customizeAiToggleTitle.tr,
+              subtitle: AppStrings.customizeAiToggleSubtitle.tr,
               value: controller.isEnabled.value,
               onChanged: controller.onToggle,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           // The fields only apply while customization is on.
           Obx(
             () => IgnorePointer(
@@ -47,11 +50,11 @@ class CustomizeAiScreen extends GetView<CustomizeAiController> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           AppSettingsTile(
             icon: PhosphorIconsRegular.notebook,
-            title: 'customize_ai_memories'.tr,
-            subtitle: 'customize_ai_memories_subtitle'.tr,
+            title: AppStrings.customizeAiMemories.tr,
+            subtitle: AppStrings.customizeAiMemoriesSubtitle.tr,
             onTap: controller.onMemories,
           ),
         ],
@@ -70,37 +73,39 @@ class _CustomizeForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SectionLabel('customize_ai_personality'.tr),
+        _SectionLabel(AppStrings.customizeAiPersonality.tr),
         _PersonalityField(controller: controller),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         AppTextField(
           controller: controller.instructionsController,
-          hint: 'customize_ai_instructions_hint'.tr,
+          label: AppStrings.customizeAiInstructionsLabel.tr,
+          hint: AppStrings.customizeAiInstructionsHint.tr,
           keyboardType: TextInputType.multiline,
           minLines: 3,
           maxLines: 5,
         ),
-        const SizedBox(height: 20),
-        _SectionLabel('customize_ai_your_info'.tr),
+        const SizedBox(height: AppSpacing.xl),
+        _SectionLabel(AppStrings.customizeAiYourInfo.tr),
         AppTextField(
           controller: controller.nicknameController,
-          hint: 'customize_ai_nickname_hint'.tr,
+          label: AppStrings.customizeAiNicknameLabel.tr,
           prefixIcon: PhosphorIconsRegular.userCircle,
           textInputAction: TextInputAction.next,
           autofillHints: const [AutofillHints.nickname],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         AppTextField(
           controller: controller.occupationController,
-          hint: 'customize_ai_occupation_hint'.tr,
+          label: AppStrings.customizeAiOccupationLabel.tr,
           prefixIcon: PhosphorIconsRegular.briefcase,
           textInputAction: TextInputAction.next,
           autofillHints: const [AutofillHints.jobTitle],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         AppTextField(
           controller: controller.aboutController,
-          hint: 'customize_ai_about_hint'.tr,
+          label: AppStrings.customizeAiAboutLabel.tr,
+          hint: AppStrings.customizeAiAboutHint.tr,
           keyboardType: TextInputType.multiline,
           minLines: 3,
           maxLines: 5,
@@ -119,11 +124,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: CustomText(
+      child: AppText(
         text,
         maxLines: 1,
-        fontSize: 13,
-        color: context.color.textBody,
+        fontSize: AppFontSize.caption,
+        color: appColors.textBody,
       ),
     );
   }
@@ -141,13 +146,13 @@ class _PersonalityField extends StatelessWidget {
       initialValue: controller.personality.value,
       onChanged: controller.onPersonalityChanged,
       isExpanded: true,
-      dropdownColor: context.color.inputFill,
+      dropdownColor: appColors.inputFill,
       borderRadius: BorderRadius.circular(14),
       style: AppTextField.textStyle(context),
       icon: Icon(
         PhosphorIconsRegular.caretDown,
         size: 20,
-        color: context.color.textNatural,
+        color: appColors.textNatural,
       ),
       decoration: AppTextField.decoration(
         context,
@@ -157,11 +162,11 @@ class _PersonalityField extends StatelessWidget {
         for (final key in CustomizeAiController.personalityKeys)
           DropdownMenuItem(
             value: key,
-            child: CustomText(
+            child: AppText(
               key.tr,
               maxLines: 1,
-              fontSize: 16,
-              color: context.color.textNatural,
+              fontSize: AppFontSize.body,
+              color: appColors.textNatural,
             ),
           ),
       ],

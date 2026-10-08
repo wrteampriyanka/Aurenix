@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
 
 /// Row of [length] boxes for entering a numeric verification code.
 ///
@@ -140,18 +141,16 @@ class _OtpBox extends StatelessWidget {
       duration: const Duration(milliseconds: 150),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: active ? context.color.backgroundBase : context.color.inputFill,
+        color: active ? appColors.backgroundBase : appColors.inputFill,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: active ? context.color.primary : context.color.inputBorder,
+          color: active ? appColors.primary : appColors.inputBorder,
         ),
       ),
-      child: CustomText(
+      child: AppText(
         digit ?? '0',
-        fontSize: 16,
-        color: digit != null
-            ? context.color.textNatural
-            : context.color.textBody,
+        fontSize: AppFontSize.body,
+        color: digit != null ? appColors.textNatural : appColors.textBody,
       ),
     );
   }

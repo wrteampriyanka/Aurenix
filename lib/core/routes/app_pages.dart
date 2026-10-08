@@ -3,10 +3,6 @@ import 'package:get/get.dart';
 
 import 'package:aurenix/features/archive_chats/bindings/archive_chats_binding.dart';
 import 'package:aurenix/features/archive_chats/archive_chats_screen.dart';
-import 'package:aurenix/features/budget/bindings/budget_binding.dart';
-import 'package:aurenix/features/budget/budget_screen.dart';
-import 'package:aurenix/features/categories/bindings/categories_binding.dart';
-import 'package:aurenix/features/categories/categories_screen.dart';
 import 'package:aurenix/features/collaboration/bindings/collaboration_binding.dart';
 import 'package:aurenix/features/collaboration/collaboration_screen.dart';
 import 'package:aurenix/features/connected_apps/bindings/connected_apps_binding.dart';
@@ -44,12 +40,8 @@ import 'package:aurenix/features/register/bindings/register_binding.dart';
 import 'package:aurenix/features/register/register_screen.dart';
 import 'package:aurenix/features/reset_password/bindings/reset_password_binding.dart';
 import 'package:aurenix/features/reset_password/reset_password_screen.dart';
-import 'package:aurenix/features/savings/bindings/savings_binding.dart';
-import 'package:aurenix/features/savings/savings_screen.dart';
 import 'package:aurenix/features/splash/bindings/splash_binding.dart';
 import 'package:aurenix/features/splash/splash_screen.dart';
-import 'package:aurenix/features/transactions/bindings/transactions_binding.dart';
-import 'package:aurenix/features/transactions/transactions_screen.dart';
 import 'package:aurenix/features/upgrade/bindings/checkout_binding.dart';
 import 'package:aurenix/features/upgrade/bindings/upgrade_binding.dart';
 import 'package:aurenix/features/upgrade/checkout_screen.dart';
@@ -125,12 +117,6 @@ class AppPages {
       AppRoutes.archiveChats,
       () => const ArchiveChatsScreen(),
       ArchiveChatsBinding(),
-    ),
-    _screen(AppRoutes.budget, () => const BudgetScreen(), BudgetBinding()),
-    _screen(
-      AppRoutes.categories,
-      () => const CategoriesScreen(),
-      CategoriesBinding(),
     ),
     _screen(
       AppRoutes.checkout,
@@ -243,16 +229,10 @@ class AppPages {
       transitionDuration: _authTransitionDuration,
       curve: _authTransitionCurve,
     ),
-    _screen(AppRoutes.savings, () => const SavingsScreen(), SavingsBinding()),
     GetPage(
       name: AppRoutes.splash,
       page: () => const SplashScreen(),
       binding: SplashBinding(),
-    ),
-    _screen(
-      AppRoutes.transactions,
-      () => const TransactionsScreen(),
-      TransactionsBinding(),
     ),
     _sheet(AppRoutes.upgrade, () => const UpgradeScreen(), UpgradeBinding()),
     _sheet(

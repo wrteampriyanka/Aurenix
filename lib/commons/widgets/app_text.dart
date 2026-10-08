@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
 
-class CustomText extends StatelessWidget {
-  const CustomText(
+class AppText extends StatelessWidget {
+  const AppText(
     this.text, {
     super.key,
     this.color,
@@ -17,8 +17,27 @@ class CustomText extends StatelessWidget {
     this.underlineOrLineColor,
     this.letterSpacing,
     this.textBaseline,
-    this.textSpan,
-  });
+  }) : textSpan = null;
+
+  /// Renders [span] instead of a plain string, for text with links or mixed
+  /// styling. Avoids the empty positional [text] the plain constructor would
+  /// otherwise need.
+  const AppText.rich(
+    InlineSpan span, {
+    super.key,
+    this.color,
+    this.showLineThrough = false,
+    this.fontWeight,
+    this.fontStyle,
+    this.fontSize,
+    this.textAlign,
+    this.maxLines = 10,
+    this.showUnderline = false,
+    this.underlineOrLineColor,
+    this.letterSpacing,
+    this.textBaseline,
+  }) : textSpan = span,
+       text = '';
 
   final String text;
   final Color? color;
@@ -33,7 +52,7 @@ class CustomText extends StatelessWidget {
   final double? letterSpacing;
   final TextBaseline? textBaseline;
 
-  /// When set, renders [Text.rich] with this span instead of [text].
+  /// Set by [AppText.rich]; null for the plain constructor.
   final InlineSpan? textSpan;
 
   @override
@@ -45,7 +64,7 @@ class CustomText extends StatelessWidget {
         : null;
 
     final style = TextStyle(
-      color: color ?? context.color.textPrimary,
+      color: color ?? appColors.textPrimary,
       fontWeight: fontWeight,
       fontStyle: fontStyle,
       fontSize: fontSize,

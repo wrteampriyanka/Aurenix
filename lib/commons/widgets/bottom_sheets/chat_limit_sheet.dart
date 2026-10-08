@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/home/widgets/chat_upgrade_card.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
 
 /// Comes up over the chat once the free allowance is used up: the paid plan
 /// up top, why the chat stopped and when it opens again, and its price with
@@ -46,7 +47,7 @@ class ChatLimitSheet extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: context.color.sheetBackground,
+        color: appColors.sheetBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -82,7 +83,7 @@ class _ProHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Container(
       height: 188,
       color: color.sheetBackground,
@@ -129,9 +130,9 @@ class _ProHeader extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CustomText(
+                AppText(
                   'Aurenix',
-                  fontSize: 40,
+                  fontSize: AppFontSize.display,
                   fontWeight: FontWeight.w700,
                   color: color.textNatural,
                 ),
@@ -145,9 +146,9 @@ class _ProHeader extends StatelessWidget {
                     color: color.textNatural,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: CustomText(
+                  child: AppText(
                     'Pro',
-                    fontSize: 30,
+                    fontSize: AppFontSize.headline,
                     fontWeight: FontWeight.w700,
                     color: color.backgroundTopBand.last,
                   ),

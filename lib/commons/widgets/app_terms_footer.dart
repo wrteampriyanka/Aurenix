@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// "By clicking continue you agree to our Terms & Conditions and Privacy
 /// Policy." footer shown at the bottom of the auth screens.
@@ -20,32 +22,31 @@ class AppTermsFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final linkStyle = TextStyle(
-      color: context.color.textNatural,
+      color: appColors.textNatural,
       decoration: TextDecoration.underline,
-      decorationColor: context.color.textNatural,
+      decorationColor: appColors.textNatural,
     );
 
-    return CustomText(
-      '',
-      fontSize: 12,
-      textAlign: TextAlign.center,
-      color: context.color.textBody,
-      textSpan: TextSpan(
+    return AppText.rich(
+      TextSpan(
         children: [
-          TextSpan(text: 'terms_prefix'.tr),
+          TextSpan(text: AppStrings.termsPrefix.tr),
           TextSpan(
-            text: 'terms_and_conditions'.tr,
+            text: AppStrings.termsAndConditions.tr,
             recognizer: termsRecognizer,
             style: linkStyle,
           ),
-          TextSpan(text: 'and'.tr),
+          TextSpan(text: AppStrings.and.tr),
           TextSpan(
-            text: 'privacy_policy'.tr,
+            text: AppStrings.privacyPolicy.tr,
             recognizer: privacyRecognizer,
             style: linkStyle,
           ),
         ],
       ),
+      fontSize: AppFontSize.overline,
+      textAlign: TextAlign.center,
+      color: appColors.textBody,
     );
   }
 }

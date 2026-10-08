@@ -48,10 +48,10 @@ class _WaveOrbState extends State<WaveOrb>
         child: CustomPaint(
           painter: _WaveOrbPainter(
             time: time,
-            bright: context.color.orbBright,
-            base: context.color.orbBase,
-            deep: context.color.primary,
-            ring: context.color.orbRing,
+            bright: appColors.orbBright,
+            base: appColors.orbBase,
+            deep: appColors.primary,
+            ring: appColors.orbRing,
             showRing: widget.showRing,
             showDots: widget.showDots,
             speed: widget.speed,
@@ -169,7 +169,7 @@ class _WaveOrbPainter extends CustomPainter {
     final waves = [
       // Middle light wave: mirror of the top one, its trough under the top
       // crest.
-      _Wave(
+      const _Wave(
         level: 0.16,
         amplitude: 0.26,
         phase: p + math.pi,
@@ -178,7 +178,7 @@ class _WaveOrbPainter extends CustomPainter {
         alpha: 0.24,
       ),
       // Top light wave: the big crest just left of centre.
-      _Wave(
+      const _Wave(
         level: 0.0,
         amplitude: 0.26,
         rise: 1,

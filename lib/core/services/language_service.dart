@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/storage/storage_service.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// One of the languages the app can be shown in, picked from Profile.
 class AppLanguage {
@@ -34,21 +35,21 @@ class LanguageService {
   static const english = AppLanguage(
     code: 'en_US',
     locale: Locale('en', 'US'),
-    nameKey: 'language_english',
+    nameKey: AppStrings.languageEnglish,
     nativeName: 'English',
   );
 
   static const hindi = AppLanguage(
     code: 'hi_IN',
     locale: Locale('hi', 'IN'),
-    nameKey: 'language_hindi',
+    nameKey: AppStrings.languageHindi,
     nativeName: 'हिन्दी',
   );
 
   static const arabic = AppLanguage(
     code: 'ar_SA',
     locale: Locale('ar', 'SA'),
-    nameKey: 'language_arabic',
+    nameKey: AppStrings.languageArabic,
     nativeName: 'العربية',
   );
 
@@ -76,12 +77,14 @@ class LanguageService {
     selected.value = language;
     switching.value = true;
     try {
-      // Rebuilds every widget so each `.tr` string is re-resolved.
-      await Get.updateLocale(language.locale);
+      // Saved first: if the rebuild below throws, the choice is still the
+      // one the user made rather than reverting on the next launch.
       await StorageService.instance.setString(
         StorageService.languageKey,
         language.code,
       );
+      // Rebuilds every widget so each `.tr` string is re-resolved.
+      await Get.updateLocale(language.locale);
     } finally {
       switching.value = false;
     }

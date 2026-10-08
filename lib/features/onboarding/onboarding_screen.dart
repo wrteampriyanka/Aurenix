@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/app_background.dart';
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_background.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/onboarding/controllers/onboarding_controller.dart';
 import 'package:aurenix/features/onboarding/widgets/integration_hub.dart';
 import 'package:aurenix/features/onboarding/widgets/wave_orb.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class OnboardingScreen extends GetView<OnboardingController> {
   const OnboardingScreen({super.key});
@@ -15,7 +18,7 @@ class OnboardingScreen extends GetView<OnboardingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppBackground(
         // The orb lights the top here, so keep the softer fade.
         deepTop: false,
@@ -39,19 +42,19 @@ class OnboardingScreen extends GetView<OnboardingController> {
                               width: 320,
                               child: Column(
                                 children: [
-                                  CustomText(
-                                    'onboarding_title'.tr,
-                                    fontSize: 30,
+                                  AppText(
+                                    AppStrings.onboardingTitle.tr,
+                                    fontSize: AppFontSize.headline,
                                     fontWeight: FontWeight.w600,
                                     textAlign: TextAlign.center,
-                                    color: context.color.textNatural,
+                                    color: appColors.textNatural,
                                   ),
                                   const SizedBox(height: 10),
-                                  CustomText(
-                                    'onboarding_subtitle'.tr,
-                                    fontSize: 16,
+                                  AppText(
+                                    AppStrings.onboardingSubtitle.tr,
+                                    fontSize: AppFontSize.body,
                                     textAlign: TextAlign.center,
-                                    color: context.color.textBody,
+                                    color: appColors.textBody,
                                   ),
                                 ],
                               ),
@@ -62,12 +65,12 @@ class OnboardingScreen extends GetView<OnboardingController> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.lg),
                 AppButton(
-                  label: 'get_started'.tr,
+                  label: AppStrings.getStarted.tr,
                   onPressed: controller.onGetStarted,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.lg),
               ],
             ),
           ),

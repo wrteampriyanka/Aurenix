@@ -3,9 +3,12 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/presets/controllers/presets_controller.dart';
+import 'package:aurenix/features/presets/models/preset.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Flies a preset card between the list and the detail screen: the card
 /// grows from its small size to the big header card, the avatar glides
@@ -41,7 +44,7 @@ class PresetHero extends StatelessWidget {
     final push = direction == HeroFlightDirection.push;
     final small = _FlightEnd.of(push ? fromContext : toContext);
     final big = _FlightEnd.of(push ? toContext : fromContext);
-    final color = flightContext.color;
+    final color = appColors;
     return AnimatedBuilder(
       animation: animation,
       builder: (context, _) {
@@ -217,7 +220,7 @@ class PresetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: color.inputFill,
       shape: RoundedRectangleBorder(
@@ -244,13 +247,13 @@ class PresetName extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomText(
+    return AppText(
       name,
       maxLines: 1,
       fontSize: fontSize,
       fontWeight: FontWeight.w700,
       textAlign: textAlign,
-      color: context.color.textNatural,
+      color: appColors.textNatural,
     );
   }
 }
@@ -265,19 +268,19 @@ class PresetDescription extends StatelessWidget {
 
   static const double _fontSize = 14;
 
-  /// Two lines at [CustomText]'s 1.3 line height.
+  /// Two lines at [AppText]'s 1.3 line height.
   static const double height = _fontSize * 1.3 * 2;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
-      child: CustomText(
+      child: AppText(
         description,
         maxLines: 2,
         fontSize: _fontSize,
         textAlign: textAlign,
-        color: context.color.textBody,
+        color: appColors.textBody,
       ),
     );
   }
@@ -313,7 +316,7 @@ class PresetAvatar extends StatelessWidget {
     // screen never stalls on a second one.
     final cacheWidth = (_decodeSize * MediaQuery.devicePixelRatioOf(context))
         .round();
-    final border = Border.all(color: context.color.profileCardBorder);
+    final border = Border.all(color: appColors.profileCardBorder);
     return _AvatarMarker(
       image: image,
       child: Container(
@@ -340,16 +343,16 @@ class PresetRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(PhosphorIconsFill.star, size: 16, color: color.ratingStar),
         const SizedBox(width: 6),
-        CustomText(
+        AppText(
           rating.toStringAsFixed(1),
           maxLines: 1,
-          fontSize: 14,
+          fontSize: AppFontSize.label,
           color: color.textNatural,
         ),
       ],
@@ -377,11 +380,11 @@ class PresetAuthorRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
-    final author = CustomText(
-      'presets_by'.trParams({'name': preset.author}),
+    final color = appColors;
+    final author = AppText(
+      AppStrings.presetsBy.trParams({'name': preset.author}),
       maxLines: 1,
-      fontSize: 14,
+      fontSize: AppFontSize.label,
       color: color.textNatural,
     );
     final end = trailing ?? PresetRating(rating: preset.rating);
@@ -409,7 +412,7 @@ class PresetAuthorRow extends StatelessWidget {
       return Row(
         children: [
           Expanded(child: author),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           end,
         ],
       );
@@ -433,7 +436,7 @@ class PresetVisitSiteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: color.sidebarSelected,
       shape: StadiumBorder(side: BorderSide(color: color.tileBorder)),
@@ -450,12 +453,12 @@ class PresetVisitSiteButton extends StatelessWidget {
                 size: 20,
                 color: color.textNatural,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Flexible(
-                child: CustomText(
-                  'presets_visit_site'.tr,
+                child: AppText(
+                  AppStrings.presetsVisitSite.tr,
                   maxLines: 1,
-                  fontSize: 14,
+                  fontSize: AppFontSize.label,
                   fontWeight: FontWeight.w500,
                   color: color.textNatural,
                 ),
@@ -483,7 +486,7 @@ class PresetQuickStarters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return SizedBox(
       height: 44,
       child: ListView.separated(
@@ -500,10 +503,10 @@ class PresetQuickStarters extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Center(
-                child: CustomText(
+                child: AppText(
                   starters[i],
                   maxLines: 1,
-                  fontSize: 14,
+                  fontSize: AppFontSize.label,
                   color: color.textNatural,
                 ),
               ),
@@ -523,11 +526,11 @@ class PresetSectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomText(
+    return AppText(
       title,
       maxLines: 1,
-      fontSize: 13,
-      color: context.color.textBody,
+      fontSize: AppFontSize.caption,
+      color: appColors.textBody,
     );
   }
 }

@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:audio_session/audio_session.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -14,25 +13,10 @@ import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/services/screen_share_service.dart';
 import 'package:aurenix/core/services/voice_service.dart';
-import 'package:aurenix/features/widgets/bottom_sheets/audio_output_sheet.dart';
-import 'package:aurenix/features/widgets/app_snackbar.dart';
-
-enum LiveStatus { idle, listening, thinking, speaking }
-
-/// Somewhere the voice can play: the phone speaker or connected headphones.
-class AudioOutput {
-  const AudioOutput({
-    required this.id,
-    required this.name,
-    this.isSpeaker = false,
-  });
-
-  static const speaker = AudioOutput(id: 'speaker', name: '', isSpeaker: true);
-
-  final String id;
-  final String name;
-  final bool isSpeaker;
-}
+import 'package:aurenix/commons/widgets/bottom_sheets/audio_output_sheet.dart';
+import 'package:aurenix/commons/widgets/app_snackbar.dart';
+import 'package:aurenix/features/live_talk/models/audio_output.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Hands-free voice chat: listens, sends what was said to the AI, reads the
 /// reply aloud, then listens again. With the camera on, each question goes
@@ -58,7 +42,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
   final isSharingScreen = false.obs;
 
   final _speech = SpeechToText();
-  final _tts = FlutterTts();
+  final _voice = VoiceService.instance;
   final _history = <ChatTurn>[];
 
   StreamSubscription<ChatChunk>? _reply;
@@ -102,13 +86,13 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
           }
           isMuted.value = true;
           status.value = LiveStatus.idle;
-          AppSnackbar.error('chat_mic_unavailable'.tr);
+          AppSnackbar.error(AppStrings.chatMicUnavailable.tr);
         };
     } catch (_) {
       available = false;
     }
     if (!available) {
-      AppSnackbar.error('chat_mic_unavailable'.tr);
+      AppSnackbar.error(AppStrings.chatMicUnavailable.tr);
       return;
     }
     if (_closed || isMuted.value) return;
@@ -118,7 +102,6 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     await _speech.listen(
       onResult: _onResult,
       listenOptions: SpeechListenOptions(
-        partialResults: true,
         listenMode: ListenMode.dictation,
         pauseFor: const Duration(seconds: 2),
       ),
@@ -146,7 +129,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
   Future<void> _ask(String text) async {
     final turn = ++_turn;
     status.value = LiveStatus.thinking;
-    _speech.stop();
+    unawaited(_speech.stop());
     final image = await _snapshot();
     if (turn != _turn) return;
     // Only the latest photo is sent; earlier ones would make every request
@@ -162,12 +145,15 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
           onError: (Object e) {
             if (turn != _turn) return;
             _history.removeLast();
-            _speak(turn, e is ApiException ? e.message : 'chat_error'.tr);
+            _speak(
+              turn,
+              e is ApiException ? e.message : AppStrings.chatError.tr,
+            );
           },
           onDone: () {
             if (turn != _turn) return;
             _history[index] = ChatTurn(role: ChatRole.user, text: text);
-            final reply = _plainText(buffer.toString());
+            final reply = VoiceService.plainText(buffer.toString());
             _history.add(ChatTurn(role: ChatRole.model, text: reply));
             _speak(turn, reply);
           },
@@ -180,65 +166,23 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     status.value = LiveStatus.speaking;
     caption.value = text;
     try {
-      await _prepareTts();
-      for (final part in _speechParts(text)) {
-        if (turn != _turn) return;
-        if (await _tts.speak(part) != 1) break;
-      }
+      await _voice.speak(text);
     } catch (_) {
       // Keep the conversation going with the caption only.
     }
     if (turn != _turn) return;
     status.value = LiveStatus.idle;
-    _listen();
+    unawaited(_listen());
   }
-
-  Future<void> _prepareTts() async {
-    await _tts.awaitSpeakCompletion(true);
-    if (GetPlatform.isIOS) {
-      await _tts.setSharedInstance(true);
-      await _tts.setIosAudioCategory(IosTextToSpeechAudioCategory.playback, [
-        IosTextToSpeechAudioCategoryOptions.duckOthers,
-      ], IosTextToSpeechAudioMode.spokenAudio);
-    }
-    await VoiceService.instance.apply(_tts);
-  }
-
-  /// Sentence sized parts, since Android refuses to read long text at once.
-  static List<String> _speechParts(String text, {int maxLength = 1000}) {
-    final parts = <String>[];
-    var current = '';
-    for (final sentence in text.split(RegExp(r'(?<=[.!?\n])\s+'))) {
-      if (current.isNotEmpty &&
-          current.length + sentence.length + 1 > maxLength) {
-        parts.add(current);
-        current = '';
-      }
-      current = current.isEmpty ? sentence : '$current $sentence';
-      while (current.length > maxLength) {
-        parts.add(current.substring(0, maxLength));
-        current = current.substring(maxLength);
-      }
-    }
-    if (current.trim().isNotEmpty) parts.add(current);
-    return parts;
-  }
-
-  /// Markdown without the symbols, so they are neither shown nor read out.
-  static String _plainText(String markdown) => markdown
-      .replaceAllMapped(RegExp(r'\[([^\]]*)\]\([^)]*\)'), (m) => m[1]!)
-      .replaceAll(RegExp(r'[*_#`>|~]'), '')
-      .replaceAll(RegExp(r'^\s*[-+]\s+', multiLine: true), '')
-      .trim();
 
   /// Stops whatever is happening in the current turn.
   Future<void> _interrupt() async {
     _turn++;
-    _reply?.cancel();
+    unawaited(_reply?.cancel());
     _reply = null;
     status.value = LiveStatus.idle;
     await _speech.cancel();
-    await _tts.stop();
+    await _voice.stop();
   }
 
   void onToggleCaptions() => showCaptions.toggle();
@@ -312,7 +256,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
       await _interrupt();
       caption.value = '';
     } else {
-      _listen();
+      unawaited(_listen());
     }
   }
 
@@ -359,7 +303,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
       camera.value = controller;
     } catch (e) {
       debugPrint('Live talk camera failed: $e');
-      controller?.dispose();
+      unawaited(controller?.dispose());
       final denied = e is CameraException && e.code.startsWith('CameraAccess');
       AppSnackbar.error(
         (denied ? 'live_camera_denied' : 'live_camera_unavailable').tr,
@@ -403,13 +347,13 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
       await _closeCamera();
       _reopenCamera = false;
       final started = await ScreenShareService.instance.start(
-        channelName: 'live_share_channel'.tr,
-        title: 'live_share_notification_title'.tr,
-        text: 'live_share_notification_text'.tr,
+        channelName: AppStrings.liveShareChannel.tr,
+        title: AppStrings.liveShareNotificationTitle.tr,
+        text: AppStrings.liveShareNotificationText.tr,
       );
       if (_closed) return await ScreenShareService.instance.stop();
       if (started == null) {
-        AppSnackbar.error('live_share_unavailable'.tr);
+        AppSnackbar.error(AppStrings.liveShareUnavailable.tr);
       }
       // False means the user declined, which needs no message.
       if (started != true) return;
@@ -431,7 +375,7 @@ class LiveTalkController extends GetxController with WidgetsBindingObserver {
     await _interrupt();
     caption.value = '';
     await Get.toNamed(AppRoutes.voiceSettings);
-    if (!_closed) _listen();
+    if (!_closed) unawaited(_listen());
   }
 
   void onEnd() => Get.back();

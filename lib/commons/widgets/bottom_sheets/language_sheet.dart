@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/services/language_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Floating sheet listing the app languages. Tapping one switches the app
 /// to it (the highlight moves at once) and then closes the sheet.
@@ -40,7 +42,7 @@ class LanguageSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     final service = LanguageService.instance;
     return SafeArea(
       top: false,
@@ -69,10 +71,10 @@ class LanguageSheet extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-              child: CustomText(
-                'language_title'.tr,
+              child: AppText(
+                AppStrings.languageTitle.tr,
                 maxLines: 1,
-                fontSize: 18,
+                fontSize: AppFontSize.h3,
                 fontWeight: FontWeight.w600,
                 color: color.textNatural,
               ),
@@ -114,7 +116,7 @@ class _LanguageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     final name = language.nameKey.tr;
     // "English" in English needs no second line.
     final native = name == language.nativeName ? null : language.nativeName;
@@ -132,18 +134,18 @@ class _LanguageRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
+                    AppText(
                       name,
                       maxLines: 1,
-                      fontSize: 15,
+                      fontSize: AppFontSize.chat,
                       color: color.textNatural,
                     ),
                     if (native != null) ...[
                       const SizedBox(height: 2),
-                      CustomText(
+                      AppText(
                         native,
                         maxLines: 1,
-                        fontSize: 13,
+                        fontSize: AppFontSize.caption,
                         color: color.textBody,
                       ),
                     ],

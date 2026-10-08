@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
 
 /// Light pill button with a leading brand logo (e.g. Google, GitHub).
 class AppSocialButton extends StatelessWidget {
@@ -24,7 +26,7 @@ class AppSocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.color.socialButtonFill,
+      color: appColors.socialButtonFill,
       shape: const StadiumBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -36,14 +38,14 @@ class AppSocialButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(logo, width: 20, height: 20),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Flexible(
-                child: CustomText(
+                child: AppText(
                   label,
                   maxLines: 1,
-                  fontSize: 16,
+                  fontSize: AppFontSize.body,
                   fontWeight: FontWeight.w500,
-                  color: context.color.textPrimary,
+                  color: appColors.textOnLight,
                 ),
               ),
             ],

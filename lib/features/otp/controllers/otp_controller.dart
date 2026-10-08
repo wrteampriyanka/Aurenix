@@ -6,17 +6,7 @@ import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/services/session_service.dart';
-
-/// Why the code is being verified, which decides where Continue leads.
-enum OtpPurpose { register, resetPassword }
-
-/// Route arguments for the OTP screen.
-class OtpArgs {
-  const OtpArgs({required this.email, required this.purpose});
-
-  final String email;
-  final OtpPurpose purpose;
-}
+import 'package:aurenix/features/otp/models/otp_args.dart';
 
 class OtpController extends GetxController {
   static const codeLength = 4;
@@ -25,7 +15,11 @@ class OtpController extends GetxController {
   final codeController = TextEditingController();
   final codeFocusNode = FocusNode();
 
-  final OtpArgs? _args = Get.arguments as OtpArgs?;
+  /// Null when the route was opened without arguments; `as OtpArgs?` would
+  /// still throw on an argument of any other type.
+  final OtpArgs? _args = Get.arguments is OtpArgs
+      ? Get.arguments as OtpArgs
+      : null;
 
   /// Email the code was sent to.
   String? get email => _args?.email;
@@ -70,12 +64,12 @@ class OtpController extends GetxController {
     // TODO: verify the code for [email].
     switch (_args?.purpose) {
       case OtpPurpose.resetPassword:
-        Get.toNamed(AppRoutes.resetPassword, arguments: email);
+        unawaited(Get.toNamed(AppRoutes.resetPassword, arguments: email));
       case OtpPurpose.register || null:
         // Account is verified: remember the session, then clear the auth
         // screens so back can't return.
         await SessionService.instance.signIn();
-        Get.offAllNamed(AppRoutes.home);
+        unawaited(Get.offAllNamed(AppRoutes.home));
     }
   }
 

@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/services/voice_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/onboarding/widgets/wave_orb.dart';
 import 'package:aurenix/features/voice_settings/controllers/voice_settings_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class VoiceSettingsScreen extends GetView<VoiceSettingsController> {
   const VoiceSettingsScreen({super.key});
@@ -16,14 +19,14 @@ class VoiceSettingsScreen extends GetView<VoiceSettingsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppPlainBackground(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Header(onClose: controller.onDismiss),
-              Divider(height: 1, color: context.color.strokeDark),
+              Divider(height: 1, color: appColors.strokeDark),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -55,7 +58,7 @@ class VoiceSettingsScreen extends GetView<VoiceSettingsController> {
                             _VoiceName(voice: controller.voices[i]),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     _Dots(controller: controller),
                   ],
                 ),
@@ -63,10 +66,10 @@ class VoiceSettingsScreen extends GetView<VoiceSettingsController> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: AppButton(
-                  label: 'voice_save'.tr,
+                  label: AppStrings.voiceSave.tr,
                   icon: null,
                   height: 52,
-                  fontSize: 16,
+                  fontSize: AppFontSize.body,
                   onPressed: controller.onSave,
                 ),
               ),
@@ -91,7 +94,7 @@ class _Header extends StatelessWidget {
       child: Row(
         children: [
           Material(
-            color: context.color.tileFillHighlight,
+            color: appColors.tileFillHighlight,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -101,19 +104,19 @@ class _Header extends StatelessWidget {
                 child: Icon(
                   PhosphorIconsRegular.x,
                   size: 20,
-                  color: context.color.textNatural,
+                  color: appColors.textNatural,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSpacing.lg),
           Expanded(
-            child: CustomText(
-              'voice_title'.tr,
+            child: AppText(
+              AppStrings.voiceTitle.tr,
               maxLines: 1,
-              fontSize: 22,
+              fontSize: AppFontSize.h1,
               fontWeight: FontWeight.w600,
-              color: context.color.textNatural,
+              color: appColors.textNatural,
             ),
           ),
         ],
@@ -132,19 +135,19 @@ class _VoiceName extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CustomText(
-          'voice_greeting'.trParams({'name': voice.name}),
-          fontSize: 22,
+        AppText(
+          AppStrings.voiceGreeting.trParams({'name': voice.name}),
+          fontSize: AppFontSize.h1,
           fontWeight: FontWeight.w700,
           textAlign: TextAlign.center,
-          color: context.color.textNatural,
+          color: appColors.textNatural,
         ),
         const SizedBox(height: 6),
-        CustomText(
+        AppText(
           voice.taglineKey.tr,
-          fontSize: 14,
+          fontSize: AppFontSize.label,
           textAlign: TextAlign.center,
-          color: context.color.textBody,
+          color: appColors.textBody,
         ),
       ],
     );
@@ -168,7 +171,7 @@ class _Dots extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () => controller.onDot(i),
               child: Padding(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(AppSpacing.xs),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   width: 6,
@@ -176,8 +179,8 @@ class _Dots extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: i == controller.index.value
-                        ? context.color.textNatural
-                        : context.color.platformIcon,
+                        ? appColors.textNatural
+                        : appColors.platformIcon,
                   ),
                 ),
               ),

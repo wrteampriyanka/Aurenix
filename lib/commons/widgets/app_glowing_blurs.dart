@@ -63,8 +63,8 @@ class GlowConfig {
   );
 }
 
-class KGlowingBlurs extends StatefulWidget {
-  const KGlowingBlurs({
+class AppGlowingBlurs extends StatefulWidget {
+  const AppGlowingBlurs({
     required this.glows,
     super.key,
     this.intensity = 1.0,
@@ -76,10 +76,10 @@ class KGlowingBlurs extends StatefulWidget {
   final bool animate;
 
   @override
-  State<KGlowingBlurs> createState() => _KGlowingBlursState();
+  State<AppGlowingBlurs> createState() => _AppGlowingBlursState();
 }
 
-class _KGlowingBlursState extends State<KGlowingBlurs>
+class _AppGlowingBlursState extends State<AppGlowingBlurs>
     with SingleTickerProviderStateMixin, ElapsedTimeMixin {
   @override
   Widget build(BuildContext context) {

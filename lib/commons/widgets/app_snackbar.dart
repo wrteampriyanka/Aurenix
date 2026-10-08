@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
 
 /// The app's one snackbar: a dark rounded card floating above the bottom
 /// edge, in the same colours as the sheets and cards around it.
@@ -32,14 +33,14 @@ abstract final class AppSnackbar {
     if (Get.isSnackbarOpen) Get.closeCurrentSnackbar();
     Get.showSnackbar(
       GetSnackBar(
-        messageText: CustomText(
+        messageText: AppText(
           message,
-          fontSize: 14,
+          fontSize: AppFontSize.label,
           maxLines: 3,
           color: color.textNatural,
         ),
         icon: Padding(
-          padding: const EdgeInsets.only(left: 14),
+          padding: const EdgeInsetsDirectional.only(start: 14),
           child: Icon(
             isError
                 ? PhosphorIconsRegular.warningCircle
@@ -51,7 +52,6 @@ abstract final class AppSnackbar {
         shouldIconPulse: false,
         backgroundColor: color.sheetCard,
         borderColor: isError ? accent.withValues(alpha: 0.5) : color.strokeDark,
-        borderWidth: 1,
         borderRadius: 16,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -62,13 +62,10 @@ abstract final class AppSnackbar {
             offset: const Offset(0, 8),
           ),
         ],
-        snackPosition: SnackPosition.BOTTOM,
-        snackStyle: SnackStyle.FLOATING,
         duration: duration ?? _duration,
         animationDuration: const Duration(milliseconds: 300),
         forwardAnimationCurve: Curves.easeOutCubic,
         reverseAnimationCurve: Curves.easeInCubic,
-        isDismissible: true,
         dismissDirection: DismissDirection.horizontal,
       ),
     );

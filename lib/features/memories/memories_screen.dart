@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_search_field.dart';
-import 'package:aurenix/features/widgets/app_settings_tile.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_search_field.dart';
+import 'package:aurenix/commons/widgets/app_settings_tile.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/memories/controllers/memories_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class MemoriesScreen extends GetView<MemoriesController> {
   const MemoriesScreen({super.key});
@@ -15,16 +18,16 @@ class MemoriesScreen extends GetView<MemoriesController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'memories_title'.tr,
+      title: AppStrings.memoriesTitle.tr,
       bottom: Obx(
         () => AppButton(
-          label: 'memories_remove_all'.tr,
+          label: AppStrings.memoriesRemoveAll.tr,
           icon: null,
           height: 52,
-          fontSize: 16,
-          color: context.color.upgradeButton,
-          highlightColor: context.color.upgradeButtonHighlight,
-          borderColor: context.color.upgradeButtonBorder,
+          fontSize: AppFontSize.body,
+          color: appColors.upgradeButton,
+          highlightColor: appColors.upgradeButtonHighlight,
+          borderColor: appColors.upgradeButtonBorder,
           onPressed: controller.memories.isEmpty
               ? null
               : controller.onRemoveAll,
@@ -35,34 +38,34 @@ class MemoriesScreen extends GetView<MemoriesController> {
         children: [
           Obx(
             () => AppToggleCard(
-              title: 'memories_saved_title'.tr,
-              subtitle: 'memories_saved_subtitle'.tr,
+              title: AppStrings.memoriesSavedTitle.tr,
+              subtitle: AppStrings.memoriesSavedSubtitle.tr,
               value: controller.referenceSavedMemories.value,
               onChanged: controller.onReferenceSavedMemories,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Obx(
             () => AppToggleCard(
-              title: 'memories_history_title'.tr,
-              subtitle: 'memories_history_subtitle'.tr,
+              title: AppStrings.memoriesHistoryTitle.tr,
+              subtitle: AppStrings.memoriesHistorySubtitle.tr,
               value: controller.referenceChatHistory.value,
               onChanged: controller.onReferenceChatHistory,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           AppSearchField(
             controller: controller.searchController,
-            hintText: 'memories_search_hint'.tr,
+            hintText: AppStrings.memoriesSearchHint.tr,
           ),
-          const SizedBox(height: 20),
-          CustomText(
-            'memories_all'.tr,
+          const SizedBox(height: AppSpacing.xl),
+          AppText(
+            AppStrings.memoriesAll.tr,
             maxLines: 1,
-            fontSize: 12,
-            color: context.color.textBody,
+            fontSize: AppFontSize.overline,
+            color: appColors.textBody,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           _MemoriesList(controller: controller),
         ],
       ),
@@ -86,13 +89,13 @@ class _MemoriesList extends StatelessWidget {
         if (memories.isEmpty) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
-            child: CustomText(
+            child: AppText(
               controller.memories.isEmpty
-                  ? 'memories_empty'.tr
-                  : 'memories_no_results'.tr,
-              fontSize: 14,
+                  ? AppStrings.memoriesEmpty.tr
+                  : AppStrings.memoriesNoResults.tr,
+              fontSize: AppFontSize.label,
               textAlign: TextAlign.center,
-              color: context.color.textBody,
+              color: appColors.textBody,
             ),
           );
         }
@@ -100,11 +103,11 @@ class _MemoriesList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (final (i, memory) in memories.indexed) ...[
-              if (i > 0) const SizedBox(height: 16),
-              CustomText(
+              if (i > 0) const SizedBox(height: AppSpacing.lg),
+              AppText(
                 memory,
-                fontSize: 15,
-                color: context.color.textNatural,
+                fontSize: AppFontSize.chat,
+                color: appColors.textNatural,
               ),
             ],
           ],

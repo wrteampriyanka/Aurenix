@@ -52,24 +52,26 @@ class AppSwitch extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(height / 2),
               color: value
-                  ? activeColor ?? context.color.primary
-                  : inactiveColor ?? context.color.switchTrackOff,
+                  ? activeColor ?? appColors.primary
+                  : inactiveColor ?? appColors.switchTrackOff,
             ),
             child: AnimatedAlign(
               duration: _duration,
               curve: Curves.easeOut,
-              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+              alignment: value
+                  ? AlignmentDirectional.centerEnd
+                  : AlignmentDirectional.centerStart,
               child: Container(
                 width: thumbSize,
                 height: thumbSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: context.color.switchThumb,
-                  boxShadow: const [
+                  color: appColors.switchThumb,
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x33000000),
+                      color: appColors.switchShadow,
                       blurRadius: 4,
-                      offset: Offset(0, 1),
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),

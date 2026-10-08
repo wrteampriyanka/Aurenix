@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_search_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_search_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/presets/controllers/presets_controller.dart';
 import 'package:aurenix/features/presets/widgets/preset_widgets.dart';
+import 'package:aurenix/features/presets/models/preset.dart';
+import 'package:aurenix/features/presets/models/preset_group.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Called with the tapped preset and the hero tag of its card.
 typedef PresetTap = void Function(Preset preset, String heroTag);
@@ -27,7 +32,7 @@ class PresetsScreen extends GetView<PresetsController> {
   Widget build(BuildContext context) {
     controller.route = ModalRoute.of(context);
     return AppDetailPage(
-      title: 'presets_title'.tr,
+      title: AppStrings.presetsTitle.tr,
       padding: const EdgeInsets.fromLTRB(0, 4, 0, 16),
       header: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,11 +41,11 @@ class PresetsScreen extends GetView<PresetsController> {
             padding: const EdgeInsets.fromLTRB(_side, 8, _side, 12),
             child: AppSearchField(
               controller: controller.searchController,
-              hintText: 'presets_search_hint'.tr,
+              hintText: AppStrings.presetsSearchHint.tr,
             ),
           ),
           _FilterChips(controller: controller),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
         ],
       ),
       child: Obx(() {
@@ -50,7 +55,7 @@ class PresetsScreen extends GetView<PresetsController> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (final (i, group) in PresetsController.groups.indexed)
+            for (final (i, group) in controller.groups.indexed)
               _GroupView(
                 group: group,
                 heroPrefix: 'group$i',
@@ -79,7 +84,7 @@ class _FilterChips extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           padding: PresetsScreen._sidePadding,
           itemCount: PresetFilter.values.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
           itemBuilder: (_, i) {
             final filter = PresetFilter.values[i];
             return _FilterChip(
@@ -107,7 +112,7 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: selected ? color.sidebarSelected : color.inputFill,
       shape: StadiumBorder(
@@ -121,10 +126,10 @@ class _FilterChip extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Center(
-            child: CustomText(
+            child: AppText(
               label,
               maxLines: 1,
-              fontSize: 13,
+              fontSize: AppFontSize.caption,
               fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               color: color.textNatural,
             ),
@@ -144,34 +149,38 @@ class _Results extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final results = controller.results;
-    if (results.isEmpty) {
+    // [results] reads the catalogue, which loads after the first frame,
+    // so this has to be its own observer.
+    return Obx(() {
+      final results = controller.results;
+      if (results.isEmpty) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 32),
+          child: AppText(
+            AppStrings.presetsEmpty.tr,
+            fontSize: AppFontSize.label,
+            textAlign: TextAlign.center,
+            color: appColors.textBody,
+          ),
+        );
+      }
       return Padding(
-        padding: const EdgeInsets.only(top: 32),
-        child: CustomText(
-          'presets_empty'.tr,
-          fontSize: 14,
-          textAlign: TextAlign.center,
-          color: context.color.textBody,
+        padding: PresetsScreen._sidePadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final preset in results) ...[
+              _PresetTile(
+                preset: preset,
+                heroTag: 'results-${preset.id}',
+                onTap: controller.onPreset,
+              ),
+              PresetsScreen._gap,
+            ],
+          ],
         ),
       );
-    }
-    return Padding(
-      padding: PresetsScreen._sidePadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final preset in results) ...[
-            _PresetTile(
-              preset: preset,
-              heroTag: 'results-${preset.id}',
-              onTap: controller.onPreset,
-            ),
-            PresetsScreen._gap,
-          ],
-        ],
-      ),
-    );
+    });
   }
 }
 
@@ -297,7 +306,7 @@ class _PresetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return PresetHero(
       tag: heroTag,
       child: PresetCard(
@@ -310,7 +319,7 @@ class _PresetTile extends StatelessWidget {
               children: [
                 if (rank case final rank?) ...[
                   _RankBadge(rank: rank),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                 ],
                 PresetAvatar(image: preset.image, size: 56),
                 const SizedBox(width: 14),
@@ -319,16 +328,16 @@ class _PresetTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       PresetName(preset.name),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       PresetDescription(preset.description),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Divider(height: 1, color: color.profileCardDivider),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             PresetAuthorRow(preset: preset),
           ],
         ),
@@ -362,7 +371,7 @@ class _FeaturedPresetCard extends StatelessWidget {
             Center(child: PresetAvatar(image: preset.image, size: 64)),
             const SizedBox(height: 14),
             PresetName(preset.name, textAlign: TextAlign.center),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: PresetDescription(
@@ -387,7 +396,7 @@ class _RankBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Container(
       width: 30,
       height: 30,
@@ -397,10 +406,10 @@ class _RankBadge extends StatelessWidget {
         color: color.rankBadge,
         border: Border.all(color: color.rankBadgeBorder),
       ),
-      child: CustomText(
+      child: AppText(
         '$rank',
         maxLines: 1,
-        fontSize: 14,
+        fontSize: AppFontSize.label,
         fontWeight: FontWeight.w700,
         color: color.textNatural,
       ),

@@ -1,4 +1,5 @@
 import 'package:aurenix/core/constants/app_assets.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// A paid plan offered on the upgrade screen. All texts are translation keys.
 class UpgradePlan {
@@ -36,7 +37,7 @@ class UpgradePlan {
 
   static const lite = UpgradePlan(
     id: 'lite',
-    nameKey: 'upgrade_lite_name',
+    nameKey: AppStrings.upgradeLiteName,
     featureKeys: [
       'upgrade_feature_unlimited_prompts',
       'upgrade_feature_code_60',
@@ -52,7 +53,7 @@ class UpgradePlan {
 
   static const pro = UpgradePlan(
     id: 'pro',
-    nameKey: 'upgrade_pro_name',
+    nameKey: AppStrings.upgradeProName,
     featureKeys: [
       'upgrade_feature_unlimited_prompts',
       'upgrade_feature_code_unlimited',

@@ -3,12 +3,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/connected_apps/services/connected_apps_service.dart';
 import 'package:aurenix/features/connected_apps/widgets/integration_app_logo.dart';
 import 'package:aurenix/features/home/controllers/home_controller.dart';
+import 'package:aurenix/commons/widgets/bottom_sheets/sheet_reveal.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// A coloured tile at the top of the services sheet.
 class _Service {
@@ -37,37 +41,37 @@ class ServicesSheet extends GetView<HomeController> {
 
   static final _services = [
     _Service(
-      labelKey: 'services_attach_document',
+      labelKey: AppStrings.servicesAttachDocument,
       svg: AppAssets.attachIcon,
       color: (c) => c.serviceAttach,
-      onTap: (c) => c.onAttachDocument(),
+      onTap: (c) => c.attachment.onAttachDocument(),
     ),
     _Service(
-      labelKey: 'services_capture_image',
+      labelKey: AppStrings.servicesCaptureImage,
       icon: PhosphorIconsRegular.camera,
       color: (c) => c.serviceCapture,
-      onTap: (c) => c.onCaptureImage(),
+      onTap: (c) => c.attachment.onCaptureImage(),
     ),
     _Service(
-      labelKey: 'services_generate_code',
+      labelKey: AppStrings.servicesGenerateCode,
       svg: AppAssets.codeIcon,
       color: (c) => c.serviceCode,
       onTap: (c) => c.onService(HomeController.codeAction),
     ),
     _Service(
-      labelKey: 'services_integration',
+      labelKey: AppStrings.servicesIntegration,
       svg: AppAssets.integrationIcon,
       color: (c) => c.serviceIntegration,
       onTap: (c) => c.onIntegrations(),
     ),
     _Service(
-      labelKey: 'services_ai_research',
+      labelKey: AppStrings.servicesAiResearch,
       svg: AppAssets.researchIcon,
       color: (c) => c.serviceResearch,
       onTap: (c) => c.onService(HomeController.researchAction),
     ),
     _Service(
-      labelKey: 'services_generate_image',
+      labelKey: AppStrings.servicesGenerateImage,
       svg: AppAssets.generateImagesIcon,
       color: (c) => c.serviceGenerateImage,
       onTap: (c) => c.onService(HomeController.generateImagesAction),
@@ -100,9 +104,9 @@ class ServicesSheet extends GetView<HomeController> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: context.color.sheetBackground,
+          color: appColors.sheetBackground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          border: Border.all(color: context.color.tileBorder),
+          border: Border.all(color: appColors.tileBorder),
         ),
         child: SafeArea(
           top: false,
@@ -114,7 +118,7 @@ class ServicesSheet extends GetView<HomeController> {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: context.color.sheetHandle,
+                  color: appColors.sheetHandle,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -123,7 +127,7 @@ class ServicesSheet extends GetView<HomeController> {
                   padding: const EdgeInsets.fromLTRB(12, 20, 12, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _staggered(context, [
+                    children: staggeredSheetRows(context, step: 0.08, [
                       ..._pairs([
                         for (final service in _services)
                           _ServiceTile(
@@ -134,10 +138,10 @@ class ServicesSheet extends GetView<HomeController> {
                       if (apps.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(6, 6, 6, 12),
-                          child: CustomText(
-                            'services_integrated_apps'.tr,
-                            fontSize: 12,
-                            color: context.color.textBody,
+                          child: AppText(
+                            AppStrings.servicesIntegratedApps.tr,
+                            fontSize: AppFontSize.overline,
+                            color: appColors.textBody,
                           ),
                         ),
                       ..._pairs([
@@ -155,29 +159,6 @@ class ServicesSheet extends GetView<HomeController> {
     );
   }
 
-  /// Fades and slides [children] up one after another as the sheet opens,
-  /// driven by the sheet's own route animation so closing plays it back.
-  static List<Widget> _staggered(BuildContext context, List<Widget> children) {
-    final animation = ModalRoute.of(context)?.animation;
-    if (animation == null) return children;
-    const step = 0.08, span = 0.5;
-    return [
-      for (var i = 0; i < children.length; i++)
-        _Reveal(
-          animation: animation.drive(
-            CurveTween(
-              curve: Interval(
-                (0.15 + i * step).clamp(0.0, 1 - span),
-                (0.15 + i * step + span).clamp(span, 1.0),
-                curve: Curves.easeOutCubic,
-              ),
-            ),
-          ),
-          child: children[i],
-        ),
-    ];
-  }
-
   /// Lays [children] out two per row, leaving a gap for an odd last one.
   static List<Widget> _pairs(List<Widget> children) => [
     for (var i = 0; i < children.length; i += 2)
@@ -188,7 +169,7 @@ class ServicesSheet extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(child: children[i]),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: i + 1 < children.length
                     ? children[i + 1]
@@ -209,9 +190,9 @@ class _ServiceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final white = context.color.textOnPrimary;
+    final white = appColors.textOnPrimary;
     return Material(
-      color: service.color(context.color),
+      color: service.color(appColors),
       borderRadius: BorderRadius.circular(8),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -231,10 +212,10 @@ class _ServiceTile extends StatelessWidget {
               else
                 Icon(service.icon, size: 18, color: white),
               const SizedBox(height: 6),
-              CustomText(
+              AppText(
                 service.labelKey.tr,
                 maxLines: 1,
-                fontSize: 14,
+                fontSize: AppFontSize.label,
                 fontWeight: FontWeight.w500,
                 color: white,
               ),
@@ -255,13 +236,13 @@ class _AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.color.sheetCard,
+      color: appColors.sheetCard,
       borderRadius: BorderRadius.circular(8),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -270,47 +251,26 @@ class _AppCard extends StatelessWidget {
                   IntegrationAppLogo(app: app, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: CustomText(
+                    child: AppText(
                       app.nameKey.tr,
                       maxLines: 1,
-                      fontSize: 15,
+                      fontSize: AppFontSize.chat,
                       fontWeight: FontWeight.w500,
-                      color: context.color.textNatural,
+                      color: appColors.textNatural,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              CustomText(
+              const SizedBox(height: AppSpacing.sm),
+              AppText(
                 app.descriptionKey.tr,
                 maxLines: 2,
-                fontSize: 12,
-                color: context.color.textBody,
+                fontSize: AppFontSize.overline,
+                color: appColors.textBody,
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _Reveal extends StatelessWidget {
-  const _Reveal({required this.animation, required this.child});
-
-  /// 0 hidden, 1 in place.
-  final Animation<double> animation;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: animation,
-      child: SlideTransition(
-        position: animation.drive(
-          Tween(begin: const Offset(0, 0.3), end: Offset.zero),
-        ),
-        child: child,
       ),
     );
   }

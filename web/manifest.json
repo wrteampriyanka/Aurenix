@@ -1,11 +1,11 @@
 {
-    "name": "aurenix",
-    "short_name": "aurenix",
+    "name": "Aurenix",
+    "short_name": "Aurenix",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#2563EB",
+    "background_color": "#11141A",
     "theme_color": "#2563EB",
-    "description": "A new Flutter project.",
+    "description": "Aurenix — an AI assistant for chat, live talk and collaboration.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

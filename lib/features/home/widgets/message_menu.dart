@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
 
 /// One line of [showMessageMenu]: an outline icon and a label.
 class MessageMenuItem {
@@ -28,7 +32,7 @@ Future<void> showMessageMenu({
   required Rect anchor,
   required List<MessageMenuItem> items,
 }) async {
-  HapticFeedback.mediumImpact();
+  unawaited(HapticFeedback.mediumImpact());
   // The card resolves with the row that was tapped rather than running it
   // itself: an action that opens a sheet off `Get.context` would otherwise
   // build it against this route while the route is still being torn down.
@@ -79,7 +83,10 @@ class _MessageMenu extends StatelessWidget {
     final top = fitsBelow
         ? below
         : (anchor.top - _gap - height).clamp(safe.top + _margin, below);
-    final left = (anchor.right - width).clamp(
+    // The card hangs off the bubble's near edge: its right in LTR, its left
+    // in RTL, where the user's own bubble sits on the other side.
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final left = (rtl ? anchor.left : anchor.right - width).clamp(
       _margin,
       screen.width - width - _margin,
     );
@@ -100,8 +107,9 @@ class _MessageMenu extends StatelessWidget {
             opacity: animation,
             child: ScaleTransition(
               scale: Tween(begin: 0.85, end: 1.0).animate(curve),
-              // Growing out of the bubble's near corner.
-              alignment: fitsBelow ? Alignment.topRight : Alignment.bottomRight,
+              // Growing out of the bubble's near corner. ScaleTransition
+              // takes a resolved Alignment, so mirror it by hand.
+              alignment: Alignment(rtl ? -1.0 : 1.0, fitsBelow ? -1.0 : 1.0),
               child: _Card(items: items),
             ),
           ),
@@ -119,7 +127,7 @@ class _Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.color.sidebarBackground,
+      color: appColors.sidebarBackground,
       elevation: 12,
       shadowColor: Colors.black.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(24),
@@ -137,21 +145,17 @@ class _Card extends StatelessWidget {
                   child: Row(
                     children: [
                       const SizedBox(width: 18),
-                      Icon(
-                        item.icon,
-                        size: 22,
-                        color: context.color.textNatural,
-                      ),
-                      const SizedBox(width: 16),
+                      Icon(item.icon, size: 22, color: appColors.textNatural),
+                      const SizedBox(width: AppSpacing.lg),
                       Expanded(
-                        child: CustomText(
+                        child: AppText(
                           item.label,
                           maxLines: 1,
-                          fontSize: 15,
-                          color: context.color.textNatural,
+                          fontSize: AppFontSize.chat,
+                          color: appColors.textNatural,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                     ],
                   ),
                 ),

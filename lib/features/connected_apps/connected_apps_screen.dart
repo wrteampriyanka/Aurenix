@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_search_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_search_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/connected_apps/controllers/connected_apps_controller.dart';
 import 'package:aurenix/features/connected_apps/widgets/integration_app_logo.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class ConnectedAppsScreen extends GetView<ConnectedAppsController> {
   const ConnectedAppsScreen({super.key});
@@ -14,12 +17,12 @@ class ConnectedAppsScreen extends GetView<ConnectedAppsController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'connected_apps_title'.tr,
+      title: AppStrings.connectedAppsTitle.tr,
       header: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: AppSearchField(
           controller: controller.searchController,
-          hintText: 'connected_apps_search_hint'.tr,
+          hintText: AppStrings.connectedAppsSearchHint.tr,
         ),
       ),
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -29,11 +32,11 @@ class ConnectedAppsScreen extends GetView<ConnectedAppsController> {
         if (connected.isEmpty && available.isEmpty) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
-            child: CustomText(
-              'connected_apps_empty'.tr,
-              fontSize: 14,
+            child: AppText(
+              AppStrings.connectedAppsEmpty.tr,
+              fontSize: AppFontSize.label,
               textAlign: TextAlign.center,
-              color: context.color.textBody,
+              color: appColors.textBody,
             ),
           );
         }
@@ -42,15 +45,15 @@ class ConnectedAppsScreen extends GetView<ConnectedAppsController> {
           children: [
             if (connected.isNotEmpty)
               _Section(
-                titleKey: 'connected_apps_connected',
+                titleKey: AppStrings.connectedAppsConnected,
                 apps: connected,
                 onTap: controller.onApp,
               ),
             if (connected.isNotEmpty && available.isNotEmpty)
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
             if (available.isNotEmpty)
               _Section(
-                titleKey: 'connected_apps_more',
+                titleKey: AppStrings.connectedAppsMore,
                 apps: available,
                 onTap: controller.onApp,
               ),
@@ -80,13 +83,13 @@ class _Section extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        CustomText(
+        AppText(
           titleKey.tr,
           maxLines: 1,
-          fontSize: 13,
-          color: context.color.textBody,
+          fontSize: AppFontSize.caption,
+          color: appColors.textBody,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         for (var i = 0; i < apps.length; i += 2) ...[
           if (i > 0) const SizedBox(height: _gap),
           SizedBox(
@@ -129,7 +132,7 @@ class _AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: color.sheetCard,
       borderRadius: BorderRadius.circular(12),
@@ -144,23 +147,23 @@ class _AppCard extends StatelessWidget {
               Row(
                 children: [
                   IntegrationAppLogo(app: app, size: _logoSize),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
-                    child: CustomText(
+                    child: AppText(
                       app.nameKey.tr,
                       maxLines: 1,
-                      fontSize: 14,
+                      fontSize: AppFontSize.label,
                       fontWeight: FontWeight.w500,
                       color: color.textNatural,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              CustomText(
+              const SizedBox(height: AppSpacing.sm),
+              AppText(
                 app.descriptionKey.tr,
                 maxLines: 2,
-                fontSize: 12,
+                fontSize: AppFontSize.overline,
                 fontWeight: FontWeight.w400,
                 color: color.textBody,
               ),

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
 import 'package:aurenix/features/projects/controllers/projects_controller.dart';
+import 'package:aurenix/features/home/models/project.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class ProjectsScreen extends GetView<ProjectsController> {
   const ProjectsScreen({super.key});
@@ -14,19 +17,19 @@ class ProjectsScreen extends GetView<ProjectsController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'projects_title'.tr,
+      title: AppStrings.projectsTitle.tr,
       action: _CreateButton(onTap: controller.onCreate),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Obx(() {
         final projects = controller.projects;
         if (projects.isEmpty) {
           return Padding(
             padding: const EdgeInsets.only(top: 32),
-            child: CustomText(
-              'projects_empty'.tr,
-              fontSize: 14,
+            child: AppText(
+              AppStrings.projectsEmpty.tr,
+              fontSize: AppFontSize.label,
               textAlign: TextAlign.center,
-              color: context.color.textBody,
+              color: appColors.textBody,
             ),
           );
         }
@@ -59,7 +62,7 @@ class _CreateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: color.inputFill,
       shape: StadiumBorder(side: BorderSide(color: color.tileBorder)),
@@ -76,10 +79,10 @@ class _CreateButton extends StatelessWidget {
                 size: 18,
                 color: color.textNatural,
               ),
-              const SizedBox(width: 8),
-              CustomText(
-                'projects_create_new'.tr,
-                fontSize: 13,
+              const SizedBox(width: AppSpacing.sm),
+              AppText(
+                AppStrings.projectsCreateNew.tr,
+                fontSize: AppFontSize.caption,
                 color: color.textNatural,
               ),
             ],
@@ -103,7 +106,7 @@ class _ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: color.inputFill,
       shape: RoundedRectangleBorder(
@@ -125,19 +128,21 @@ class _ProjectCard extends StatelessWidget {
                   Icon(project.icon, size: 20, color: project.iconColor),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: CustomText(
+                    child: AppText(
                       project.name,
                       maxLines: 1,
-                      fontSize: 14,
+                      fontSize: AppFontSize.label,
                       color: color.textNatural,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 6),
-              CustomText(
-                'projects_chats'.trParams({'count': '${project.chatCount}'}),
-                fontSize: 12,
+              AppText(
+                AppStrings.projectsChats.trParams({
+                  'count': '${project.chatCount}',
+                }),
+                fontSize: AppFontSize.overline,
                 color: color.textBody,
               ),
             ],

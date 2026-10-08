@@ -56,8 +56,8 @@ class _IntegrationHubState extends State<IntegrationHub>
               child: CustomPaint(
                 painter: _ConnectorPainter(
                   time: time,
-                  lineColor: context.color.connectorLine,
-                  pulseColor: context.color.orbLight,
+                  lineColor: appColors.connectorLine,
+                  pulseColor: appColors.orbLight,
                 ),
               ),
             ),
@@ -82,10 +82,10 @@ class _IntegrationHubState extends State<IntegrationHub>
             top: IntegrationHub.bottomTileY,
             child: _PlatformTile(asset: AppAssets.jiraLogo, size: tile),
           ),
-          Positioned(
+          const Positioned(
             left: (w - center) / 2,
             top: IntegrationHub.stemHeight,
-            child: const _AppIconTile(size: center),
+            child: _AppIconTile(size: center),
           ),
         ],
       ),
@@ -114,18 +114,15 @@ class _TileFrame extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(radius),
-        color: context.color.tileFill,
+        color: appColors.tileFill,
         gradient: highlighted
             ? LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  context.color.tileFillHighlight,
-                  context.color.tileFill,
-                ],
+                colors: [appColors.tileFillHighlight, appColors.tileFill],
               )
             : null,
-        border: Border.all(color: context.color.tileBorder),
+        border: Border.all(color: appColors.tileBorder),
       ),
       child: child,
     );
@@ -147,10 +144,7 @@ class _PlatformTile extends StatelessWidget {
         asset,
         width: size * 0.46,
         height: size * 0.46,
-        colorFilter: ColorFilter.mode(
-          context.color.platformIcon,
-          BlendMode.srcIn,
-        ),
+        colorFilter: ColorFilter.mode(appColors.platformIcon, BlendMode.srcIn),
       ),
     );
   }
@@ -170,7 +164,7 @@ class _AppIconTile extends StatelessWidget {
       child: Image.asset(
         AppAssets.appIcon,
         width: size * 0.5,
-        color: context.color.appIconMuted,
+        color: appColors.appIconMuted,
       ),
     );
   }

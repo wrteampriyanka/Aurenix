@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/features/home/models/project.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Which chats a project's assistant may remember.
-enum ProjectMemory { all, projectOnly }
 
 /// Everything [CreateProjectSheet] collects about a new project.
 class ProjectDraft {
@@ -43,15 +46,7 @@ class CreateProjectSheet extends StatefulWidget {
   final ProjectDraft? initial;
 
   /// Swatches offered on the last sheet.
-  static const colors = [
-    Color(0xFFFFFFFF),
-    Color(0xFFFACC15),
-    Color(0xFFF97316),
-    Color(0xFFEC4899),
-    Color(0xFF8B5CF6),
-    Color(0xFF38BDF8),
-    Color(0xFF2DD4BF),
-  ];
+  static final colors = appColors.projectIconSwatch;
 
   /// Icons offered on the last sheet, laid out nine to a row over three rows.
   static const icons = [
@@ -212,15 +207,15 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
           onIcon: (v) => setState(() => _icon = v),
           onCreate: _create,
           actionLabel: _isEditing
-              ? 'projects_instructions_save'.tr
-              : 'continue'.tr,
+              ? AppStrings.projectsInstructionsSave.tr
+              : AppStrings.continueKey.tr,
         );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Padding(
       // Lifts the sheet above the keyboard while the name is being typed.
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -254,15 +249,15 @@ class _CreateProjectSheetState extends State<CreateProjectSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        CustomText(
+                        AppText(
                           _isEditing
-                              ? 'projects_menu_edit'.tr
-                              : 'sidebar_new_project'.tr,
-                          fontSize: 18,
+                              ? AppStrings.projectsMenuEdit.tr
+                              : AppStrings.sidebarNewProject.tr,
+                          fontSize: AppFontSize.h3,
                           fontWeight: FontWeight.w600,
                           color: color.textNatural,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         _Header(
                           controller: _name,
                           focusNode: _nameFocus,
@@ -333,7 +328,7 @@ class _Header extends StatelessWidget {
           height: 52,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: context.color.sheetCard,
+            color: appColors.sheetCard,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: color),
           ),
@@ -346,15 +341,16 @@ class _Header extends StatelessWidget {
             child: Icon(icon, key: ValueKey(icon), size: 24, color: color),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: AppTextField(
             controller: controller,
             focusNode: focusNode,
-            hint: 'projects_name_hint'.tr,
+            hint: AppStrings.projectsNameHint.tr,
             textInputAction: TextInputAction.done,
-            validator: (v) =>
-                (v ?? '').trim().isEmpty ? 'projects_name_required'.tr : null,
+            validator: (v) => (v ?? '').trim().isEmpty
+                ? AppStrings.projectsNameRequired.tr
+                : null,
             onFieldSubmitted: (_) => onSubmitted(),
           ),
         ),
@@ -376,18 +372,18 @@ class _MemoryStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _StepLabel('projects_memory_label'.tr),
-        const SizedBox(height: 12),
+        _StepLabel(AppStrings.projectsMemoryLabel.tr),
+        const SizedBox(height: AppSpacing.md),
         _OptionTile(
-          title: 'projects_memory_default'.tr,
-          subtitle: 'projects_memory_default_desc'.tr,
+          title: AppStrings.projectsMemoryDefault.tr,
+          subtitle: AppStrings.projectsMemoryDefaultDesc.tr,
           selected: value == ProjectMemory.all,
           onTap: () => onChanged(ProjectMemory.all),
         ),
         const SizedBox(height: 10),
         _OptionTile(
-          title: 'projects_memory_only'.tr,
-          subtitle: 'projects_memory_only_desc'.tr,
+          title: AppStrings.projectsMemoryOnly.tr,
+          subtitle: AppStrings.projectsMemoryOnlyDesc.tr,
           selected: value == ProjectMemory.projectOnly,
           onTap: () => onChanged(ProjectMemory.projectOnly),
         ),
@@ -432,7 +428,7 @@ class _LookStep extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -457,7 +453,7 @@ class _LookStep extends StatelessWidget {
           label: actionLabel,
           icon: null,
           height: 50,
-          fontSize: 16,
+          fontSize: AppFontSize.body,
           onPressed: onCreate,
         ),
       ],
@@ -474,7 +470,11 @@ class _StepLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: AlignmentDirectional.centerStart,
-      child: CustomText(text, fontSize: 13, color: context.color.textBody),
+      child: AppText(
+        text,
+        fontSize: AppFontSize.caption,
+        color: appColors.textBody,
+      ),
     );
   }
 }
@@ -495,7 +495,7 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
       curve: Curves.easeOut,
@@ -521,24 +521,24 @@ class _OptionTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomText(
+                      AppText(
                         title,
                         maxLines: 1,
-                        fontSize: 15,
+                        fontSize: AppFontSize.chat,
                         fontWeight: FontWeight.w600,
                         color: color.textNatural,
                       ),
-                      const SizedBox(height: 4),
-                      CustomText(
+                      const SizedBox(height: AppSpacing.xs),
+                      AppText(
                         subtitle,
                         maxLines: 2,
-                        fontSize: 12,
+                        fontSize: AppFontSize.overline,
                         color: color.textBody,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 220),
                   curve: Curves.easeOut,
@@ -617,7 +617,7 @@ class _IconCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.color;
+    final theme = appColors;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,

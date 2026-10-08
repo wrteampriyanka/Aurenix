@@ -3,11 +3,16 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/services/demo_chat_service.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/home/controllers/home_controller.dart';
 import 'package:aurenix/features/home/widgets/message_menu.dart';
+import 'package:aurenix/features/home/models/chat_attachment.dart';
+import 'package:aurenix/features/home/models/chat_message.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// The conversation: user bubbles on the right, AI replies full width.
 class ChatMessages extends StatelessWidget {
@@ -22,7 +27,7 @@ class ChatMessages extends StatelessWidget {
         Obx(
           () => controller.showDisclaimer.value
               ? ChatNotice(
-                  text: 'chat_disclaimer'.tr,
+                  text: AppStrings.chatDisclaimer.tr,
                   onClose: controller.onCloseDisclaimer,
                 )
               : const SizedBox.shrink(),
@@ -70,14 +75,14 @@ class ChatNotice extends StatelessWidget {
     return Container(
       margin: margin,
       padding: const EdgeInsets.fromLTRB(16, 10, 4, 10),
-      color: context.color.tileFill,
+      color: appColors.tileFill,
       child: Row(
         children: [
           Expanded(
-            child: CustomText(
+            child: AppText(
               text,
-              fontSize: 12,
-              color: context.color.textBody,
+              fontSize: AppFontSize.overline,
+              color: appColors.textBody,
             ),
           ),
           IconButton(
@@ -85,7 +90,7 @@ class ChatNotice extends StatelessWidget {
             icon: Icon(
               PhosphorIconsRegular.x,
               size: 20,
-              color: context.color.textNatural,
+              color: appColors.textNatural,
             ),
           ),
         ],
@@ -112,23 +117,23 @@ class _UserBubble extends StatelessWidget {
         if (message.text.isNotEmpty) ...[
           MessageMenuItem(
             icon: PhosphorIconsRegular.copy,
-            label: 'chat_copy_text'.tr,
+            label: AppStrings.chatCopyText.tr,
             onTap: () => controller.onCopy(message),
           ),
           MessageMenuItem(
             icon: PhosphorIconsRegular.textAlignLeft,
-            label: 'chat_select_text'.tr,
+            label: AppStrings.chatSelectText.tr,
             onTap: () => controller.onSelectText(message),
           ),
         ],
         MessageMenuItem(
           icon: PhosphorIconsRegular.pencilSimple,
-          label: 'chat_edit_message'.tr,
+          label: AppStrings.chatEditMessage.tr,
           onTap: () => controller.onEditMessage(message),
         ),
         MessageMenuItem(
           icon: PhosphorIconsRegular.shareNetwork,
-          label: 'chat_share'.tr,
+          label: AppStrings.chatShare.tr,
           onTap: () => controller.onShare(message),
         ),
       ],
@@ -138,7 +143,7 @@ class _UserBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: AlignmentDirectional.centerEnd,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.sizeOf(context).width * 0.75,
@@ -163,7 +168,7 @@ class _UserBubble extends StatelessWidget {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: context.color.sidebarSelected,
+                        color: appColors.sidebarSelected,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: _BubbleText(
@@ -195,8 +200,8 @@ class _BubbleText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = TextStyle(
-      color: context.color.textNatural,
-      fontSize: 15,
+      color: appColors.textNatural,
+      fontSize: AppFontSize.chat,
       height: 1.3,
     );
     return selectable
@@ -227,7 +232,7 @@ class _SentAttachment extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: context.color.sidebarSelected,
+        color: appColors.sidebarSelected,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -236,15 +241,15 @@ class _SentAttachment extends StatelessWidget {
           Icon(
             PhosphorIconsRegular.fileText,
             size: 20,
-            color: context.color.textNatural,
+            color: appColors.textNatural,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Flexible(
-            child: CustomText(
+            child: AppText(
               attachment.name,
               maxLines: 1,
-              fontSize: 14,
-              color: context.color.textNatural,
+              fontSize: AppFontSize.label,
+              color: appColors.textNatural,
             ),
           ),
         ],
@@ -283,20 +288,20 @@ class _AiMessage extends StatelessWidget {
             if (drawing) ...[
               const SizedBox(height: 10),
               const _ImagePlaceholder(),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
             ],
           ],
           for (final image in message.images) ...[
             _ReplyImage(image: image),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
           ],
           if (text.isNotEmpty) _Markdown(text: text),
           if (error != null) ...[
-            if (text.isNotEmpty) const SizedBox(height: 8),
-            CustomText(error, fontSize: 14, color: context.color.error),
+            if (text.isNotEmpty) const SizedBox(height: AppSpacing.sm),
+            AppText(error, fontSize: AppFontSize.label, color: appColors.error),
           ],
           if (!message.isStreaming.value) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             _MessageActions(message: message, controller: controller),
           ],
         ],
@@ -333,8 +338,8 @@ class _ImagePlaceholderState extends State<_ImagePlaceholder>
 
   @override
   Widget build(BuildContext context) {
-    final base = context.color.inputFill;
-    final highlight = context.color.sidebarSelected;
+    final base = appColors.inputFill;
+    final highlight = appColors.sidebarSelected;
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: SizedBox(
@@ -413,9 +418,13 @@ class _StatusState extends State<_Status> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final dim = context.color.textBody;
-    final bright = context.color.textNatural;
-    final text = CustomText(widget.text, fontSize: 15, color: bright);
+    final dim = appColors.textBody;
+    final bright = appColors.textNatural;
+    final text = AppText(
+      widget.text,
+      fontSize: AppFontSize.chat,
+      color: bright,
+    );
     return AnimatedBuilder(
       animation: _pulse,
       builder: (context, child) {
@@ -445,8 +454,8 @@ class _Markdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final body = TextStyle(
-      color: context.color.textNatural,
-      fontSize: 15,
+      color: appColors.textNatural,
+      fontSize: AppFontSize.chat,
       height: 1.4,
     );
     return MarkdownBody(
@@ -457,32 +466,39 @@ class _Markdown extends StatelessWidget {
         listBullet: body,
         strong: body.copyWith(fontWeight: FontWeight.w700),
         em: body.copyWith(fontStyle: FontStyle.italic),
-        h1: body.copyWith(fontSize: 22, fontWeight: FontWeight.w700),
-        h2: body.copyWith(fontSize: 19, fontWeight: FontWeight.w700),
-        h3: body.copyWith(fontSize: 17, fontWeight: FontWeight.w700),
+        h1: body.copyWith(
+          fontSize: AppFontSize.h1,
+          fontWeight: FontWeight.w700,
+        ),
+        h2: body.copyWith(
+          fontSize: AppFontSize.markdownH2,
+          fontWeight: FontWeight.w700,
+        ),
+        h3: body.copyWith(
+          fontSize: AppFontSize.markdownH3,
+          fontWeight: FontWeight.w700,
+        ),
         a: body.copyWith(
-          color: context.color.buttonHighlight,
+          color: appColors.buttonHighlight,
           decoration: TextDecoration.underline,
         ),
         code: body.copyWith(
           fontFamily: 'monospace',
-          fontSize: 13,
-          backgroundColor: context.color.inputFill,
+          fontSize: AppFontSize.caption,
+          backgroundColor: appColors.inputFill,
         ),
         codeblockDecoration: BoxDecoration(
-          color: context.color.inputFill,
+          color: appColors.inputFill,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: context.color.inputBorder),
+          border: Border.all(color: appColors.inputBorder),
         ),
         blockquoteDecoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(color: context.color.primary, width: 3),
-          ),
+          border: Border(left: BorderSide(color: appColors.primary, width: 3)),
         ),
         horizontalRuleDecoration: BoxDecoration(
-          border: Border(top: BorderSide(color: context.color.divider)),
+          border: Border(top: BorderSide(color: appColors.divider)),
         ),
-        tableBorder: TableBorder.all(color: context.color.divider),
+        tableBorder: TableBorder.all(color: appColors.divider),
         tableBody: body,
         tableHead: body.copyWith(fontWeight: FontWeight.w700),
         pPadding: const EdgeInsets.only(bottom: 4),
@@ -556,7 +572,7 @@ class _MessageActions extends StatelessWidget {
             const Spacer(),
             SizedBox(
               height: 20,
-              child: VerticalDivider(width: 1, color: context.color.divider),
+              child: VerticalDivider(width: 1, color: appColors.divider),
             ),
             _SourcesButton(sources: sources, onOpen: controller.onOpenSource),
           ],
@@ -594,8 +610,8 @@ class _ActionIconState extends State<_ActionIcon> {
   @override
   Widget build(BuildContext context) {
     final color = widget.active
-        ? context.color.buttonHighlight
-        : context.color.textNatural;
+        ? appColors.buttonHighlight
+        : appColors.textNatural;
     return Material(
       color: Colors.transparent,
       shape: const CircleBorder(),
@@ -648,7 +664,7 @@ class _SourcesButton extends StatelessWidget {
       onTap: () => _showSheet(context),
       radius: 22,
       child: Padding(
-        padding: const EdgeInsets.only(left: 12),
+        padding: const EdgeInsetsDirectional.only(start: 12),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -657,7 +673,7 @@ class _SourcesButton extends StatelessWidget {
             Icon(
               PhosphorIconsRegular.caretRight,
               size: 16,
-              color: context.color.textBody,
+              color: appColors.textBody,
             ),
           ],
         ),
@@ -668,7 +684,7 @@ class _SourcesButton extends StatelessWidget {
   void _showSheet(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: context.color.sidebarBackground,
+      backgroundColor: appColors.sidebarBackground,
       showDragHandle: true,
       builder: (context) => SafeArea(
         child: Column(
@@ -677,11 +693,11 @@ class _SourcesButton extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: CustomText(
-                'chat_sources'.tr,
-                fontSize: 18,
+              child: AppText(
+                AppStrings.chatSources.tr,
+                fontSize: AppFontSize.h3,
                 fontWeight: FontWeight.w700,
-                color: context.color.textNatural,
+                color: appColors.textNatural,
               ),
             ),
             Flexible(
@@ -691,16 +707,16 @@ class _SourcesButton extends StatelessWidget {
                   for (final source in sources)
                     ListTile(
                       leading: _Favicon(source: source, size: 24),
-                      title: CustomText(
+                      title: AppText(
                         source.title,
                         maxLines: 1,
-                        fontSize: 15,
-                        color: context.color.textNatural,
+                        fontSize: AppFontSize.chat,
+                        color: appColors.textNatural,
                       ),
                       trailing: Icon(
                         PhosphorIconsRegular.arrowUpRight,
                         size: 18,
-                        color: context.color.textBody,
+                        color: appColors.textBody,
                       ),
                       onTap: () {
                         Navigator.pop(context);
@@ -729,7 +745,7 @@ class _Favicon extends StatelessWidget {
     final globe = Icon(
       PhosphorIconsRegular.globe,
       size: size,
-      color: context.color.textBody,
+      color: appColors.textBody,
     );
     // Gemini's grounding titles are the site's domain.
     return ClipOval(

@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_search_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_search_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Floating sheet with a search field over a list of options. Opens scrolled
 /// to the current [selected] option and resolves with the one tapped, or
@@ -119,7 +122,7 @@ class _AppPickerSheetState<T> extends State<AppPickerSheet<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     final media = MediaQuery.of(context);
     return Padding(
       // Lifts the sheet above the keyboard while searching.
@@ -151,10 +154,10 @@ class _AppPickerSheetState<T> extends State<AppPickerSheet<T>> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-                child: CustomText(
+                child: AppText(
                   widget.title,
                   maxLines: 1,
-                  fontSize: 18,
+                  fontSize: AppFontSize.h3,
                   fontWeight: FontWeight.w600,
                   color: color.textNatural,
                 ),
@@ -163,16 +166,16 @@ class _AppPickerSheetState<T> extends State<AppPickerSheet<T>> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: AppSearchField(
                   controller: _search,
-                  hintText: widget.searchHint ?? 'picker_search_hint'.tr,
+                  hintText: widget.searchHint ?? AppStrings.pickerSearchHint.tr,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Expanded(
                 child: _matches.isEmpty
                     ? Center(
-                        child: CustomText(
-                          'picker_no_results'.tr,
-                          fontSize: 14,
+                        child: AppText(
+                          AppStrings.pickerNoResults.tr,
+                          fontSize: AppFontSize.label,
                           color: color.textBody,
                         ),
                       )
@@ -194,7 +197,7 @@ class _AppPickerSheetState<T> extends State<AppPickerSheet<T>> {
   }
 
   Widget _row(BuildContext context, T item) {
-    final color = context.color;
+    final color = appColors;
     final selected = item == widget.selected;
     return Material(
       color: selected ? color.sheetCard : Colors.transparent,
@@ -208,13 +211,13 @@ class _AppPickerSheetState<T> extends State<AppPickerSheet<T>> {
             children: [
               if (widget.leadingOf case final leading?) ...[
                 leading(item),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
               ],
               Expanded(
-                child: CustomText(
+                child: AppText(
                   widget.labelOf(item),
                   maxLines: 1,
-                  fontSize: 15,
+                  fontSize: AppFontSize.chat,
                   color: color.textNatural,
                 ),
               ),

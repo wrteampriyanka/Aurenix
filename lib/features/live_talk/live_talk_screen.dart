@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/onboarding/widgets/wave_orb.dart';
 import 'package:aurenix/features/live_talk/controllers/live_talk_controller.dart';
+import 'package:aurenix/features/live_talk/models/audio_output.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class LiveTalkScreen extends GetView<LiveTalkController> {
   const LiveTalkScreen({super.key});
@@ -15,7 +19,7 @@ class LiveTalkScreen extends GetView<LiveTalkController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppPlainBackground(
         child: Stack(
           fit: StackFit.expand,
@@ -25,7 +29,7 @@ class LiveTalkScreen extends GetView<LiveTalkController> {
               child: Column(
                 children: [
                   _TopActions(controller: controller),
-                  Divider(height: 1, color: context.color.strokeDark),
+                  Divider(height: 1, color: appColors.strokeDark),
                   Expanded(child: _Center(controller: controller)),
                   _BottomActions(controller: controller),
                 ],
@@ -100,7 +104,7 @@ class _Center extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             Flexible(child: _Caption(controller: controller, showPrompt: true)),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             _Status(controller: controller),
           ],
         ),
@@ -141,7 +145,7 @@ class _CameraCenter extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 96),
             child: _Caption(controller: controller, showPrompt: false),
@@ -172,9 +176,9 @@ class _ScreenShareCenter extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: context.color.tileFill,
+                color: appColors.tileFill,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: context.color.buttonHighlight),
+                border: Border.all(color: appColors.buttonHighlight),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -184,37 +188,37 @@ class _ScreenShareCenter extends StatelessWidget {
                     height: 72,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: context.color.primary,
+                      color: appColors.primary,
                     ),
                     child: Icon(
                       PhosphorIconsRegular.screencast,
                       size: 32,
-                      color: context.color.textNatural,
+                      color: appColors.textNatural,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  CustomText(
-                    'live_share_title'.tr,
-                    fontSize: 20,
+                  const SizedBox(height: AppSpacing.xl),
+                  AppText(
+                    AppStrings.liveShareTitle.tr,
+                    fontSize: AppFontSize.h2,
                     fontWeight: FontWeight.w700,
                     textAlign: TextAlign.center,
-                    color: context.color.textNatural,
+                    color: appColors.textNatural,
                   ),
                   const SizedBox(height: 10),
-                  CustomText(
+                  AppText(
                     (GetPlatform.isIOS
                             ? 'live_share_hint_ios'
                             : 'live_share_hint')
                         .tr,
-                    fontSize: 14,
+                    fontSize: AppFontSize.label,
                     textAlign: TextAlign.center,
-                    color: context.color.textBody,
+                    color: appColors.textBody,
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 96),
             child: _Caption(controller: controller, showPrompt: false),
@@ -245,23 +249,23 @@ class _Caption extends StatelessWidget {
         // Narrow like the design, so it wraps after "you".
         return SizedBox(
           width: 250,
-          child: CustomText(
-            'home_prompt'.tr,
-            fontSize: 22,
+          child: AppText(
+            AppStrings.homePrompt.tr,
+            fontSize: AppFontSize.h1,
             fontWeight: FontWeight.w700,
             textAlign: TextAlign.center,
-            color: context.color.textNatural,
+            color: appColors.textNatural,
           ),
         );
       }
       return SingleChildScrollView(
         reverse: true,
-        child: CustomText(
+        child: AppText(
           caption,
-          fontSize: 18,
+          fontSize: AppFontSize.h3,
           fontWeight: FontWeight.w600,
           textAlign: TextAlign.center,
-          color: context.color.textNatural,
+          color: appColors.textNatural,
         ),
       );
     });
@@ -277,15 +281,15 @@ class _Status extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => CustomText(
+      () => AppText(
         switch (controller.status.value) {
-          _ when controller.isMuted.value => 'live_muted'.tr,
-          LiveStatus.listening => 'live_listening'.tr,
-          LiveStatus.thinking => 'live_thinking'.tr,
+          _ when controller.isMuted.value => AppStrings.liveMuted.tr,
+          LiveStatus.listening => AppStrings.liveListening.tr,
+          LiveStatus.thinking => AppStrings.liveThinking.tr,
           LiveStatus.speaking || LiveStatus.idle => '',
         },
-        fontSize: 14,
-        color: context.color.textBody,
+        fontSize: AppFontSize.label,
+        color: appColors.textBody,
       ),
     );
   }
@@ -313,7 +317,7 @@ class _BottomActions extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Obx(
               () => _PillButton(
@@ -323,7 +327,7 @@ class _BottomActions extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Obx(
               () => _PillButton(
@@ -333,7 +337,7 @@ class _BottomActions extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: _PillButton(
               icon: PhosphorIconsRegular.x,
@@ -362,14 +366,14 @@ class _CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: active ? context.color.primary : context.color.tileFillHighlight,
+      color: active ? appColors.primary : appColors.tileFillHighlight,
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: SizedBox.square(
           dimension: 44,
-          child: Icon(icon, size: 22, color: context.color.textNatural),
+          child: Icon(icon, size: 22, color: appColors.textNatural),
         ),
       ),
     );
@@ -392,10 +396,10 @@ class _PillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.color.tileFillHighlight,
+      color: appColors.tileFillHighlight,
       shape: StadiumBorder(
         side: active
-            ? BorderSide(color: context.color.buttonHighlight)
+            ? BorderSide(color: appColors.buttonHighlight)
             : BorderSide.none,
       ),
       clipBehavior: Clip.antiAlias,
@@ -403,7 +407,7 @@ class _PillButton extends StatelessWidget {
         onTap: onTap,
         child: SizedBox(
           height: 48,
-          child: Icon(icon, size: 22, color: context.color.textNatural),
+          child: Icon(icon, size: 22, color: appColors.textNatural),
         ),
       ),
     );
@@ -416,7 +420,7 @@ class _BottomGlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final glow = context.color.backgroundGlow;
+    final glow = appColors.backgroundGlow;
     return Positioned(
       left: 0,
       right: 0,

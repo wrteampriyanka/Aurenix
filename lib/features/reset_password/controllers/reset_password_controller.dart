@@ -10,13 +10,11 @@ class ResetPasswordController extends GetxController {
   final confirmController = TextEditingController();
 
   /// Email whose password is being reset, passed as the route argument.
-  final String? email = Get.arguments as String?;
-
-  final isPasswordHidden = true.obs;
-  final isConfirmHidden = true.obs;
-
-  void togglePasswordVisibility() => isPasswordHidden.toggle();
-  void toggleConfirmVisibility() => isConfirmHidden.toggle();
+  /// Null when the route was opened without one; `as String?` would still
+  /// throw on an argument of any other type.
+  final String? email = Get.arguments is String
+      ? Get.arguments as String
+      : null;
 
   String? validateConfirm(String? value) =>
       Validators.confirmPassword(value, passwordController.text);

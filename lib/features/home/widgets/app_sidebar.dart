@@ -4,10 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_svg_icon.dart';
+import 'package:aurenix/commons/widgets/app_svg_icon.dart';
 import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/home/models/chat_summary.dart';
+import 'package:aurenix/features/home/models/sidebar_item.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Menu, chats and profile shown in the home drawer.
 ///
@@ -42,7 +47,7 @@ class AppSidebar extends GetView<SidebarController> {
                       _itemRow(item),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Obx(
                   () => _MenuCard(
                     children: [
@@ -61,13 +66,16 @@ class AppSidebar extends GetView<SidebarController> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.lg),
                 Padding(
-                  padding: const EdgeInsets.only(left: 6, bottom: 8),
-                  child: CustomText(
-                    'sidebar_chats'.tr,
-                    fontSize: 12,
-                    color: context.color.textBody,
+                  padding: const EdgeInsetsDirectional.only(
+                    start: 6,
+                    bottom: 8,
+                  ),
+                  child: AppText(
+                    AppStrings.sidebarChats.tr,
+                    fontSize: AppFontSize.overline,
+                    color: appColors.textBody,
                   ),
                 ),
                 const _ChatsCard(),
@@ -95,9 +103,9 @@ class AppSidebar extends GetView<SidebarController> {
 
 /// Rounded outlined box shared by the sidebar cards.
 BoxDecoration _cardDecoration(BuildContext context) => BoxDecoration(
-  color: context.color.sidebarCard,
+  color: appColors.sidebarCard,
   borderRadius: BorderRadius.circular(14),
-  border: Border.all(color: context.color.tileBorder),
+  border: Border.all(color: appColors.tileBorder),
 );
 
 /// Back button that grows in front of the search field while searching.
@@ -117,7 +125,7 @@ class _BackButton extends StatelessWidget {
         if (t == 0) return const SizedBox.shrink();
         return ClipRect(
           child: Align(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             widthFactor: t,
             child: Opacity(
               opacity: t,
@@ -127,7 +135,7 @@ class _BackButton extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsetsDirectional.only(end: 10),
         child: _RoundButton(
           icon: PhosphorIconsRegular.caretLeft,
           onTap: controller.onSearchBack,
@@ -146,14 +154,14 @@ class _RoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.color.tileFill,
-      shape: CircleBorder(side: BorderSide(color: context.color.tileBorder)),
+      color: appColors.tileFill,
+      shape: CircleBorder(side: BorderSide(color: appColors.tileBorder)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: SizedBox.square(
           dimension: 44,
-          child: Icon(icon, size: 20, color: context.color.textNatural),
+          child: Icon(icon, size: 20, color: appColors.textNatural),
         ),
       ),
     );
@@ -171,7 +179,7 @@ class _SearchField extends GetView<SidebarController> {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return AnimatedBuilder(
       animation: controller.search,
       builder: (context, _) {
@@ -230,23 +238,23 @@ class _SearchField extends GetView<SidebarController> {
                               cursorColor: color.primary,
                               style: TextStyle(
                                 color: color.textNatural,
-                                fontSize: 14,
+                                fontSize: AppFontSize.label,
                               ),
                               decoration: InputDecoration(
-                                hintText: 'sidebar_search_hint'.tr,
+                                hintText: AppStrings.sidebarSearchHint.tr,
                                 hintStyle: TextStyle(
                                   color: color.textBody,
-                                  fontSize: 14,
+                                  fontSize: AppFontSize.label,
                                 ),
                                 hintMaxLines: 1,
                                 border: InputBorder.none,
                                 isCollapsed: true,
                               ),
                             )
-                          : CustomText(
-                              'sidebar_search_hint'.tr,
+                          : AppText(
+                              AppStrings.sidebarSearchHint.tr,
                               maxLines: 1,
-                              fontSize: 14,
+                              fontSize: AppFontSize.label,
                               color: color.textBody,
                             ),
                     ),
@@ -289,7 +297,7 @@ class _ClearButton extends StatelessWidget {
                   child: Icon(
                     PhosphorIconsFill.xCircle,
                     size: 18,
-                    color: context.color.textBody,
+                    color: appColors.textBody,
                   ),
                 ),
               ),
@@ -319,7 +327,7 @@ class _MenuCard extends StatelessWidget {
                   thickness: 1,
                   indent: 12,
                   endIndent: 12,
-                  color: context.color.tileBorder,
+                  color: appColors.tileBorder,
                 ),
               children[i],
             ],
@@ -370,28 +378,24 @@ class _MenuRow extends StatelessWidget {
               AppSvgIcon(
                 asset,
                 size: 20,
-                color: iconColor ?? context.color.textNatural,
+                color: iconColor ?? appColors.textNatural,
               )
             else
-              Icon(
-                icon,
-                size: 20,
-                color: iconColor ?? context.color.textNatural,
-              ),
-            const SizedBox(width: 12),
+              Icon(icon, size: 20, color: iconColor ?? appColors.textNatural),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
-              child: CustomText(
+              child: AppText(
                 label,
                 maxLines: 1,
-                fontSize: 14,
-                color: context.color.textNatural,
+                fontSize: AppFontSize.label,
+                color: appColors.textNatural,
               ),
             ),
             if (showArrow)
               Icon(
                 PhosphorIconsRegular.caretRight,
                 size: 16,
-                color: context.color.textNatural,
+                color: appColors.textNatural,
               ),
           ],
         ),
@@ -437,12 +441,12 @@ class _ChatsCard extends GetView<SidebarController> {
             child: chats.isEmpty
                 ? Padding(
                     key: const ValueKey('empty'),
-                    padding: const EdgeInsets.all(12),
-                    child: CustomText(
-                      'sidebar_no_chats'.tr,
-                      fontSize: 14,
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: AppText(
+                      AppStrings.sidebarNoChats.tr,
+                      fontSize: AppFontSize.label,
                       textAlign: TextAlign.center,
-                      color: context.color.textBody,
+                      color: appColors.textBody,
                     ),
                   )
                 : Column(
@@ -486,21 +490,21 @@ class _ChatRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? context.color.sidebarSelected : Colors.transparent,
+      color: selected ? appColors.sidebarSelected : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.only(left: 8),
+          padding: const EdgeInsetsDirectional.only(start: 8),
           child: Row(
             children: [
               Expanded(
-                child: CustomText(
+                child: AppText(
                   chat.title,
                   maxLines: 1,
-                  fontSize: 14,
-                  color: context.color.textNatural,
+                  fontSize: AppFontSize.label,
+                  color: appColors.textNatural,
                 ),
               ),
               Builder(
@@ -517,7 +521,7 @@ class _ChatRow extends StatelessWidget {
                     child: Icon(
                       PhosphorIconsRegular.dotsThreeVertical,
                       size: 16,
-                      color: context.color.textBody,
+                      color: appColors.textBody,
                     ),
                   ),
                 ),
@@ -553,32 +557,32 @@ class _ProfileTile extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: context.color.primary,
+                    color: appColors.primary,
                   ),
                   child: Icon(
                     PhosphorIconsRegular.user,
                     size: 20,
-                    color: context.color.textNatural,
+                    color: appColors.textNatural,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomText(
+                      AppText(
                         controller.userName,
                         maxLines: 1,
-                        fontSize: 14,
+                        fontSize: AppFontSize.label,
                         fontWeight: FontWeight.w600,
-                        color: context.color.textNatural,
+                        color: appColors.textNatural,
                       ),
                       const SizedBox(height: 2),
-                      CustomText(
+                      AppText(
                         controller.userEmail,
                         maxLines: 1,
-                        fontSize: 12,
-                        color: context.color.textBody,
+                        fontSize: AppFontSize.overline,
+                        color: appColors.textBody,
                       ),
                     ],
                   ),
@@ -586,7 +590,7 @@ class _ProfileTile extends StatelessWidget {
                 Icon(
                   PhosphorIconsRegular.caretRight,
                   size: 16,
-                  color: context.color.textNatural,
+                  color: appColors.textNatural,
                 ),
               ],
             ),

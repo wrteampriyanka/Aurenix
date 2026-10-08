@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// What the user picked from a project's long-press menu.
 enum ProjectMenuAction { edit, instructions, importChats, delete }
@@ -33,7 +36,7 @@ class ProjectMenuSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return SafeArea(
       top: false,
       child: Container(
@@ -61,22 +64,22 @@ class ProjectMenuSheet extends StatelessWidget {
             const SizedBox(height: 10),
             _Row(
               icon: PhosphorIconsRegular.pencilSimple,
-              label: 'projects_menu_edit'.tr,
+              label: AppStrings.projectsMenuEdit.tr,
               action: ProjectMenuAction.edit,
             ),
             _Row(
               icon: PhosphorIconsRegular.slidersHorizontal,
-              label: 'projects_menu_instructions'.tr,
+              label: AppStrings.projectsMenuInstructions.tr,
               action: ProjectMenuAction.instructions,
             ),
             _Row(
               icon: PhosphorIconsRegular.arrowCircleDown,
-              label: 'projects_menu_import_chats'.tr,
+              label: AppStrings.projectsMenuImportChats.tr,
               action: ProjectMenuAction.importChats,
             ),
             _Row(
               icon: PhosphorIconsRegular.trash,
-              label: 'projects_menu_delete'.tr,
+              label: AppStrings.projectsMenuDelete.tr,
               action: ProjectMenuAction.delete,
             ),
             const SizedBox(height: 10),
@@ -96,7 +99,7 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -106,12 +109,12 @@ class _Row extends StatelessWidget {
           child: Row(
             children: [
               Icon(icon, size: 24, color: color.textNatural),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.lg),
               Expanded(
-                child: CustomText(
+                child: AppText(
                   label,
                   maxLines: 1,
-                  fontSize: 16,
+                  fontSize: AppFontSize.body,
                   color: color.textNatural,
                 ),
               ),

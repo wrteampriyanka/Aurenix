@@ -5,7 +5,7 @@ import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/elapsed_time_mixin.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 
 /// Primary pill button with a leading animated circular icon.
 /// Uses the primary blue by default; pass [color], [highlightColor] and
@@ -71,14 +71,14 @@ class _AppButtonState extends State<AppButton>
           decoration: BoxDecoration(
             borderRadius: radius,
             border: Border.all(
-              color: widget.borderColor ?? context.color.buttonBorder,
+              color: widget.borderColor ?? appColors.buttonBorder,
             ),
             gradient: RadialGradient(
               center: const Alignment(-0.7, -1.4),
               radius: 1.6,
               colors: [
-                widget.highlightColor ?? context.color.buttonHighlight,
-                widget.color ?? context.color.primary,
+                widget.highlightColor ?? appColors.buttonHighlight,
+                widget.color ?? appColors.primary,
               ],
               stops: const [0, 0.55],
             ),
@@ -108,12 +108,12 @@ class _AppButtonState extends State<AppButton>
                       const SizedBox(width: 18),
                     ],
                     Flexible(
-                      child: CustomText(
+                      child: AppText(
                         widget.label,
                         maxLines: 1,
                         fontSize: widget.fontSize,
                         fontWeight: FontWeight.w400,
-                        color: context.color.textNatural,
+                        color: appColors.textNatural,
                       ),
                     ),
                   ],
@@ -146,7 +146,7 @@ class _AnimatedIconCircle extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: context.color.primaryShade50,
+        color: appColors.primaryShade50,
         shape: BoxShape.circle,
       ),
       child: animate
@@ -160,9 +160,9 @@ class _AnimatedIconCircle extends StatelessWidget {
                 ),
                 child: child,
               ),
-              child: Icon(icon, size: 18, color: context.color.primary),
+              child: Icon(icon, size: 18, color: appColors.primary),
             )
-          : Icon(icon, size: 18, color: context.color.primary),
+          : Icon(icon, size: 18, color: appColors.primary),
     );
 
     if (!animate) return circle;
@@ -171,10 +171,7 @@ class _AnimatedIconCircle extends StatelessWidget {
     // (e.g. a full-screen background shader) on every tick.
     return RepaintBoundary(
       child: CustomPaint(
-        painter: _RipplePainter(
-          time: time,
-          color: context.color.primaryShade50,
-        ),
+        painter: _RipplePainter(time: time, color: appColors.primaryShade50),
         child: circle,
       ),
     );

@@ -41,8 +41,9 @@ class ChatQuotaService {
   /// Messages still left in the current window.
   int get remaining => (freeMessages - used.value).clamp(0, freeMessages);
 
-  /// Reads the saved window back. Call once after [StorageService.init].
-  void init() {
+  /// Reads the saved window back. Call once after [StorageService.init],
+  /// and await it: the first frame must not see an empty allowance.
+  Future<void> init() async {
     final storage = StorageService.instance;
     final start = storage.getInt(_windowStartKey);
     if (start == null) return;

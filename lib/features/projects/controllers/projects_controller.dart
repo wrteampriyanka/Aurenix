@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/home/models/project.dart';
 
 /// All of the user's projects. The list lives in [SidebarController], which
 /// stays alive under this screen, so new projects show in the sidebar too.

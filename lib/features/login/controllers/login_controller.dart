@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/services/session_service.dart';
-import 'package:aurenix/features/otp/controllers/otp_controller.dart';
-import 'package:aurenix/features/widgets/bottom_sheets/forgot_password_sheet.dart';
+import 'package:aurenix/commons/widgets/bottom_sheets/forgot_password_sheet.dart';
+import 'package:aurenix/features/otp/models/otp_args.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -15,13 +17,9 @@ class LoginController extends GetxController {
   final forgotFormKey = GlobalKey<FormState>();
   final forgotEmailController = TextEditingController();
 
-  final isPasswordHidden = true.obs;
-
   late final termsRecognizer = TapGestureRecognizer()..onTap = onTermsTap;
   late final privacyRecognizer = TapGestureRecognizer()..onTap = onPrivacyTap;
   late final registerRecognizer = TapGestureRecognizer()..onTap = onRegister;
-
-  void togglePasswordVisibility() => isPasswordHidden.toggle();
 
   void onRegister() => Get.toNamed(AppRoutes.register);
 
@@ -39,7 +37,7 @@ class LoginController extends GetxController {
   /// return to them and the next app launch opens straight into the chat.
   Future<void> _goHome() async {
     await SessionService.instance.signIn();
-    Get.offAllNamed(AppRoutes.home);
+    unawaited(Get.offAllNamed(AppRoutes.home));
   }
 
   /// Opens the forgot password sheet, prefilled with the login email.

@@ -2,9 +2,9 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/commons/widgets/app_system_ui_overlay.dart';
 
 /// Slides [sidebar] in from the left over [child], which stays in place and
 /// is dimmed behind it.
@@ -51,10 +51,7 @@ class SidebarDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+    return AppSystemUiOverlay(
       child: LayoutBuilder(
         builder: (context, constraints) {
           final drawerWidth = math.min(
@@ -78,8 +75,8 @@ class SidebarDrawer extends StatelessWidget {
                         child: GestureDetector(
                           onTap: animation.reverse,
                           child: ColoredBox(
-                            color: context.color.sidebarScrim.withValues(
-                              alpha: context.color.sidebarScrim.a * t,
+                            color: appColors.sidebarScrim.withValues(
+                              alpha: appColors.sidebarScrim.a * t,
                             ),
                           ),
                         ),
@@ -97,7 +94,7 @@ class SidebarDrawer extends StatelessWidget {
                           offset: Offset(-(1 - t) * width, 0),
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              color: context.color.sidebarBackground,
+                              color: appColors.sidebarBackground,
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(

@@ -3,10 +3,14 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/features/collaboration/controllers/collaboration_controller.dart';
+import 'package:aurenix/features/collaboration/models/collaborator.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Who a project is shared with: its access setting, an invite field and
 /// the list of members with their roles.
@@ -16,26 +20,26 @@ class CollaborationScreen extends GetView<CollaborationController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'collaboration_title'.tr,
+      title: AppStrings.collaborationTitle.tr,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       bottom: AppButton(
-        label: 'collaboration_share_link'.tr,
+        label: AppStrings.collaborationShareLink.tr,
         icon: null,
         height: 52,
-        fontSize: 16,
+        fontSize: AppFontSize.body,
         onPressed: controller.onShareLink,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const _AccessTile(),
-          const SizedBox(height: 20),
-          _Label('collaboration_invite_label'.tr),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.xl),
+          _Label(AppStrings.collaborationInviteLabel.tr),
+          const SizedBox(height: AppSpacing.sm),
           _InviteRow(controller: controller),
-          const SizedBox(height: 20),
-          _Label('collaboration_members_label'.tr),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.xl),
+          _Label(AppStrings.collaborationMembersLabel.tr),
+          const SizedBox(height: AppSpacing.sm),
           Obx(
             () => Column(
               children: [
@@ -65,7 +69,11 @@ class _Label extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomText(text, fontSize: 12, color: context.color.textBody);
+    return AppText(
+      text,
+      fontSize: AppFontSize.overline,
+      color: appColors.textBody,
+    );
   }
 }
 
@@ -75,7 +83,7 @@ class _AccessTile extends GetView<CollaborationController> {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       color: color.inputFill,
       borderRadius: BorderRadius.circular(14),
@@ -96,13 +104,13 @@ class _AccessTile extends GetView<CollaborationController> {
                 size: 20,
                 color: color.textNatural,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Obx(
-                  () => CustomText(
+                  () => AppText(
                     _accessLabel(controller.access.value),
                     maxLines: 1,
-                    fontSize: 15,
+                    fontSize: AppFontSize.chat,
                     color: color.textNatural,
                   ),
                 ),
@@ -121,8 +129,8 @@ class _AccessTile extends GetView<CollaborationController> {
 }
 
 String _accessLabel(ProjectAccess access) => switch (access) {
-  ProjectAccess.onlyInvited => 'collaboration_only_invited'.tr,
-  ProjectAccess.anyoneWithLink => 'collaboration_anyone_with_link'.tr,
+  ProjectAccess.onlyInvited => AppStrings.collaborationOnlyInvited.tr,
+  ProjectAccess.anyoneWithLink => AppStrings.collaborationAnyoneWithLink.tr,
 };
 
 IconData _accessIcon(ProjectAccess access) => switch (access) {
@@ -175,16 +183,16 @@ class _AccessMenuEntry extends PopupMenuEntry<ProjectAccess> {
 class _AccessMenuEntryState extends State<_AccessMenuEntry> {
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-          child: CustomText(
-            'collaboration_menu_title'.tr,
-            fontSize: 12,
+          child: AppText(
+            AppStrings.collaborationMenuTitle.tr,
+            fontSize: AppFontSize.overline,
             color: color.textBody,
           ),
         ),
@@ -212,10 +220,10 @@ class _AccessMenuEntryState extends State<_AccessMenuEntry> {
                         ),
                         const SizedBox(width: 14),
                         Expanded(
-                          child: CustomText(
+                          child: AppText(
                             _accessLabel(access),
                             maxLines: 1,
-                            fontSize: 15,
+                            fontSize: AppFontSize.chat,
                             color: color.textNatural,
                           ),
                         ),
@@ -239,7 +247,7 @@ class _InviteRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Row(
       children: [
         Expanded(
@@ -266,10 +274,16 @@ class _InviteRow extends StatelessWidget {
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => controller.onInvite(),
                     cursorColor: color.primary,
-                    style: TextStyle(color: color.textNatural, fontSize: 15),
+                    style: TextStyle(
+                      color: color.textNatural,
+                      fontSize: AppFontSize.chat,
+                    ),
                     decoration: InputDecoration(
-                      hintText: 'collaboration_email_hint'.tr,
-                      hintStyle: TextStyle(color: color.textBody, fontSize: 15),
+                      hintText: AppStrings.collaborationEmailHint.tr,
+                      hintStyle: TextStyle(
+                        color: color.textBody,
+                        fontSize: AppFontSize.chat,
+                      ),
                       hintMaxLines: 1,
                       border: InputBorder.none,
                       isCollapsed: true,
@@ -281,7 +295,7 @@ class _InviteRow extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Obx(
           () => Material(
             color: controller.canInvite.value
@@ -322,10 +336,10 @@ class _MemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Container(
       height: 64,
-      padding: const EdgeInsets.only(left: 12, right: 4),
+      padding: const EdgeInsetsDirectional.only(start: 12, end: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: color.tileBorder),
@@ -340,42 +354,42 @@ class _MemberTile extends StatelessWidget {
               color: member.color,
               shape: BoxShape.circle,
             ),
-            child: CustomText(
+            child: AppText(
               member.initials,
-              fontSize: 14,
+              fontSize: AppFontSize.label,
               fontWeight: FontWeight.w600,
               color: color.textNatural,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomText(
+                AppText(
                   member.name,
                   maxLines: 1,
-                  fontSize: 15,
+                  fontSize: AppFontSize.chat,
                   color: color.textNatural,
                 ),
                 const SizedBox(height: 2),
-                CustomText(
+                AppText(
                   member.email,
                   maxLines: 1,
-                  fontSize: 12,
+                  fontSize: AppFontSize.overline,
                   color: color.textBody,
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           if (member.role == CollaboratorRole.owner)
             Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: CustomText(
+              padding: const EdgeInsetsDirectional.only(end: 12),
+              child: AppText(
                 roleLabel(member.role),
-                fontSize: 13,
+                fontSize: AppFontSize.caption,
                 color: color.textBody,
               ),
             )
@@ -387,9 +401,9 @@ class _MemberTile extends StatelessWidget {
   }
 
   static String roleLabel(CollaboratorRole role) => switch (role) {
-    CollaboratorRole.owner => 'collaboration_role_owner'.tr,
-    CollaboratorRole.canEdit => 'collaboration_role_can_edit'.tr,
-    CollaboratorRole.viewOnly => 'collaboration_role_view_only'.tr,
+    CollaboratorRole.owner => AppStrings.collaborationRoleOwner.tr,
+    CollaboratorRole.canEdit => AppStrings.collaborationRoleCanEdit.tr,
+    CollaboratorRole.viewOnly => AppStrings.collaborationRoleViewOnly.tr,
   };
 }
 
@@ -407,7 +421,7 @@ class _RoleMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return PopupMenuButton<CollaboratorRole?>(
       onSelected: (role) => role == null ? onRemove() : onRole(role),
       padding: EdgeInsets.zero,
@@ -420,27 +434,26 @@ class _RoleMenu extends StatelessWidget {
         PopupMenuItem(
           value: CollaboratorRole.canEdit,
           height: 44,
-          child: CustomText(
+          child: AppText(
             _MemberTile.roleLabel(CollaboratorRole.canEdit),
-            fontSize: 14,
+            fontSize: AppFontSize.label,
             color: color.textNatural,
           ),
         ),
         PopupMenuItem(
           value: CollaboratorRole.viewOnly,
           height: 44,
-          child: CustomText(
+          child: AppText(
             _MemberTile.roleLabel(CollaboratorRole.viewOnly),
-            fontSize: 14,
+            fontSize: AppFontSize.label,
             color: color.textNatural,
           ),
         ),
         PopupMenuItem(
-          value: null,
           height: 44,
-          child: CustomText(
-            'collaboration_remove'.tr,
-            fontSize: 14,
+          child: AppText(
+            AppStrings.collaborationRemove.tr,
+            fontSize: AppFontSize.label,
             color: color.error,
           ),
         ),
@@ -450,12 +463,12 @@ class _RoleMenu extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CustomText(
+            AppText(
               _MemberTile.roleLabel(member.role),
-              fontSize: 13,
+              fontSize: AppFontSize.caption,
               color: color.textBody,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.xs),
             Icon(
               PhosphorIconsRegular.caretDown,
               size: 14,

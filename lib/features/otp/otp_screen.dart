@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/app_background.dart';
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_otp_field.dart';
-import 'package:aurenix/features/widgets/app_terms_footer.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_background.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_otp_field.dart';
+import 'package:aurenix/commons/widgets/app_terms_footer.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/otp/controllers/otp_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class OtpScreen extends GetView<OtpController> {
   const OtpScreen({super.key});
@@ -15,7 +18,7 @@ class OtpScreen extends GetView<OtpController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppBackground(
         gridOverContent: false,
         child: SafeArea(
@@ -29,16 +32,15 @@ class OtpScreen extends GetView<OtpController> {
                     children: [
                       const SizedBox(height: 56),
                       _Header(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       AppOtpField(
                         controller: controller.codeController,
                         focusNode: controller.codeFocusNode,
-                        length: OtpController.codeLength,
                         onCompleted: (_) => controller.onContinue(),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       AppButton(
-                        label: 'continue'.tr,
+                        label: AppStrings.continueKey.tr,
                         icon: null,
                         height: 44,
                         onPressed: controller.onContinue,
@@ -46,12 +48,12 @@ class OtpScreen extends GetView<OtpController> {
                       const SizedBox(height: 28),
                       _ResendPrompt(controller: controller),
                       const Spacer(),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                       AppTermsFooter(
                         termsRecognizer: controller.termsRecognizer,
                         privacyRecognizer: controller.privacyRecognizer,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),
@@ -69,19 +71,21 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CustomText(
-          'otp_title'.tr,
-          fontSize: 32,
+        AppText(
+          AppStrings.otpTitle.tr,
+          fontSize: AppFontSize.title,
           fontWeight: FontWeight.w700,
           textAlign: TextAlign.center,
-          color: context.color.textNatural,
+          color: appColors.textNatural,
         ),
         const SizedBox(height: 10),
-        CustomText(
-          'otp_subtitle'.trParams({'count': '${OtpController.codeLength}'}),
-          fontSize: 16,
+        AppText(
+          AppStrings.otpSubtitle.trParams({
+            'count': '${OtpController.codeLength}',
+          }),
+          fontSize: AppFontSize.body,
           textAlign: TextAlign.center,
-          color: context.color.textBody,
+          color: appColors.textBody,
         ),
       ],
     );
@@ -97,29 +101,28 @@ class _ResendPrompt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final linkStyle = TextStyle(
-      color: context.color.primary,
+      color: appColors.primary,
       decoration: TextDecoration.underline,
-      decorationColor: context.color.primary,
+      decorationColor: appColors.primary,
     );
 
     return Obx(
-      () => CustomText(
-        '',
-        fontSize: 14,
-        textAlign: TextAlign.center,
-        color: context.color.textBody,
-        textSpan: controller.canResend
+      () => AppText.rich(
+        controller.canResend
             ? TextSpan(
-                text: 'resend_code'.tr,
+                text: AppStrings.resendCode.tr,
                 recognizer: controller.resendRecognizer,
                 style: linkStyle,
               )
             : TextSpan(
                 children: [
-                  TextSpan(text: 'resend_code_in'.tr),
+                  TextSpan(text: AppStrings.resendCodeIn.tr),
                   TextSpan(text: controller.resendCountdown, style: linkStyle),
                 ],
               ),
+        fontSize: AppFontSize.label,
+        textAlign: TextAlign.center,
+        color: appColors.textBody,
       ),
     );
   }

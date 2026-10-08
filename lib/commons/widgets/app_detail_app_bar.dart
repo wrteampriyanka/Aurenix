@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
 
 /// Top bar of the profile detail screens: reaches up behind the status bar,
 /// carries the teal glow, and rounds off its bottom-left and bottom-right
@@ -26,7 +26,7 @@ class AppDetailAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     const shape = BorderRadius.vertical(bottom: Radius.circular(_radius));
     return CustomPaint(
       foregroundPainter: _OpenTopBorderPainter(

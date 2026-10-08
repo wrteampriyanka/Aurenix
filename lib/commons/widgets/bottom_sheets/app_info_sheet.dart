@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Floating sheet describing a third-party app: its logo, name and handle,
 /// a Connect or Disconnect button, and the permissions it grants.
@@ -72,7 +75,7 @@ class AppInfoSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     final reveal = _Stagger(ModalRoute.of(context)?.animation);
     return SafeArea(
       top: false,
@@ -102,7 +105,7 @@ class AppInfoSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: color.tileBorder),
@@ -114,16 +117,16 @@ class AppInfoSheet extends StatelessWidget {
                             0,
                             _Header(logo: logo, name: name, handle: handle),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.lg),
                           reveal(
                             1,
                             connected
                                 ? _DisconnectButton(onPressed: onDisconnect)
                                 : AppButton(
-                                    label: 'app_info_connect'.tr,
+                                    label: AppStrings.appInfoConnect.tr,
                                     icon: null,
                                     height: 44,
-                                    fontSize: 15,
+                                    fontSize: AppFontSize.chat,
                                     onPressed: onConnect,
                                   ),
                           ),
@@ -131,7 +134,7 @@ class AppInfoSheet extends StatelessWidget {
                       ),
                     ),
                     if (permissions.isNotEmpty) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -170,7 +173,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Row(
       children: [
         Container(
@@ -183,23 +186,23 @@ class _Header extends StatelessWidget {
           ),
           child: logo,
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomText(
+              AppText(
                 name,
                 maxLines: 1,
-                fontSize: 16,
+                fontSize: AppFontSize.body,
                 fontWeight: FontWeight.w600,
                 color: color.textNatural,
               ),
-              const SizedBox(height: 4),
-              CustomText(
+              const SizedBox(height: AppSpacing.xs),
+              AppText(
                 handle,
                 maxLines: 1,
-                fontSize: 12,
+                fontSize: AppFontSize.overline,
                 showUnderline: true,
                 underlineOrLineColor: color.textBody,
                 color: color.textBody,
@@ -220,7 +223,7 @@ class _DisconnectButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.color.sheetCard,
+      color: appColors.sheetCard,
       shape: const StadiumBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -228,11 +231,11 @@ class _DisconnectButton extends StatelessWidget {
         child: SizedBox(
           height: 44,
           child: Center(
-            child: CustomText(
-              'app_info_disconnect'.tr,
+            child: AppText(
+              AppStrings.appInfoDisconnect.tr,
               maxLines: 1,
-              fontSize: 15,
-              color: context.color.textBody,
+              fontSize: AppFontSize.chat,
+              color: appColors.textBody,
             ),
           ),
         ),
@@ -248,7 +251,7 @@ class _PermissionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -266,12 +269,12 @@ class _PermissionRow extends StatelessWidget {
               color: color.textBody,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: CustomText(
+            child: AppText(
               label,
               maxLines: 2,
-              fontSize: 14,
+              fontSize: AppFontSize.label,
               color: color.textNatural,
             ),
           ),

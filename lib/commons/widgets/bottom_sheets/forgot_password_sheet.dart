@@ -3,13 +3,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/validators.dart';
 import 'package:aurenix/features/login/controllers/login_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Bottom sheet asking for the account email before starting verification.
 /// Plain dark background, as in the design.
@@ -36,10 +39,8 @@ class ForgotPasswordSheet extends GetView<LoginController> {
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: context.color.backgroundBase,
-                border: Border(
-                  top: BorderSide(color: context.color.strokeDark),
-                ),
+                color: appColors.backgroundBase,
+                border: Border(top: BorderSide(color: appColors.strokeDark)),
               ),
             ),
           ),
@@ -74,44 +75,45 @@ class _Content extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: context.color.divider,
+                color: appColors.divider,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           _FadeSlideIn(
             order: 0,
             child: SvgPicture.asset(AppAssets.forgotPassword, height: 150),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           _FadeSlideIn(
             order: 1,
             child: Column(
               children: [
-                CustomText(
-                  'forgot_password_title'.tr,
-                  fontSize: 26,
+                AppText(
+                  AppStrings.forgotPasswordTitle.tr,
+                  fontSize: AppFontSize.sheetTitle,
                   fontWeight: FontWeight.w600,
                   textAlign: TextAlign.center,
-                  color: context.color.textNatural,
+                  color: appColors.textNatural,
                 ),
-                const SizedBox(height: 8),
-                CustomText(
-                  'forgot_password_subtitle'.tr,
-                  fontSize: 15,
+                const SizedBox(height: AppSpacing.sm),
+                AppText(
+                  AppStrings.forgotPasswordSubtitle.tr,
+                  fontSize: AppFontSize.chat,
                   textAlign: TextAlign.center,
-                  color: context.color.textBody,
+                  color: appColors.textBody,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
           _FadeSlideIn(
             order: 2,
             child: AppTextField(
               controller: controller.forgotEmailController,
-              hint: 'email_hint'.tr,
+              label: AppStrings.fieldEmailLabel.tr,
+              hint: AppStrings.emailHint.tr,
               prefixIcon: PhosphorIconsRegular.envelopeSimple,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.done,
@@ -120,11 +122,11 @@ class _Content extends StatelessWidget {
               onFieldSubmitted: (_) => controller.onStartVerification(),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           _FadeSlideIn(
             order: 3,
             child: AppButton(
-              label: 'start_verification'.tr,
+              label: AppStrings.startVerification.tr,
               icon: PhosphorIconsRegular.shieldCheck,
               height: 52,
               onPressed: controller.onStartVerification,

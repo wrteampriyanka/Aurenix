@@ -2,6 +2,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/storage/storage_service.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// One of the voices the assistant can speak with, picked in Voice
 /// Preferences. The device's text to speech voices differ per phone, so a
@@ -44,7 +45,7 @@ class VoiceService {
     AssistantVoice(
       id: 'victor',
       name: 'Victor',
-      taglineKey: 'voice_tagline_victor',
+      taglineKey: AppStrings.voiceTaglineVictor,
       isMale: true,
       pitch: 1.0,
       fallbackPitch: 0.75,
@@ -53,7 +54,7 @@ class VoiceService {
     AssistantVoice(
       id: 'aria',
       name: 'Aria',
-      taglineKey: 'voice_tagline_aria',
+      taglineKey: AppStrings.voiceTaglineAria,
       isMale: false,
       pitch: 1.05,
       fallbackPitch: 1.2,
@@ -62,7 +63,7 @@ class VoiceService {
     AssistantVoice(
       id: 'orion',
       name: 'Orion',
-      taglineKey: 'voice_tagline_orion',
+      taglineKey: AppStrings.voiceTaglineOrion,
       isMale: true,
       pitch: 0.9,
       fallbackPitch: 0.62,
@@ -71,7 +72,7 @@ class VoiceService {
     AssistantVoice(
       id: 'luna',
       name: 'Luna',
-      taglineKey: 'voice_tagline_luna',
+      taglineKey: AppStrings.voiceTaglineLuna,
       isMale: false,
       pitch: 1.15,
       fallbackPitch: 1.35,
@@ -90,6 +91,92 @@ class VoiceService {
     selected.value = voice;
     await StorageService.instance.setString(StorageService.voiceKey, voice.id);
   }
+
+  // ---------------------------------------------------------------------
+  // The engine.
+  //
+  // One [FlutterTts] for the whole app. There is only one native engine, so
+  // three instances were three handles on the same thing: whoever spoke last
+  // owned the error handler, and stopping one stopped the others without
+  // their knowing. Everything goes through [speak] and [stop] now, and a run
+  // counter says whose turn it still is.
+  // ---------------------------------------------------------------------
+
+  final _tts = FlutterTts();
+
+  /// Bumped by [stop] and by each new [speak], so a speak that has been
+  /// taken over can tell and give up quietly.
+  int _run = 0;
+
+  bool _configured = false;
+
+  /// Sets the engine up once per app run. Each speak call returns only once
+  /// it has been read out. On iOS it plays through the speaker even in
+  /// silent mode and after the mic has set up recording.
+  Future<void> _configure() async {
+    if (_configured) return;
+    _configured = true;
+    _tts.setErrorHandler((_) => _run++);
+    await _tts.awaitSpeakCompletion(true);
+    if (GetPlatform.isIOS) {
+      await _tts.setSharedInstance(true);
+      await _tts.setIosAudioCategory(IosTextToSpeechAudioCategory.playback, [
+        IosTextToSpeechAudioCategoryOptions.duckOthers,
+      ], IosTextToSpeechAudioMode.spokenAudio);
+    }
+  }
+
+  /// Reads [text] aloud in [voice], the selected one by default.
+  ///
+  /// Returns true once the whole text has been read, false if another caller
+  /// started speaking or [stop] was called part way through. Throws if the
+  /// engine refuses to speak.
+  Future<bool> speak(String text, {AssistantVoice? voice}) async {
+    final run = ++_run;
+    await _configure();
+    if (run != _run) return false;
+    await apply(_tts, voice);
+    for (final part in speechParts(text)) {
+      if (run != _run) return false;
+      if (await _tts.speak(part) != 1) throw Exception('speak failed');
+    }
+    return run == _run;
+  }
+
+  /// Stops whatever is being read out. Any [speak] still running returns
+  /// false rather than finishing.
+  Future<void> stop() async {
+    _run++;
+    await _tts.stop();
+  }
+
+  /// Splits [text] at sentence ends into parts short enough for Android,
+  /// which refuses to read long text in one go.
+  static List<String> speechParts(String text, {int maxLength = 1000}) {
+    final parts = <String>[];
+    var current = '';
+    for (final sentence in text.split(RegExp(r'(?<=[.!?\n])\s+'))) {
+      if (current.isNotEmpty &&
+          current.length + sentence.length + 1 > maxLength) {
+        parts.add(current);
+        current = '';
+      }
+      current = current.isEmpty ? sentence : '$current $sentence';
+      while (current.length > maxLength) {
+        parts.add(current.substring(0, maxLength));
+        current = current.substring(maxLength);
+      }
+    }
+    if (current.trim().isNotEmpty) parts.add(current);
+    return parts;
+  }
+
+  /// Markdown without the symbols, so they are neither shown nor read out.
+  static String plainText(String markdown) => markdown
+      .replaceAllMapped(RegExp(r'\[([^\]]*)\]\([^)]*\)'), (m) => m[1]!)
+      .replaceAll(RegExp(r'[*_#`>|~]'), '')
+      .replaceAll(RegExp(r'^\s*[-+]\s+', multiLine: true), '')
+      .trim();
 
   /// The installed voice each assistant voice speaks with, by id, worked
   /// out once. Missing when the phone has no voice left to give it.

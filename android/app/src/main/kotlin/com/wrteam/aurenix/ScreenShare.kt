@@ -1,4 +1,4 @@
-package com.example.aurenix
+package com.wrteam.aurenix
 
 import android.app.Activity
 import android.content.Intent

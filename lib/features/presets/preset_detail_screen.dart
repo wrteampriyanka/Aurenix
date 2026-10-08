@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/presets/controllers/preset_detail_controller.dart';
-import 'package:aurenix/features/presets/controllers/presets_controller.dart';
 import 'package:aurenix/features/presets/widgets/preset_widgets.dart';
+import 'package:aurenix/features/presets/models/preset.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Everything about one preset: its card, ratings, capabilities and quick
 /// starter prompts, with "Start Chat" pinned to the bottom.
@@ -24,10 +27,14 @@ class PresetDetailScreen extends GetView<PresetDetailController> {
   @override
   Widget build(BuildContext context) {
     final preset = controller.preset;
+    // Opened without a preset; the controller is already navigating away.
+    if (preset == null) {
+      return Scaffold(backgroundColor: appColors.backgroundBase);
+    }
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppPlainBackground(
-        glow: context.color.backgroundGlow,
+        glow: appColors.backgroundGlow,
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,21 +57,21 @@ class PresetDetailScreen extends GetView<PresetDetailController> {
                     _Reveal(
                       index: 1,
                       child: _Section(
-                        title: 'presets_ratings_reviews'.tr,
+                        title: AppStrings.presetsRatingsReviews.tr,
                         child: _RatingsCard(preset: preset),
                       ),
                     ),
                     _Reveal(
                       index: 2,
                       child: _Section(
-                        title: 'presets_capabilities'.tr,
+                        title: AppStrings.presetsCapabilities.tr,
                         child: _CapabilitiesCard(preset.capabilities),
                       ),
                     ),
                     _Reveal(
                       index: 3,
                       child: _Section(
-                        title: 'presets_quick_starters'.tr,
+                        title: AppStrings.presetsQuickStarters.tr,
                         padded: false,
                         child: PresetQuickStarters(
                           starters: preset.quickStarters,
@@ -80,8 +87,8 @@ class PresetDetailScreen extends GetView<PresetDetailController> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(_side, 8, _side, 16),
                   child: AppButton(
-                    label: 'presets_start_chat'.tr,
-                    fontSize: 16,
+                    label: AppStrings.presetsStartChat.tr,
+                    fontSize: AppFontSize.body,
                     height: 52,
                     onPressed: controller.onStartChat,
                   ),
@@ -172,7 +179,7 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -208,13 +215,13 @@ class _HeaderCard extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                child: CustomText(
-                  'presets_category_rank'.trParams({
+                child: AppText(
+                  AppStrings.presetsCategoryRank.trParams({
                     'rank': '${preset.categoryRank}',
                     'category': preset.category,
                   }),
                   maxLines: 1,
-                  fontSize: 14,
+                  fontSize: AppFontSize.label,
                   color: color.textNatural,
                 ),
               ),
@@ -227,7 +234,7 @@ class _HeaderCard extends StatelessWidget {
                   Row(
                     children: [
                       PresetAvatar(image: preset.image, size: 68),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Align(
                           alignment: AlignmentDirectional.centerEnd,
@@ -236,8 +243,8 @@ class _HeaderCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  PresetName(preset.name, fontSize: 18),
+                  const SizedBox(height: AppSpacing.lg),
+                  PresetName(preset.name, fontSize: AppFontSize.h3),
                   const SizedBox(height: 6),
                   PresetDescription(preset.description),
                   const SizedBox(height: 14),
@@ -266,7 +273,7 @@ class _Conversations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -275,12 +282,12 @@ class _Conversations extends StatelessWidget {
           size: 18,
           color: color.textNatural,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
         Flexible(
-          child: CustomText(
-            'presets_conversations'.trParams({'count': count}),
+          child: AppText(
+            AppStrings.presetsConversations.trParams({'count': count}),
             maxLines: 1,
-            fontSize: 14,
+            fontSize: AppFontSize.label,
             color: color.textNatural,
           ),
         ),
@@ -298,7 +305,7 @@ class _RatingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -317,22 +324,22 @@ class _RatingsCard extends StatelessWidget {
                       color: color.ratingStar,
                     ),
                     const SizedBox(width: 10),
-                    CustomText(
+                    AppText(
                       preset.rating.toStringAsFixed(1),
                       maxLines: 1,
-                      fontSize: 26,
+                      fontSize: AppFontSize.sheetTitle,
                       fontWeight: FontWeight.w700,
                       color: color.textNatural,
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                CustomText(
-                  'presets_reviews_count'.trParams({
+                AppText(
+                  AppStrings.presetsReviewsCount.trParams({
                     'count': '${preset.reviews}',
                   }),
                   maxLines: 1,
-                  fontSize: 12,
+                  fontSize: AppFontSize.overline,
                   color: color.textBody,
                 ),
               ],
@@ -366,20 +373,20 @@ class _RatingBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Row(
       children: [
         SizedBox(
           width: 16,
-          child: CustomText(
+          child: AppText(
             '$stars',
             maxLines: 1,
-            fontSize: 13,
+            fontSize: AppFontSize.caption,
             textAlign: TextAlign.center,
             color: color.textNatural,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(3),
@@ -404,7 +411,7 @@ class _CapabilitiesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return PresetCard(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Column(
@@ -419,12 +426,12 @@ class _CapabilitiesCard extends StatelessWidget {
                     size: 18,
                     color: color.textNatural,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: CustomText(
+                    child: AppText(
                       capability,
                       maxLines: 1,
-                      fontSize: 14,
+                      fontSize: AppFontSize.label,
                       color: color.textNatural,
                     ),
                   ),

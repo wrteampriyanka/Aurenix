@@ -1,24 +1,19 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
+import 'package:aurenix/features/home/models/chat_summary.dart';
+import 'package:aurenix/features/archive_chats/repositories/archive_chats_repository.dart';
 
 /// Actions offered from an archived chat's more menu.
 enum ArchivedChatAction { unarchive, delete }
 
 class ArchiveChatsController extends GetxController {
+  final _repository = const ArchiveChatsRepository();
+
   final searchController = TextEditingController();
   final query = ''.obs;
 
-  // TODO: load the user's archived chats once the API exists.
-  final chats = <ChatSummary>[
-    const ChatSummary(id: 'a1', title: 'Multiverse & Cosmic Power'),
-    const ChatSummary(
-      id: 'a2',
-      title: 'Branched - Incursion of tow universes and their fate',
-    ),
-    const ChatSummary(id: 'a3', title: 'Astral travel & Subconscious'),
-  ].obs;
+  final chats = <ChatSummary>[].obs;
 
   /// Archived chats whose title contains the search query.
   List<ChatSummary> get filteredChats {
@@ -30,6 +25,7 @@ class ArchiveChatsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _load();
     searchController.addListener(() => query.value = searchController.text);
   }
 
@@ -39,6 +35,10 @@ class ArchiveChatsController extends GetxController {
   // TODO: sync with the API; for now both just drop it from this list.
   void onAction(ChatSummary chat, ArchivedChatAction action) {
     chats.removeWhere((c) => c.id == chat.id);
+  }
+
+  Future<void> _load() async {
+    chats.value = await _repository.archivedChats();
   }
 
   @override

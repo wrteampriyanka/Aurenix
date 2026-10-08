@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// The sheet behind "Edit Project" and "Add Instructions": one multi-line
 /// field holding what the assistant should keep in mind for this project.
@@ -55,7 +58,7 @@ class _ProjectInstructionsSheetState extends State<ProjectInstructionsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Padding(
       // Lifts the sheet above the keyboard while the instructions are typed.
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -89,25 +92,25 @@ class _ProjectInstructionsSheetState extends State<ProjectInstructionsSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      CustomText(
-                        'projects_instructions_title'.tr,
-                        fontSize: 26,
+                      AppText(
+                        AppStrings.projectsInstructionsTitle.tr,
+                        fontSize: AppFontSize.sheetTitle,
                         fontWeight: FontWeight.w700,
                         textAlign: TextAlign.center,
                         color: color.textNatural,
                       ),
-                      const SizedBox(height: 8),
-                      CustomText(
-                        'projects_instructions_desc'.tr,
+                      const SizedBox(height: AppSpacing.sm),
+                      AppText(
+                        AppStrings.projectsInstructionsDesc.tr,
                         maxLines: 3,
-                        fontSize: 14,
+                        fontSize: AppFontSize.label,
                         textAlign: TextAlign.center,
                         color: color.textBody,
                       ),
                       const SizedBox(height: 18),
                       AppTextField(
                         controller: _text,
-                        hint: 'projects_instructions_hint'.tr,
+                        hint: AppStrings.projectsInstructionsHint.tr,
                         keyboardType: TextInputType.multiline,
                         textInputAction: TextInputAction.newline,
                         minLines: 5,
@@ -115,10 +118,10 @@ class _ProjectInstructionsSheetState extends State<ProjectInstructionsSheet> {
                       ),
                       const SizedBox(height: 18),
                       AppButton(
-                        label: 'projects_instructions_save'.tr,
+                        label: AppStrings.projectsInstructionsSave.tr,
                         icon: null,
                         height: 54,
-                        fontSize: 17,
+                        fontSize: AppFontSize.markdownH3,
                         onPressed: _save,
                       ),
                     ],

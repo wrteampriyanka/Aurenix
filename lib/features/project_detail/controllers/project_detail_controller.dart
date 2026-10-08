@@ -5,8 +5,12 @@ import 'package:get/get.dart';
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/features/home/controllers/home_controller.dart';
 import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
-import 'package:aurenix/features/widgets/app_snackbar.dart';
-import 'package:aurenix/features/widgets/bottom_sheets/project_files_sheet.dart';
+import 'package:aurenix/commons/widgets/app_snackbar.dart';
+import 'package:aurenix/commons/widgets/bottom_sheets/project_files_sheet.dart';
+import 'package:aurenix/features/home/models/chat_summary.dart';
+import 'package:aurenix/features/home/models/project.dart';
+import 'package:aurenix/features/project_detail/repositories/project_detail_repository.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// One project's chats, opened by tapping a project card or sidebar row.
 /// The project itself lives in [SidebarController], so renaming or deleting
@@ -14,7 +18,10 @@ import 'package:aurenix/features/widgets/bottom_sheets/project_files_sheet.dart'
 class ProjectDetailController extends GetxController {
   ProjectDetailController({required this.projectId});
 
-  final String projectId;
+  /// Null when the route was opened without a project argument.
+  final String? projectId;
+
+  final _repository = const ProjectDetailRepository();
 
   final _sidebar = Get.find<SidebarController>();
 
@@ -26,27 +33,7 @@ class ProjectDetailController extends GetxController {
   Project? get project =>
       _sidebar.projects.firstWhereOrNull((p) => p.id == projectId);
 
-  // TODO: load the project's own chats once chats can be stored by project.
-  final chats = <ChatSummary>[
-    const ChatSummary(
-      id: 'pc1',
-      title: 'Multiverse & Cosmic Power',
-      authorInitials: 'MS',
-      authorColor: Color(0xFF2563EB),
-    ),
-    const ChatSummary(
-      id: 'pc2',
-      title: 'Branched - Incursion of tow universes',
-      authorInitials: 'AL',
-      authorColor: Color(0xFFB45309),
-    ),
-    const ChatSummary(
-      id: 'pc3',
-      title: 'Astral travel & Subconscious',
-      authorInitials: 'RM',
-      authorColor: Color(0xFF0F766E),
-    ),
-  ].obs;
+  final chats = <ChatSummary>[].obs;
 
   /// Chats whose title contains the search query.
   List<ChatSummary> get filteredChats {
@@ -55,25 +42,7 @@ class ProjectDetailController extends GetxController {
     return chats.where((c) => c.title.toLowerCase().contains(q)).toList();
   }
 
-  // TODO: load and upload the project's files once the backend stores them.
-  final files = <ProjectFile>[
-    const ProjectFile(id: 'pf1', name: 'Universe Study Doc 3', bytes: 23 << 20),
-    const ProjectFile(
-      id: 'pf2',
-      name: 'Warm Hole - Research Paper',
-      bytes: 103 << 20,
-    ),
-    const ProjectFile(
-      id: 'pf3',
-      name: 'Paper Universe Theory',
-      bytes: 11 << 20,
-    ),
-    const ProjectFile(
-      id: 'pf4',
-      name: 'Project Question Entanglement',
-      bytes: 493 << 20,
-    ),
-  ].obs;
+  final files = <ProjectFile>[].obs;
 
   final messageController = TextEditingController();
   final hasText = false.obs;
@@ -81,6 +50,17 @@ class ProjectDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // No project resolved — the route was opened without an argument, or the
+    // project it named is gone. Nothing on this screen can render, so hand
+    // the user the project list rather than an empty shell.
+    if (project == null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => Get.offNamed(AppRoutes.projects),
+      );
+      return;
+    }
+    _load();
     searchController.addListener(() => query.value = searchController.text);
     messageController.addListener(
       () => hasText.value = messageController.text.trim().isNotEmpty,
@@ -129,7 +109,7 @@ class ProjectDetailController extends GetxController {
         );
       }
     } catch (_) {
-      AppSnackbar.error('project_files_failed'.tr);
+      AppSnackbar.error(AppStrings.projectFilesFailed.tr);
     }
   }
 
@@ -156,7 +136,13 @@ class ProjectDetailController extends GetxController {
 
   void _backToHome() {
     Get.until((route) => route.settings.name == AppRoutes.home);
-    Get.find<HomeController>().closeDrawer();
+    Get.find<HomeController>().drawer.close();
+  }
+
+  Future<void> _load() async {
+    final id = projectId!;
+    chats.value = await _repository.chats(id);
+    files.value = await _repository.files(id);
   }
 
   @override

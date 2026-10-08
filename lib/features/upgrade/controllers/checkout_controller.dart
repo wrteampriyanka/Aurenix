@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/services/chat_quota_service.dart';
-import 'package:aurenix/features/widgets/bottom_sheets/app_picker_sheet.dart';
+import 'package:aurenix/commons/widgets/bottom_sheets/app_picker_sheet.dart';
 import 'package:aurenix/features/upgrade/models/country.dart';
 import 'package:aurenix/features/upgrade/models/upgrade_plan.dart';
-import 'package:aurenix/features/widgets/app_snackbar.dart';
+import 'package:aurenix/commons/widgets/app_snackbar.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class CheckoutController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -30,11 +31,13 @@ class CheckoutController extends GetxController {
 
   Future<void> onCountryTap() async {
     final picked = await AppPickerSheet.show<Country>(
-      title: 'upgrade_select_country'.tr,
-      searchHint: 'upgrade_search_country'.tr,
+      title: AppStrings.upgradeSelectCountry.tr,
+      searchHint: AppStrings.upgradeSearchCountry.tr,
       items: Country.all,
       labelOf: (c) => c.name,
-      leadingOf: (c) => Text(c.flag, style: const TextStyle(fontSize: 22)),
+      leadingOf: (c) =>
+          // A flag glyph, not text: sized to the row, not to the type scale.
+          Text(c.flag, style: const TextStyle(fontSize: 22)),
       selected: country.value,
     );
     if (picked == null || picked == country.value) return;
@@ -49,8 +52,8 @@ class CheckoutController extends GetxController {
     final states = country.value.states;
     if (states == null) return;
     final picked = await AppPickerSheet.show<String>(
-      title: 'upgrade_select_state'.tr,
-      searchHint: 'upgrade_search_state'.tr,
+      title: AppStrings.upgradeSelectState.tr,
+      searchHint: AppStrings.upgradeSearchState.tr,
       items: states,
       labelOf: (s) => s,
       selected: state.value,
@@ -67,7 +70,7 @@ class CheckoutController extends GetxController {
   bool get usesPin => country.value == Country.india;
 
   String? validateState(String? value) =>
-      (value?.trim() ?? '').isEmpty ? 'upgrade_state_required'.tr : null;
+      (value?.trim() ?? '').isEmpty ? AppStrings.upgradeStateRequired.tr : null;
 
   String? validatePin(String? value) {
     final code = value?.trim() ?? '';
@@ -93,7 +96,7 @@ class CheckoutController extends GetxController {
       // The plan is theirs: the free message limit no longer applies.
       ChatQuotaService.instance.activatePlan();
       AppSnackbar.show(
-        'upgrade_payment_pending'.trParams({
+        AppStrings.upgradePaymentPending.trParams({
           'method': paymentMethod.value.labelKey.tr,
         }),
       );

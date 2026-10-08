@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_detail_app_bar.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_detail_app_bar.dart';
+import 'package:aurenix/commons/widgets/app_system_ui_overlay.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
 
 /// Plain dark screen with a soft glow behind the status bar, used by the
 /// form screens (reset password, edit profile). The glow is teal unless
@@ -18,16 +20,13 @@ class AppPlainBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+    return AppSystemUiOverlay(
       child: ColoredBox(
-        color: context.color.backgroundBase,
+        color: appColors.backgroundBase,
         child: Stack(
           fit: StackFit.expand,
           children: [
-            _TopGlow(color: glow ?? context.color.topGlow),
+            _TopGlow(color: glow ?? appColors.topGlow),
             child,
           ],
         ),
@@ -112,7 +111,7 @@ class AppBackHeader extends StatelessWidget {
       child: Row(
         children: [
           Material(
-            color: context.color.inputFill,
+            color: appColors.inputFill,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -122,19 +121,19 @@ class AppBackHeader extends StatelessWidget {
                 child: Icon(
                   PhosphorIconsRegular.caretLeft,
                   size: 20,
-                  color: context.color.textNatural,
+                  color: appColors.textNatural,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSpacing.lg),
           Expanded(
-            child: CustomText(
+            child: AppText(
               title ?? '',
               maxLines: 1,
-              fontSize: 22,
+              fontSize: AppFontSize.h1,
               fontWeight: FontWeight.w600,
-              color: context.color.textNatural,
+              color: appColors.textNatural,
             ),
           ),
           ?action,
@@ -175,12 +174,9 @@ class AppDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+    return AppSystemUiOverlay(
       child: Scaffold(
-        backgroundColor: context.color.backgroundBase,
+        backgroundColor: appColors.backgroundBase,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

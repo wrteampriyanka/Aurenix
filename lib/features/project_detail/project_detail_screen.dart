@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
-import 'package:aurenix/features/widgets/app_detail_app_bar.dart';
-import 'package:aurenix/features/widgets/app_search_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_detail_app_bar.dart';
+import 'package:aurenix/commons/widgets/app_search_field.dart';
+import 'package:aurenix/commons/widgets/app_system_ui_overlay.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/features/project_detail/controllers/project_detail_controller.dart';
+import 'package:aurenix/features/home/models/chat_summary.dart';
+import 'package:aurenix/features/home/models/project.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// A single project: its chats, with a composer for starting a new one.
 class ProjectDetailScreen extends GetView<ProjectDetailController> {
@@ -16,12 +20,9 @@ class ProjectDetailScreen extends GetView<ProjectDetailController> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+    return AppSystemUiOverlay(
       child: Scaffold(
-        backgroundColor: context.color.backgroundBase,
+        backgroundColor: appColors.backgroundBase,
         resizeToAvoidBottomInset: true,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -35,7 +36,7 @@ class ProjectDetailScreen extends GetView<ProjectDetailController> {
                     icon: PhosphorIconsRegular.fileText,
                     onTap: controller.onFiles,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   _IconButton(
                     icon: PhosphorIconsRegular.dotsThree,
                     onTap: controller.onMenu,
@@ -64,7 +65,7 @@ class ProjectDetailScreen extends GetView<ProjectDetailController> {
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                       child: AppSearchField(
                         controller: controller.searchController,
-                        hintText: 'project_detail_search_hint'.tr,
+                        hintText: AppStrings.projectDetailSearchHint.tr,
                       ),
                     ),
                     Expanded(
@@ -94,7 +95,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Row(
       children: [
         Container(
@@ -107,29 +108,31 @@ class _Header extends StatelessWidget {
           ),
           child: Icon(project.icon, size: 22, color: project.iconColor),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomText(
+              AppText(
                 project.name,
                 maxLines: 1,
-                fontSize: 20,
+                fontSize: AppFontSize.h2,
                 fontWeight: FontWeight.w600,
                 color: color.textNatural,
               ),
               const SizedBox(height: 2),
-              CustomText(
-                'projects_chats'.trParams({'count': '${project.chatCount}'}),
-                fontSize: 12,
+              AppText(
+                AppStrings.projectsChats.trParams({
+                  'count': '${project.chatCount}',
+                }),
+                fontSize: AppFontSize.overline,
                 color: color.textBody,
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Material(
           color: color.inputFill,
           shape: StadiumBorder(side: BorderSide(color: color.tileBorder)),
@@ -146,10 +149,10 @@ class _Header extends StatelessWidget {
                     size: 16,
                     color: color.textNatural,
                   ),
-                  const SizedBox(width: 8),
-                  CustomText(
-                    'project_detail_share'.tr,
-                    fontSize: 13,
+                  const SizedBox(width: AppSpacing.sm),
+                  AppText(
+                    AppStrings.projectDetailShare.tr,
+                    fontSize: AppFontSize.caption,
                     color: color.textNatural,
                   ),
                 ],
@@ -174,7 +177,7 @@ class _ChatsCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.color.tileBorder),
+        border: Border.all(color: appColors.tileBorder),
       ),
       child: AnimatedSize(
         duration: const Duration(milliseconds: 260),
@@ -185,13 +188,13 @@ class _ChatsCard extends StatelessWidget {
           if (chats.isEmpty) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              child: CustomText(
+              child: AppText(
                 controller.chats.isEmpty
-                    ? 'project_detail_empty'.tr
-                    : 'sidebar_no_chats'.tr,
-                fontSize: 14,
+                    ? AppStrings.projectDetailEmpty.tr
+                    : AppStrings.sidebarNoChats.tr,
+                fontSize: AppFontSize.label,
                 textAlign: TextAlign.center,
-                color: context.color.textBody,
+                color: appColors.textBody,
               ),
             );
           }
@@ -199,11 +202,7 @@ class _ChatsCard extends StatelessWidget {
             children: [
               for (final (i, chat) in chats.indexed) ...[
                 if (i > 0)
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: context.color.divider,
-                  ),
+                  Divider(height: 1, thickness: 1, color: appColors.divider),
                 _ChatRow(
                   chat: chat,
                   onTap: () => controller.onChat(chat),
@@ -231,7 +230,7 @@ class _ChatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Material(
       type: MaterialType.transparency,
       borderRadius: BorderRadius.circular(8),
@@ -243,10 +242,10 @@ class _ChatRow extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: CustomText(
+                child: AppText(
                   chat.title,
                   maxLines: 1,
-                  fontSize: 15,
+                  fontSize: AppFontSize.chat,
                   color: color.textNatural,
                 ),
               ),
@@ -292,11 +291,11 @@ class _Avatar extends StatelessWidget {
       height: 24,
       alignment: Alignment.center,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: CustomText(
+      child: AppText(
         initials,
-        fontSize: 10,
+        fontSize: AppFontSize.badge,
         fontWeight: FontWeight.w600,
-        color: context.color.textNatural,
+        color: appColors.textNatural,
       ),
     );
   }
@@ -310,7 +309,7 @@ class _Composer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: Row(
@@ -325,7 +324,7 @@ class _Composer extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Icon(
                     PhosphorIconsRegular.plus,
                     size: 20,
@@ -338,12 +337,15 @@ class _Composer extends StatelessWidget {
                       cursorColor: color.primary,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => controller.onSend(),
-                      style: TextStyle(color: color.textNatural, fontSize: 15),
+                      style: TextStyle(
+                        color: color.textNatural,
+                        fontSize: AppFontSize.chat,
+                      ),
                       decoration: InputDecoration(
-                        hintText: 'home_input_hint'.tr,
+                        hintText: AppStrings.homeInputHint.tr,
                         hintStyle: TextStyle(
                           color: color.textBody,
-                          fontSize: 15,
+                          fontSize: AppFontSize.chat,
                         ),
                         hintMaxLines: 1,
                         border: InputBorder.none,
@@ -357,12 +359,12 @@ class _Composer extends StatelessWidget {
                     size: 20,
                     color: color.textNatural,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                 ],
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Obx(
             () => Material(
               color: color.primary,
@@ -401,14 +403,14 @@ class _IconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: context.color.inputFill,
+      color: appColors.inputFill,
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: SizedBox.square(
           dimension: 44,
-          child: Icon(icon, size: 20, color: context.color.textNatural),
+          child: Icon(icon, size: 20, color: appColors.textNatural),
         ),
       ),
     );

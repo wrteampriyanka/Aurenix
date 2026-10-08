@@ -21,7 +21,7 @@ class IntegrationAppLogo extends StatelessWidget {
       width: size,
       height: size,
       colorFilter: app.tintLogo
-          ? ColorFilter.mode(context.color.textNatural, BlendMode.srcIn)
+          ? ColorFilter.mode(appColors.textNatural, BlendMode.srcIn)
           : null,
     );
   }

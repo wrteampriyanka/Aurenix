@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/live_talk/controllers/live_talk_controller.dart';
+import 'package:aurenix/features/live_talk/models/audio_output.dart';
+import 'package:aurenix/commons/widgets/bottom_sheets/sheet_reveal.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// Floating sheet opened by the speaker button, listing where the voice
 /// can play: the phone speaker plus any connected headphones.
@@ -18,9 +23,9 @@ class AudioOutputSheet extends GetView<LiveTalkController> {
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         decoration: BoxDecoration(
-          color: context.color.sheetBackground,
+          color: appColors.sheetBackground,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: context.color.tileBorder),
+          border: Border.all(color: appColors.tileBorder),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -30,7 +35,7 @@ class AudioOutputSheet extends GetView<LiveTalkController> {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: context.color.sheetHandle,
+                color: appColors.sheetHandle,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -39,7 +44,7 @@ class AudioOutputSheet extends GetView<LiveTalkController> {
                 () => SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
                   child: Column(
-                    children: _staggered(context, [
+                    children: staggeredSheetRows(context, [
                       for (final device in controller.outputs)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12),
@@ -60,29 +65,6 @@ class AudioOutputSheet extends GetView<LiveTalkController> {
       ),
     );
   }
-
-  /// Fades and slides [children] up one after another as the sheet opens,
-  /// driven by the sheet's own route animation so closing plays it back.
-  static List<Widget> _staggered(BuildContext context, List<Widget> children) {
-    final animation = ModalRoute.of(context)?.animation;
-    if (animation == null) return children;
-    const step = 0.1, span = 0.5;
-    return [
-      for (var i = 0; i < children.length; i++)
-        _Reveal(
-          animation: animation.drive(
-            CurveTween(
-              curve: Interval(
-                (0.15 + i * step).clamp(0.0, 1 - span),
-                (0.15 + i * step + span).clamp(span, 1.0),
-                curve: Curves.easeOutCubic,
-              ),
-            ),
-          ),
-          child: children[i],
-        ),
-    ];
-  }
 }
 
 class _OutputTile extends StatelessWidget {
@@ -101,11 +83,11 @@ class _OutputTile extends StatelessWidget {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(14),
       side: BorderSide(
-        color: selected ? context.color.primary : context.color.tileBorder,
+        color: selected ? appColors.primary : appColors.tileBorder,
       ),
     );
     return Material(
-      color: context.color.tileFill,
+      color: appColors.tileFill,
       shape: shape,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -118,25 +100,27 @@ class _OutputTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
-                      device.isSpeaker ? 'live_output_speaker'.tr : device.name,
-                      maxLines: 1,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: context.color.textNatural,
-                    ),
-                    const SizedBox(height: 4),
-                    CustomText(
+                    AppText(
                       device.isSpeaker
-                          ? 'live_output_default'.tr
-                          : 'live_output_connected'.tr,
-                      fontSize: 13,
-                      color: context.color.textBody,
+                          ? AppStrings.liveOutputSpeaker.tr
+                          : device.name,
+                      maxLines: 1,
+                      fontSize: AppFontSize.body,
+                      fontWeight: FontWeight.w600,
+                      color: appColors.textNatural,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    AppText(
+                      device.isSpeaker
+                          ? AppStrings.liveOutputDefault.tr
+                          : AppStrings.liveOutputConnected.tr,
+                      fontSize: AppFontSize.caption,
+                      color: appColors.textBody,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 width: 34,
@@ -144,41 +128,18 @@ class _OutputTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: selected
-                      ? context.color.primary
-                      : context.color.tileFillHighlight,
+                      ? appColors.primary
+                      : appColors.tileFillHighlight,
                 ),
                 child: Icon(
                   PhosphorIconsRegular.check,
                   size: 18,
-                  color: selected
-                      ? context.color.textNatural
-                      : context.color.textBody,
+                  color: selected ? appColors.textNatural : appColors.textBody,
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _Reveal extends StatelessWidget {
-  const _Reveal({required this.animation, required this.child});
-
-  /// 0 hidden, 1 in place.
-  final Animation<double> animation;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: animation,
-      child: SlideTransition(
-        position: animation.drive(
-          Tween(begin: const Offset(0, 0.3), end: Offset.zero),
-        ),
-        child: child,
       ),
     );
   }

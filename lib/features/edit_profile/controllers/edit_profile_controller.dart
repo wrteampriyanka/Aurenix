@@ -2,24 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/utils/validators.dart';
-
-/// Editable user details, passed in as the route argument and returned
-/// from the screen when the changes are saved.
-class ProfileDetails {
-  const ProfileDetails({
-    required this.name,
-    required this.email,
-    this.genderKey,
-    this.age,
-  });
-
-  final String name;
-  final String email;
-
-  /// One of [EditProfileController.genderKeys].
-  final String? genderKey;
-  final int? age;
-}
+import 'package:aurenix/features/edit_profile/models/profile_details.dart';
 
 class EditProfileController extends GetxController {
   static const genderKeys = ['gender_male', 'gender_female', 'gender_other'];

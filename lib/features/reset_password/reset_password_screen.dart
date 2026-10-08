@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/validators.dart';
 import 'package:aurenix/features/reset_password/controllers/reset_password_controller.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class ResetPasswordScreen extends GetView<ResetPasswordController> {
   const ResetPasswordScreen({super.key});
@@ -15,14 +16,14 @@ class ResetPasswordScreen extends GetView<ResetPasswordController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppPlainBackground(
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppBackHeader(title: 'reset_password_title'.tr),
-              Divider(height: 1, color: context.color.strokeDark),
+              AppBackHeader(title: AppStrings.resetPasswordTitle.tr),
+              Divider(height: 1, color: appColors.strokeDark),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
@@ -32,7 +33,7 @@ class ResetPasswordScreen extends GetView<ResetPasswordController> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                 child: AppButton(
-                  label: 'submit_new_password'.tr,
+                  label: AppStrings.submitNewPassword.tr,
                   icon: null,
                   height: 52,
                   onPressed: controller.onSubmit,
@@ -59,59 +60,27 @@ class _ResetForm extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Obx(
-              () => AppTextField(
-                controller: controller.passwordController,
-                hint: 'create_password_hint'.tr,
-                prefixIcon: PhosphorIconsRegular.lockSimple,
-                obscureText: controller.isPasswordHidden.value,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.newPassword],
-                validator: Validators.password,
-                suffix: _VisibilityToggle(
-                  hidden: controller.isPasswordHidden.value,
-                  onPressed: controller.togglePasswordVisibility,
-                ),
-              ),
+            AppTextField(
+              controller: controller.passwordController,
+              label: AppStrings.fieldNewPasswordLabel.tr,
+              hint: AppStrings.createPasswordHint.tr,
+              isPassword: true,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.newPassword],
+              validator: Validators.password,
             ),
-            const SizedBox(height: 16),
-            Obx(
-              () => AppTextField(
-                controller: controller.confirmController,
-                hint: 'confirm_password_hint'.tr,
-                prefixIcon: PhosphorIconsRegular.lockSimple,
-                obscureText: controller.isConfirmHidden.value,
-                textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.newPassword],
-                validator: controller.validateConfirm,
-                onFieldSubmitted: (_) => controller.onSubmit(),
-                suffix: _VisibilityToggle(
-                  hidden: controller.isConfirmHidden.value,
-                  onPressed: controller.toggleConfirmVisibility,
-                ),
-              ),
+            const SizedBox(height: AppSpacing.lg),
+            AppTextField(
+              controller: controller.confirmController,
+              label: AppStrings.fieldConfirmPasswordLabel.tr,
+              isPassword: true,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.newPassword],
+              validator: controller.validateConfirm,
+              onFieldSubmitted: (_) => controller.onSubmit(),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _VisibilityToggle extends StatelessWidget {
-  const _VisibilityToggle({required this.hidden, required this.onPressed});
-
-  final bool hidden;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: Icon(
-        hidden ? PhosphorIconsRegular.eyeSlash : PhosphorIconsRegular.eye,
-        size: 22,
-        color: context.color.textNatural,
       ),
     );
   }

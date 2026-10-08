@@ -3,13 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_plain_background.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_plain_background.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/validators.dart';
 import 'package:aurenix/features/edit_profile/controllers/edit_profile_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class EditProfileScreen extends GetView<EditProfileController> {
   const EditProfileScreen({super.key});
@@ -17,7 +20,7 @@ class EditProfileScreen extends GetView<EditProfileController> {
   @override
   Widget build(BuildContext context) {
     return AppDetailPage(
-      title: 'edit_profile_title'.tr,
+      title: AppStrings.editProfileTitle.tr,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
       bottom: Column(
         mainAxisSize: MainAxisSize.min,
@@ -32,10 +35,10 @@ class EditProfileScreen extends GetView<EditProfileController> {
                 : const SizedBox.shrink(),
           ),
           AppButton(
-            label: 'edit_profile_save'.tr,
+            label: AppStrings.editProfileSave.tr,
             icon: null,
             height: 52,
-            fontSize: 16,
+            fontSize: AppFontSize.body,
             onPressed: controller.onSave,
           ),
         ],
@@ -60,32 +63,36 @@ class _EditForm extends StatelessWidget {
           children: [
             AppTextField(
               controller: controller.nameController,
-              hint: 'name_hint'.tr,
+              label: AppStrings.fieldNameLabel.tr,
+              hint: AppStrings.nameHint.tr,
               prefixIcon: PhosphorIconsRegular.userCircle,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.name],
               validator: controller.validateName,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             AppTextField(
               controller: controller.emailController,
-              hint: 'email_hint'.tr,
+              label: AppStrings.fieldEmailLabel.tr,
+              hint: AppStrings.emailHint.tr,
               prefixIcon: PhosphorIconsRegular.envelopeSimple,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
               validator: Validators.email,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(child: _GenderField(controller: controller)),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.lg),
                 Expanded(
                   child: AppTextField(
                     controller: controller.ageController,
-                    hint: 'edit_profile_age_hint'.tr,
+                    label: AppStrings.fieldAgeLabel.tr,
+                    // Shares a Row with the gender picker.
+                    reserveErrorSpace: true,
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.done,
                     inputFormatters: [
@@ -116,27 +123,27 @@ class _GenderField extends StatelessWidget {
       initialValue: controller.gender.value,
       onChanged: controller.onGenderChanged,
       isExpanded: true,
-      dropdownColor: context.color.inputFill,
+      dropdownColor: appColors.inputFill,
       borderRadius: BorderRadius.circular(14),
       style: AppTextField.textStyle(context),
       icon: Icon(
         PhosphorIconsRegular.caretDown,
         size: 20,
-        color: context.color.textNatural,
+        color: appColors.textNatural,
       ),
       decoration: AppTextField.decoration(
         context,
-        hint: 'edit_profile_gender_hint'.tr,
+        hint: AppStrings.editProfileGenderHint.tr,
       ),
       items: [
         for (final key in EditProfileController.genderKeys)
           DropdownMenuItem(
             value: key,
-            child: CustomText(
+            child: AppText(
               key.tr,
               maxLines: 1,
-              fontSize: 16,
-              color: context.color.textNatural,
+              fontSize: AppFontSize.body,
+              color: appColors.textNatural,
             ),
           ),
       ],
@@ -155,16 +162,16 @@ class _DataNotice extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
       decoration: BoxDecoration(
-        color: context.color.inputFill,
+        color: appColors.inputFill,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
           Expanded(
-            child: CustomText(
-              'edit_profile_data_notice'.tr,
-              fontSize: 13,
-              color: context.color.textBody,
+            child: AppText(
+              AppStrings.editProfileDataNotice.tr,
+              fontSize: AppFontSize.caption,
+              color: appColors.textBody,
             ),
           ),
           IconButton(
@@ -172,7 +179,7 @@ class _DataNotice extends StatelessWidget {
             icon: Icon(
               PhosphorIconsRegular.x,
               size: 20,
-              color: context.color.textNatural,
+              color: appColors.textNatural,
             ),
           ),
         ],

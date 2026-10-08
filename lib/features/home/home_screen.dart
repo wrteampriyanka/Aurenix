@@ -3,18 +3,23 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_background.dart';
-import 'package:aurenix/features/widgets/app_top_bar.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_background.dart';
+import 'package:aurenix/commons/widgets/app_top_bar.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/features/onboarding/widgets/wave_orb.dart';
-import 'package:aurenix/features/presets/controllers/presets_controller.dart';
 import 'package:aurenix/features/presets/widgets/preset_widgets.dart';
 import 'package:aurenix/features/home/controllers/home_controller.dart';
 import 'package:aurenix/features/home/controllers/sidebar_controller.dart';
 import 'package:aurenix/features/home/widgets/app_sidebar.dart';
 import 'package:aurenix/features/home/widgets/chat_messages.dart';
 import 'package:aurenix/features/home/widgets/sidebar_drawer.dart';
+import 'package:aurenix/features/home/models/chat_attachment.dart';
+import 'package:aurenix/features/home/models/home_action.dart';
+import 'package:aurenix/features/presets/models/preset.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class HomeScreen extends GetView<HomeController> {
   const HomeScreen({super.key});
@@ -23,9 +28,9 @@ class HomeScreen extends GetView<HomeController> {
   Widget build(BuildContext context) {
     final sidebar = Get.find<SidebarController>();
     final scaffold = Scaffold(
-      backgroundColor: context.color.sidebarBackground,
+      backgroundColor: appColors.sidebarBackground,
       body: SidebarDrawer(
-        animation: controller.drawer,
+        animation: controller.drawer.position,
         expand: sidebar.search,
         sidebar: const AppSidebar(),
         child: _HomeBody(controller: controller),
@@ -34,12 +39,12 @@ class HomeScreen extends GetView<HomeController> {
     // Back leaves search, then closes the drawer.
     return Obx(
       () => PopScope(
-        canPop: !controller.isDrawerOpen.value,
+        canPop: !controller.drawer.isOpen.value,
         onPopInvokedWithResult: (didPop, _) {
           if (didPop) return;
           sidebar.isSearching.value
               ? sidebar.onSearchBack()
-              : controller.closeDrawer();
+              : controller.drawer.close();
         },
         child: scaffold,
       ),
@@ -55,7 +60,7 @@ class _HomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: context.color.backgroundBase,
+      color: appColors.backgroundBase,
       child: AppBackground(
         showGrid: false,
         child: SafeArea(
@@ -63,7 +68,7 @@ class _HomeBody extends StatelessWidget {
             children: [
               Obx(
                 () => AppTopBar(
-                  onMenu: controller.onMenu,
+                  onMenu: controller.drawer.toggle,
                   onModelTap: controller.onModelTap,
                   onNewChat: controller.onNewChat,
                   trailing: switch (controller.preset.value) {
@@ -81,7 +86,7 @@ class _HomeBody extends StatelessWidget {
                   return const SizedBox.shrink();
                 }
                 return ChatNotice(
-                  text: 'preset_chat_notice'.tr,
+                  text: AppStrings.presetChatNotice.tr,
                   onClose: controller.onClosePresetNotice,
                 );
               }),
@@ -135,15 +140,15 @@ class _Welcome extends StatelessWidget {
             // Narrow like the design, so it wraps after "you".
             SizedBox(
               width: 250,
-              child: CustomText(
-                'home_prompt'.tr,
-                fontSize: 22,
+              child: AppText(
+                AppStrings.homePrompt.tr,
+                fontSize: AppFontSize.h1,
                 fontWeight: FontWeight.w700,
                 textAlign: TextAlign.center,
-                color: context.color.textBody,
+                color: appColors.textBody,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxxl),
             Wrap(
               alignment: WrapAlignment.center,
               spacing: 10,
@@ -175,7 +180,7 @@ class _PresetWelcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -204,20 +209,20 @@ class _PresetWelcome extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 4),
-            CustomText(
+            const SizedBox(height: AppSpacing.xs),
+            AppText(
               preset.name,
               maxLines: 2,
-              fontSize: 20,
+              fontSize: AppFontSize.h2,
               fontWeight: FontWeight.w700,
               textAlign: TextAlign.center,
               color: color.textNatural,
             ),
-            const SizedBox(height: 8),
-            CustomText(
+            const SizedBox(height: AppSpacing.sm),
+            AppText(
               preset.description,
               maxLines: 3,
-              fontSize: 14,
+              fontSize: AppFontSize.label,
               textAlign: TextAlign.center,
               color: color.textBody,
             ),
@@ -244,7 +249,7 @@ class _QuickStarters extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
-          child: PresetSectionTitle('presets_quick_starters'.tr),
+          child: PresetSectionTitle(AppStrings.presetsQuickStarters.tr),
         ),
         PresetQuickStarters(starters: starters, onTap: onTap),
       ],
@@ -265,7 +270,7 @@ class _ActionChip extends StatelessWidget {
       color: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: radius,
-        side: BorderSide(color: context.color.tileBorder),
+        side: BorderSide(color: appColors.tileBorder),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -277,10 +282,10 @@ class _ActionChip extends StatelessWidget {
             children: [
               SvgPicture.asset(action.icon, width: 18, height: 18),
               const SizedBox(width: 10),
-              CustomText(
+              AppText(
                 action.labelKey.tr,
-                fontSize: 15,
-                color: context.color.textNatural,
+                fontSize: AppFontSize.chat,
+                color: appColors.textNatural,
               ),
             ],
           ),
@@ -311,12 +316,12 @@ class _InputBar extends StatelessWidget {
                   : _inline(context),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Obx(
-            () => controller.isListening.value
+            () => controller.dictation.isListening.value
                 ? _RoundButton(
                     icon: PhosphorIconsRegular.paperPlaneRight,
-                    onTap: controller.onSendVoice,
+                    onTap: controller.dictation.onSendVoice,
                   )
                 : controller.isGenerating.value
                 ? _RoundButton(
@@ -369,7 +374,7 @@ class _InputBar extends StatelessWidget {
       children: [
         _attachment(),
         Obx(() {
-          if (!controller.isListening.value &&
+          if (!controller.dictation.isListening.value &&
               controller.selectedAction.value == null) {
             return const SizedBox.shrink();
           }
@@ -398,9 +403,9 @@ class _InputBar extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: context.color.inputFill,
+        color: appColors.inputFill,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.color.inputBorder),
+        border: Border.all(color: appColors.inputBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,13 +416,13 @@ class _InputBar extends StatelessWidget {
 
   Widget _attachment() {
     return Obx(() {
-      final file = controller.attachment.value;
+      final file = controller.attachment.value.value;
       if (file == null) return const SizedBox.shrink();
       return Padding(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
         child: _AttachmentChip(
           attachment: file,
-          onRemove: controller.onRemoveAttachment,
+          onRemove: controller.attachment.clear,
         ),
       );
     });
@@ -428,21 +433,27 @@ class _InputBar extends StatelessWidget {
       () => TextField(
         controller: controller.messageController,
         focusNode: controller.messageFocus,
-        cursorColor: context.color.primary,
+        cursorColor: appColors.primary,
         minLines: 1,
         maxLines: 5,
         textInputAction: TextInputAction.send,
         onSubmitted: (_) => controller.onSend(),
-        style: TextStyle(color: context.color.textNatural, fontSize: 15),
+        style: TextStyle(
+          color: appColors.textNatural,
+          fontSize: AppFontSize.chat,
+        ),
         decoration: InputDecoration(
           isCollapsed: true,
           border: InputBorder.none,
-          hintText: controller.isListening.value
-              ? 'chat_listening_hint'.tr
+          hintText: controller.dictation.isListening.value
+              ? AppStrings.chatListeningHint.tr
               : controller.isChatLimited
-              ? 'chat_limit_hint'.tr
-              : 'home_input_hint'.tr,
-          hintStyle: TextStyle(color: context.color.textBody, fontSize: 15),
+              ? AppStrings.chatLimitHint.tr
+              : AppStrings.homeInputHint.tr,
+          hintStyle: TextStyle(
+            color: appColors.textBody,
+            fontSize: AppFontSize.chat,
+          ),
         ),
       ),
     );
@@ -454,28 +465,28 @@ class _InputBar extends StatelessWidget {
       icon: Icon(
         PhosphorIconsRegular.plus,
         size: 22,
-        color: context.color.textNatural,
+        color: appColors.textNatural,
       ),
     );
   }
 
   Widget _micButton(BuildContext context) {
     return Obx(
-      () => controller.isListening.value
+      () => controller.dictation.isListening.value
           ? IconButton(
-              onPressed: controller.onCancelVoice,
+              onPressed: controller.dictation.onCancelVoice,
               icon: Icon(
                 PhosphorIconsRegular.x,
                 size: 20,
-                color: context.color.textBody,
+                color: appColors.textBody,
               ),
             )
           : IconButton(
-              onPressed: controller.onMic,
+              onPressed: controller.dictation.onMic,
               icon: Icon(
                 PhosphorIconsRegular.microphone,
                 size: 22,
-                color: context.color.textNatural,
+                color: appColors.textNatural,
               ),
             ),
     );
@@ -484,12 +495,14 @@ class _InputBar extends StatelessWidget {
   /// Live mic bars while listening, otherwise the picked action's tag.
   Widget _waveformOrTag(BuildContext context) {
     return Obx(() {
-      if (controller.isListening.value) {
-        return _VoiceWaveform(levels: controller.soundLevels.toList());
+      if (controller.dictation.isListening.value) {
+        return _VoiceWaveform(
+          levels: controller.dictation.soundLevels.toList(),
+        );
       }
       final action = controller.selectedAction.value;
       return Align(
-        alignment: Alignment.centerLeft,
+        alignment: AlignmentDirectional.centerStart,
         child: action == null
             ? const SizedBox.shrink()
             : _ActionTag(action: action, onClear: controller.onClearAction),
@@ -529,7 +542,7 @@ class _VoiceWaveform extends StatelessWidget {
                             width: 2,
                             height: 4 + 22 * shown[i],
                             decoration: BoxDecoration(
-                              color: context.color.textNatural,
+                              color: appColors.textNatural,
                               borderRadius: BorderRadius.circular(1),
                             ),
                           )
@@ -537,7 +550,7 @@ class _VoiceWaveform extends StatelessWidget {
                             width: 2,
                             height: 2,
                             decoration: BoxDecoration(
-                              color: context.color.textBody,
+                              color: appColors.textBody,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -563,9 +576,9 @@ class _AttachmentChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(6, 6, 4, 6),
       decoration: BoxDecoration(
-        color: context.color.tileFill,
+        color: appColors.tileFill,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: context.color.tileBorder),
+        border: Border.all(color: appColors.tileBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -586,17 +599,17 @@ class _AttachmentChip extends StatelessWidget {
                     child: Icon(
                       PhosphorIconsRegular.fileText,
                       size: 22,
-                      color: context.color.textNatural,
+                      color: appColors.textNatural,
                     ),
                   ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Flexible(
-            child: CustomText(
+            child: AppText(
               attachment.name,
               maxLines: 1,
-              fontSize: 13,
-              color: context.color.textNatural,
+              fontSize: AppFontSize.caption,
+              color: appColors.textNatural,
             ),
           ),
           InkResponse(
@@ -607,7 +620,7 @@ class _AttachmentChip extends StatelessWidget {
               child: Icon(
                 PhosphorIconsRegular.x,
                 size: 14,
-                color: context.color.textBody,
+                color: appColors.textBody,
               ),
             ),
           ),
@@ -630,17 +643,17 @@ class _ActionTag extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(10, 5, 4, 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: context.color.tileBorder),
+        border: Border.all(color: appColors.tileBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           SvgPicture.asset(action.icon, width: 16, height: 16),
-          const SizedBox(width: 8),
-          CustomText(
+          const SizedBox(width: AppSpacing.sm),
+          AppText(
             action.labelKey.tr,
-            fontSize: 13,
-            color: context.color.textNatural,
+            fontSize: AppFontSize.caption,
+            color: appColors.textNatural,
           ),
           InkResponse(
             onTap: onClear,
@@ -650,7 +663,7 @@ class _ActionTag extends StatelessWidget {
               child: Icon(
                 PhosphorIconsRegular.x,
                 size: 14,
-                color: context.color.textBody,
+                color: appColors.textBody,
               ),
             ),
           ),
@@ -672,11 +685,11 @@ class _RoundButton extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: context.color.buttonBorder),
+        border: Border.all(color: appColors.buttonBorder),
         gradient: RadialGradient(
           center: const Alignment(-0.7, -1.4),
           radius: 1.6,
-          colors: [context.color.buttonHighlight, context.color.primary],
+          colors: [appColors.buttonHighlight, appColors.primary],
           stops: const [0, 0.55],
         ),
       ),
@@ -688,7 +701,7 @@ class _RoundButton extends StatelessWidget {
           onTap: onTap,
           child: SizedBox.square(
             dimension: 52,
-            child: Icon(icon, size: 24, color: context.color.textNatural),
+            child: Icon(icon, size: 24, color: appColors.textNatural),
           ),
         ),
       ),

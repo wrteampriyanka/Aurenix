@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
 
 /// Rounded search pill with a magnifier, and a clear button that shows up
 /// once something is typed.
@@ -19,7 +20,7 @@ class AppSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Container(
       height: _height,
       decoration: BoxDecoration(
@@ -41,10 +42,16 @@ class AppSearchField extends StatelessWidget {
               controller: controller,
               textInputAction: TextInputAction.search,
               cursorColor: color.primary,
-              style: TextStyle(color: color.textNatural, fontSize: 15),
+              style: TextStyle(
+                color: color.textNatural,
+                fontSize: AppFontSize.chat,
+              ),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: TextStyle(color: color.textBody, fontSize: 15),
+                hintStyle: TextStyle(
+                  color: color.textBody,
+                  fontSize: AppFontSize.chat,
+                ),
                 hintMaxLines: 1,
                 border: InputBorder.none,
                 isCollapsed: true,

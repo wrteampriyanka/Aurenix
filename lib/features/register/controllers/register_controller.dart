@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/services/session_service.dart';
-import 'package:aurenix/features/otp/controllers/otp_controller.dart';
+import 'package:aurenix/features/otp/models/otp_args.dart';
 
 class RegisterController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -12,13 +14,9 @@ class RegisterController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  final isPasswordHidden = true.obs;
-
   late final termsRecognizer = TapGestureRecognizer()..onTap = onTermsTap;
   late final privacyRecognizer = TapGestureRecognizer()..onTap = onPrivacyTap;
   late final signInRecognizer = TapGestureRecognizer()..onTap = onSignIn;
-
-  void togglePasswordVisibility() => isPasswordHidden.toggle();
 
   void onCreateAccount() {
     if (!(formKey.currentState?.validate() ?? false)) return;
@@ -48,7 +46,7 @@ class RegisterController extends GetxController {
   /// Remembers the session so the next launch opens straight into the chat.
   Future<void> _goHome() async {
     await SessionService.instance.signIn();
-    Get.offAllNamed(AppRoutes.home);
+    unawaited(Get.offAllNamed(AppRoutes.home));
   }
 
   // TODO: wire up the remaining actions once auth exists.

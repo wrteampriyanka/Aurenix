@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:aurenix/core/theme/app_colors.dart';
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 /// The sheet behind "Rename" in the chat menu: one line holding the chat's
 /// title, opened with the current one selected so typing replaces it.
@@ -71,7 +73,7 @@ class _RenameChatSheetState extends State<RenameChatSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.color;
+    final color = appColors;
     return Padding(
       // Lifts the sheet above the keyboard while the title is typed.
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -104,9 +106,9 @@ class _RenameChatSheetState extends State<RenameChatSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    CustomText(
-                      'chat_menu_rename_title'.tr,
-                      fontSize: 26,
+                    AppText(
+                      AppStrings.chatMenuRenameTitle.tr,
+                      fontSize: AppFontSize.sheetTitle,
                       fontWeight: FontWeight.w700,
                       textAlign: TextAlign.center,
                       color: color.textNatural,
@@ -114,17 +116,17 @@ class _RenameChatSheetState extends State<RenameChatSheet> {
                     const SizedBox(height: 18),
                     AppTextField(
                       controller: _title,
-                      hint: 'chat_menu_rename_hint'.tr,
+                      hint: AppStrings.chatMenuRenameHint.tr,
                       focusNode: _focus,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _save(),
                     ),
                     const SizedBox(height: 18),
                     AppButton(
-                      label: 'chat_menu_rename_save'.tr,
+                      label: AppStrings.chatMenuRenameSave.tr,
                       icon: null,
                       height: 54,
-                      fontSize: 17,
+                      fontSize: AppFontSize.markdownH3,
                       onPressed: _save,
                     ),
                   ],

@@ -1,4 +1,4 @@
-package com.example.aurenix
+package com.wrteam.aurenix
 
 import android.content.Intent
 import io.flutter.embedding.android.FlutterActivity

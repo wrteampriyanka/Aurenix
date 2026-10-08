@@ -1,19 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
 import 'package:aurenix/core/routes/app_routes.dart';
 import 'package:aurenix/core/services/session_service.dart';
-import 'package:aurenix/features/edit_profile/controllers/edit_profile_controller.dart';
-import 'package:aurenix/features/widgets/bottom_sheets/language_sheet.dart';
-
-/// A row in one of the profile menu cards.
-class ProfileMenuItem {
-  const ProfileMenuItem(this.labelKey, this.icon);
-
-  final String labelKey;
-  final IconData icon;
-}
+import 'package:aurenix/commons/widgets/bottom_sheets/language_sheet.dart';
+import 'package:aurenix/features/edit_profile/models/profile_details.dart';
+import 'package:aurenix/features/profile/models/profile_menu_item.dart';
 
 class ProfileController extends GetxController {
   // TODO: replace with the signed-in user once auth is wired up.
@@ -111,7 +106,7 @@ class ProfileController extends GetxController {
   /// Drops the saved session, so the next launch starts at sign in.
   Future<void> _logout() async {
     await SessionService.instance.signOut();
-    Get.offAllNamed(AppRoutes.login);
+    unawaited(Get.offAllNamed(AppRoutes.login));
   }
 
   void onItem(ProfileMenuItem item) {

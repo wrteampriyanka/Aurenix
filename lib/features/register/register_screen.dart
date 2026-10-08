@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-import 'package:aurenix/features/widgets/app_background.dart';
-import 'package:aurenix/features/widgets/app_button.dart';
-import 'package:aurenix/features/widgets/app_social_button.dart';
-import 'package:aurenix/features/widgets/app_terms_footer.dart';
-import 'package:aurenix/features/widgets/app_text_field.dart';
-import 'package:aurenix/features/widgets/custom_text.dart';
-import 'package:aurenix/features/widgets/or_divider.dart';
+import 'package:aurenix/commons/widgets/app_background.dart';
+import 'package:aurenix/commons/widgets/app_button.dart';
+import 'package:aurenix/commons/widgets/app_social_button.dart';
+import 'package:aurenix/commons/widgets/app_terms_footer.dart';
+import 'package:aurenix/commons/widgets/app_text_field.dart';
+import 'package:aurenix/commons/widgets/app_text.dart';
+import 'package:aurenix/commons/widgets/app_or_divider.dart';
 import 'package:aurenix/core/constants/app_assets.dart';
 import 'package:aurenix/core/theme/app_colors.dart';
 import 'package:aurenix/utils/validators.dart';
 import 'package:aurenix/features/register/controllers/register_controller.dart';
+import 'package:aurenix/core/theme/app_text_styles.dart';
+import 'package:aurenix/core/theme/app_spacing.dart';
+import 'package:aurenix/core/constants/app_strings.dart';
 
 class RegisterScreen extends GetView<RegisterController> {
   const RegisterScreen({super.key});
@@ -20,7 +23,7 @@ class RegisterScreen extends GetView<RegisterController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.color.backgroundBase,
+      backgroundColor: appColors.backgroundBase,
       body: AppBackground(
         gridOverContent: false,
         child: SafeArea(
@@ -32,34 +35,34 @@ class RegisterScreen extends GetView<RegisterController> {
                 child: IntrinsicHeight(
                   child: Column(
                     children: [
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       const Spacer(),
                       _Header(),
                       const SizedBox(height: 28),
                       _RegisterForm(controller: controller),
-                      const SizedBox(height: 24),
-                      const OrDivider(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
+                      const AppOrDivider(),
+                      const SizedBox(height: AppSpacing.xxl),
                       AppSocialButton(
-                        label: 'continue_with_google'.tr,
+                        label: AppStrings.continueWithGoogle.tr,
                         logo: AppAssets.googleLogo,
                         onPressed: controller.onGoogleSignUp,
                       ),
                       const SizedBox(height: 14),
                       AppSocialButton(
-                        label: 'continue_with_github'.tr,
+                        label: AppStrings.continueWithGithub.tr,
                         logo: AppAssets.githubLogo,
                         onPressed: controller.onGithubSignUp,
                       ),
                       const SizedBox(height: 28),
                       _SignInPrompt(controller: controller),
                       const Spacer(),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                       AppTermsFooter(
                         termsRecognizer: controller.termsRecognizer,
                         privacyRecognizer: controller.privacyRecognizer,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),
@@ -77,19 +80,19 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CustomText(
-          'register_title'.tr,
-          fontSize: 32,
+        AppText(
+          AppStrings.registerTitle.tr,
+          fontSize: AppFontSize.title,
           fontWeight: FontWeight.w700,
           textAlign: TextAlign.center,
-          color: context.color.textNatural,
+          color: appColors.textNatural,
         ),
         const SizedBox(height: 10),
-        CustomText(
-          'register_subtitle'.tr,
-          fontSize: 16,
+        AppText(
+          AppStrings.registerSubtitle.tr,
+          fontSize: AppFontSize.body,
           textAlign: TextAlign.center,
-          color: context.color.textBody,
+          color: appColors.textBody,
         ),
       ],
     );
@@ -111,49 +114,39 @@ class _RegisterForm extends StatelessWidget {
           children: [
             AppTextField(
               controller: controller.nameController,
-              hint: 'name_hint'.tr,
+              label: AppStrings.fieldNameLabel.tr,
+              hint: AppStrings.nameHint.tr,
               prefixIcon: PhosphorIconsRegular.userCircle,
               keyboardType: TextInputType.name,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.name],
               validator: Validators.required,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             AppTextField(
               controller: controller.emailController,
-              hint: 'email_hint'.tr,
+              label: AppStrings.fieldEmailLabel.tr,
+              hint: AppStrings.emailHint.tr,
               prefixIcon: PhosphorIconsRegular.envelopeSimple,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
               validator: Validators.email,
             ),
-            const SizedBox(height: 16),
-            Obx(
-              () => AppTextField(
-                controller: controller.passwordController,
-                hint: 'password_hint'.tr,
-                prefixIcon: PhosphorIconsRegular.lockSimpleOpen,
-                obscureText: controller.isPasswordHidden.value,
-                textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.newPassword],
-                validator: Validators.required,
-                onFieldSubmitted: (_) => controller.onCreateAccount(),
-                suffix: IconButton(
-                  onPressed: controller.togglePasswordVisibility,
-                  icon: Icon(
-                    controller.isPasswordHidden.value
-                        ? PhosphorIconsRegular.eyeSlash
-                        : PhosphorIconsRegular.eye,
-                    size: 22,
-                    color: context.color.textNatural,
-                  ),
-                ),
-              ),
+            const SizedBox(height: AppSpacing.lg),
+            AppTextField(
+              controller: controller.passwordController,
+              label: AppStrings.fieldPasswordLabel.tr,
+              hint: AppStrings.passwordHint.tr,
+              isPassword: true,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.newPassword],
+              validator: Validators.required,
+              onFieldSubmitted: (_) => controller.onCreateAccount(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             AppButton(
-              label: 'create_account'.tr,
+              label: AppStrings.createAccount.tr,
               height: 52,
               onPressed: controller.onCreateAccount,
             ),
@@ -171,25 +164,24 @@ class _SignInPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomText(
-      '',
-      fontSize: 14,
-      textAlign: TextAlign.center,
-      color: context.color.textBody,
-      textSpan: TextSpan(
+    return AppText.rich(
+      TextSpan(
         children: [
-          TextSpan(text: 'have_account'.tr),
+          TextSpan(text: AppStrings.haveAccount.tr),
           TextSpan(
-            text: 'sign_in'.tr,
+            text: AppStrings.signIn.tr,
             recognizer: controller.signInRecognizer,
             style: TextStyle(
-              color: context.color.textNatural,
+              color: appColors.textNatural,
               decoration: TextDecoration.underline,
-              decorationColor: context.color.textNatural,
+              decorationColor: appColors.textNatural,
             ),
           ),
         ],
       ),
+      fontSize: AppFontSize.label,
+      textAlign: TextAlign.center,
+      color: appColors.textBody,
     );
   }
 }
